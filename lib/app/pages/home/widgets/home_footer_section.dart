@@ -4,9 +4,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 
 class HomeFooterSection extends StatelessWidget {
-  const HomeFooterSection({super.key, required this.isMobile});
+  const HomeFooterSection({
+    super.key,
+    required this.isMobile,
+    this.onScrollToTop,
+    this.onScrollToServices,
+    this.onScrollToCases,
+  });
 
   final bool isMobile;
+  final VoidCallback? onScrollToTop;
+  final VoidCallback? onScrollToServices;
+  final VoidCallback? onScrollToCases;
 
   static const _iconColor = 'A0AABD';
 
@@ -27,7 +36,7 @@ class HomeFooterSection extends StatelessWidget {
             child: MaxWidthContainer(
               maxWidth: 1280,
               padding: EdgeInsets.zero,
-              child: isMobile ? _buildMobile() : _buildDesktop(),
+              child: isMobile ? _buildMobile() : _buildDesktop(context),
             ),
           ),
           // Full-width divider
@@ -59,7 +68,7 @@ class HomeFooterSection extends StatelessWidget {
     );
   }
 
-  Widget _buildDesktop() {
+  Widget _buildDesktop(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -101,7 +110,9 @@ class HomeFooterSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Logo — same mark as navbar
-        Row(
+        GestureDetector(
+          onTap: onScrollToTop,
+          child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
@@ -139,6 +150,7 @@ class HomeFooterSection extends StatelessWidget {
             ),
           ],
         ),
+        ),
         const SizedBox(height: 14),
         Text(
           'Transformamos ideias em\nsoluções digitais de alto impacto.',
@@ -154,7 +166,11 @@ class HomeFooterSection extends StatelessWidget {
   }
 
   Widget _buildLinks() {
-    const links = ['Serviços', 'Cases', 'Carreiras'];
+    final links = [
+      ('Serviços', onScrollToServices),
+      ('Cases', onScrollToCases),
+      ('Carreiras', null),
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: links
@@ -162,10 +178,10 @@ class HomeFooterSection extends StatelessWidget {
             (link) => Padding(
               padding: const EdgeInsets.only(bottom: 11),
               child: InkWell(
-                onTap: () {},
+                onTap: link.$2,
                 borderRadius: BorderRadius.circular(4),
                 child: Text(
-                  link,
+                  link.$1,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
