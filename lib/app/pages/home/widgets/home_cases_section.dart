@@ -175,6 +175,7 @@ class _CaseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      constraints: const BoxConstraints(minHeight: 340),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -230,23 +231,33 @@ class _CaseCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  data.title,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    height: 1.25,
-                    letterSpacing: -0.3,
-                    color: const Color(0xFF0B1C45),
+                SizedBox(
+                  height: 40,
+                  child: Text(
+                    data.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      height: 1.25,
+                      letterSpacing: -0.3,
+                      color: const Color(0xFF0B1C45),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  data.description,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13,
-                    height: 1.5,
-                    color: const Color(0xFF7A879F),
+                SizedBox(
+                  height: 60,
+                  child: Text(
+                    data.description,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      height: 1.5,
+                      color: const Color(0xFF7A879F),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),

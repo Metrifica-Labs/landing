@@ -119,6 +119,7 @@ class _ServiceCardState extends State<_ServiceCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(28),
+        constraints: const BoxConstraints(minHeight: 260),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -140,6 +141,7 @@ class _ServiceCardState extends State<_ServiceCard> {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               width: 52,
