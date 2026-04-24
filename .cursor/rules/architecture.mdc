@@ -1,0 +1,602 @@
+---
+description: criar novos módulos, refatorar código existente, organizar estrutura de pastas, implementar services/repositories/controllers, ou quando houver dúvida sobre onde colocar código ou como estruturar dependências entre camadas. Essas regras definem a arquitetura em camadas (Controller → Service → Repository) e organização de diretórios do projeto Flutter.
+alwaysApply: false
+---
+# Regras de Arquitetura - Station
+
+## Estrutura de Diretórios OBRIGATÓRIA
+
+```
+lib/app/
+├── core/                    # Configurações globais
+│   ├── api/                 # API gerada do Swagger (Chopper)
+│   │   ├── swagger/         # Arquivo api.json do Swagger
+│   │   └── *.swagger.dart  # Arquivos gerados automaticamente
+│   ├── config/
+│   ├── constants/
+│   ├── errors/              # AppError e ErrorMapper
+│   ├── navigation/
+│   ├── theme/
+│   └── utils/
+│
+├── shared/                  # Componentes compartilhados
+│   ├── models/              # Models compartilhados entre módulos
+│   ├── widgets/             # Widgets reutilizáveis
+│   ├── dialogs/             # Dialogs compartilhados
+│   ├── layouts/             # Layouts base
+│   ├── repositories/        # Repositories compartilhados (ex: AuthStorageRepository)
+│   ├── services/            # Services compartilhados (APENAS orquestração, sem API direta)
+│   └── providers/           # Providers compartilhados (ex: authStateProvider)
+│
+└── pages/                   # Módulos por funcionalidade
+    └── {module}/
+        ├── models/
+        ├── services/
+        ├── repositories/
+        ├── components/
+        ├── controllers/
+        ├── layouts/         # Layouts responsivos (mobile/web)
+        │   ├── web/        # Layouts para desktop/web
+        │   └── mobile/    # Layouts para mobile
+        ├── providers/       # Providers específicos do módulo
+        └── {module}_page.dart  # Página principal que usa ResponsiveLayout
+```
+
+**REGRA**: Cada módulo DEVE conter apenas: models, services, repositories, components, controllers, layouts, providers. Nada mais.
+
+**REGRA API**: Arquivos em `core/api/` são gerados automaticamente pelo `swagger_dart_code_generator`. NUNCA editar manualmente. Para atualizar, modifique `api.json` e execute `fvm flutter pub run build_runner build --delete-conflicting-outputs`.
+
+## Fluxo de Dependências OBRIGATÓRIO
+
+```
+Controller → Service → Repository → API/Storage
+```
+
+**REGRAS**:
+- Controller NUNCA chama Repository diretamente
+- Service NUNCA chama API diretamente
+- Repository NUNCA contém lógica de negócio
+- Módulos podem usar `shared/` e `core/` apenas
+
+## Responsabilidades por Camada
+
+### Controller
+**DEVE fazer:**
+- Validar entrada do usuário (campos vazios, formatos)
+- Gerenciar estado da UI (loading, errors, dados)
+- Chamar services e processar resultados com `fold`
+- Usar `error.displayMessage` para exibir erros
+
+**NUNCA faz:**
+- Lógica de negócio
+- Chamadas diretas de API
+- Validações de regras de negócio
+- Persistência de dados
+
+### Service
+**DEVE fazer:**
+- Implementar lógica de negócio
+- Orquestrar múltiplos repositories quando necessário
+- Usar `ErrorMapper.fromException()` para transformar exceções em `AppError`
+- Retornar `AsyncResult<T>` do pacote `result_dart` (o erro será mapeado para `AppError` internamente)
+- Validar regras de negócio (ex: usuário já existe)
+
+**NUNCA faz:**
+- Validação de formulários (campos vazios)
+- Chamadas diretas de API
+- Gerenciar estado da UI
+- Persistência direta
+
+### Repository
+**DEVE fazer:**
+- Fazer chamadas de API usando classes geradas de `core/api/`
+- Persistir dados localmente (cache, SharedPreferences)
+- Retornar DTOs gerados diretamente quando representam entidades do domínio
+- Usar mappers/extensions APENAS quando necessário transformar ou adicionar lógica
+- Retornar `AsyncResult<T>` do pacote `result_dart` onde T pode ser um DTO gerado ou Model de Domínio
+- Tratar erros de rede e converter em exceções (Exception)
+- Gerenciar cache e sincronização de dados
+
+**NUNCA faz:**
+- Lógica de negócio
+- Validações de regras de domínio
+- Transformar exceções em `AppError` (service faz)
+- Gerenciar estado da UI
+- Criar models duplicados quando já existe DTO equivalente gerado
+
+## Padrões OBRIGATÓRIOS
+
+### Result Pattern
+- Services DEVEM retornar `AsyncResult<T>` do pacote `result_dart` (aceita apenas 1 parâmetro de tipo)
+- Repositories DEVEM retornar `AsyncResult<T>` do pacote `result_dart` (aceita apenas 1 parâmetro de tipo)
+- Controllers DEVEM usar `result.fold()` para processar resultados
+- NUNCA usar try/catch em services (usar fold do repository)
+- Usar pacote `result_dart` para operações assíncronas
+- `AsyncResult<T>` é fornecido pelo pacote `result_dart` e aceita apenas 1 parâmetro de tipo
+- O tipo de erro é tratado internamente pelo `Result`, e services DEVEM mapear exceções para `AppError` usando `ErrorMapper`
+- Permite estado otimista e tratamento explícito de sucesso/falha
+
+### Tratamento de Erros
+- TODOS os erros DEVEM estender `AppError` (sealed class)
+- Erros DEVEM estar em `core/errors/`
+- Services DEVEM usar `ErrorMapper.fromException()` para mapear exceções
+- Erros DEVEM ter `displayMessage` para exibição na UI
+- NUNCA criar exceções genéricas sem código e mensagem
+
+### ErrorMapper
+- DEVE estar em `core/errors/error_mapper.dart`
+- DEVE ser uma classe estática com método `fromException()`
+- DEVE usar switch expression para mapear exceções
+- NUNCA duplicar lógica de mapeamento em services
+
+## Convenções de Nomenclatura
+
+- Models: `AuthUser`, `Station` (PascalCase, sem sufixo)
+- State Classes: `LoginState`, `RegisterState` (PascalCase + State) - DEVEM estar em `pages/{module}/models/`
+- Services: `AuthService`, `StationService` (PascalCase + Service)
+- Repositories: `AuthRepository`, `StationRepository` (PascalCase + Repository)
+- Controllers: `AuthController`, `StationController` (PascalCase + Controller)
+- Providers: `authServiceProvider`, `authControllerProvider` (camelCase + Provider)
+- Errors: `AppError`, `AuthError`, `NetworkError` (PascalCase + Error, sealed classes)
+
+## Imports
+
+- Barrel exports (`auth.dart`) para importar de módulos
+- Imports relativos dentro do mesmo módulo
+- Imports absolutos para `shared/` e `core/` (ex: `package:app/core/errors/errors.dart`)
+
+## Gerenciamento de Estado
+
+- **SEMPRE usar Riverpod** para gerenciamento de estado
+- **NUNCA usar ChangeNotifier** diretamente
+- Controllers DEVEM estender `StateNotifier<State>` do Riverpod
+- **Controllers de páginas DEVEM usar `StateNotifierProvider` SEM `autoDispose`** e com `ref.keepAlive()` para garantir que o controller não seja descartado enquanto a página estiver ativa
+- **NUNCA usar `StateNotifierProvider.autoDispose` para controllers de páginas** - isso causa descarte prematuro do controller enquanto a página ainda está visível
+- State classes DEVEM estar em `pages/{module}/models/{module}_state.dart`
+- Exemplo:
+  ```dart
+  // ✅ CORRETO - Controller de página:
+  class LoginController extends StateNotifier<LoginState> {
+    LoginController(this._loginService) : super(const LoginState());
+    // ...
+  }
+  
+  final loginControllerProvider = 
+    StateNotifierProvider<LoginController, LoginState>((ref) {
+    ref.keepAlive(); // OBRIGATÓRIO: Manter provider vivo enquanto página estiver ativa
+    return LoginController(loginService);
+  });
+  
+  // ❌ ERRADO - autoDispose descarta controller prematuramente:
+  final loginControllerProvider = 
+    StateNotifierProvider.autoDispose<LoginController, LoginState>((ref) {
+    return LoginController(loginService); // ❌ Pode ser descartado enquanto página está ativa
+  });
+  
+  // ❌ ERRADO:
+  class LoginController extends ChangeNotifier {
+    // ...
+  }
+  ```
+  
+**REGRAS CRÍTICAS para ciclo de vida de controllers:**
+- Controllers de páginas NUNCA devem ser descartados enquanto a página estiver visível
+- Usar `ref.keepAlive()` garante que o provider permaneça vivo enquanto houver referências
+- TextEditingControllers DEVEM ser gerenciados no widget (não no StateNotifier) para evitar problemas de ciclo de vida
+- NUNCA usar flag `_isDisposed` como solução - o problema é o `autoDispose` no provider
+
+### Callbacks com Providers do Riverpod (CRÍTICO)
+
+**PROBLEMA**: Callbacks que capturam referências de providers podem usar instâncias descartadas se o provider for recriado.
+
+**REGRAS OBRIGATÓRIAS**:
+- **NUNCA passar métodos de providers diretamente como callbacks** (ex: `controller.setKeepConnected`)
+- **SEMPRE criar funções que buscam a referência atual do provider no momento da execução**
+- Callbacks que dependem de providers DEVEM usar `ref.read()` ou `ref.watch()` dentro da função
+- Verificar `mounted` antes de usar `ref` em callbacks de widgets
+
+**Exemplos**:
+```dart
+// ❌ ERRADO - Captura referência antiga:
+class _LoginPageState extends ConsumerState<LoginPage> {
+  @override
+  Widget build(BuildContext context) {
+    final controller = ref.read(loginControllerProvider.notifier);
+    
+    return LoginWebLayout(
+      onKeepConnectedChanged: controller.setKeepConnected, // ❌ Referência pode ficar obsoleta
+    );
+  }
+}
+
+// ✅ CORRETO - Busca referência atual:
+class _LoginPageState extends ConsumerState<LoginPage> {
+  @override
+  Widget build(BuildContext context) {
+    final controller = ref.read(loginControllerProvider.notifier);
+    
+    // Função que sempre busca a referência atual
+    void handleKeepConnectedChanged(bool value) {
+      if (!mounted) return; // Verificar se widget ainda está montado
+      final currentController = ref.read(loginControllerProvider.notifier);
+      currentController.setKeepConnected(value);
+    }
+    
+    return LoginWebLayout(
+      onKeepConnectedChanged: handleKeepConnectedChanged, // ✅ Sempre usa referência atual
+    );
+  }
+}
+
+// ✅ CORRETO - Alternativa usando closure com ref:
+class _LoginPageState extends ConsumerState<LoginPage> {
+  @override
+  Widget build(BuildContext context) {
+    return LoginWebLayout(
+      onKeepConnectedChanged: (bool value) {
+        if (!mounted) return;
+        ref.read(loginControllerProvider.notifier).setKeepConnected(value);
+      },
+    );
+  }
+}
+```
+
+**Por que isso é crítico**:
+- Se o provider for recriado (mesmo com `keepAlive`), callbacks estáticos continuam apontando para a instância antiga
+- Isso causa erros como "TextEditingController was used after being disposed"
+- O problema só aparece em runtime, não é detectado em compile-time
+
+### ref.read() vs ref.watch() em Providers (CRÍTICO)
+
+**PROBLEMA**: Usar `ref.watch()` em providers de repositories, services e controllers causa recriação em cadeia quando qualquer dependência muda, resultando em dispose prematuro.
+
+**REGRA ABSOLUTA - NUNCA usar ref.watch() em providers de:**
+- Repositories (que dependem de kApi)
+- Services (que dependem de repositories)
+- Controllers (que dependem de services)
+
+**SEMPRE usar ref.read() para obter dependências em providers:**
+
+```dart
+// ❌ ERRADO - Cadeia de recriação quando authState muda:
+final kApi = Provider<Api>((ref) {
+  ref.watch(authStateProvider); // ❌ Causa recriação de TODOS os providers
+  // ...
+});
+
+final repositoryProvider = Provider<Repository>((ref) {
+  final api = ref.watch(kApi); // ❌ Recriado quando kApi é recriado
+  return Repository(api);
+});
+
+final serviceProvider = Provider<Service>((ref) {
+  final repo = ref.watch(repositoryProvider); // ❌ Recriado quando repo é recriado
+  return Service(repo);
+});
+
+final controllerProvider = StateNotifierProvider<Controller, State>((ref) {
+  final service = ref.watch(serviceProvider); // ❌ Controller antigo é descartado!
+  return Controller(service);
+});
+
+// ✅ CORRETO - Sem recriação em cadeia:
+final kApi = Provider<Api>((ref) {
+  // Token obtido dinamicamente via callback, não via watch
+  final notifier = ref.read(authStateProvider.notifier);
+  return Api.create(
+    httpClient: AuthenticatedHttpClient(
+      http.Client(),
+      () => ref.read(authStateProvider).token, // Token dinâmico
+    ),
+    // ...
+  );
+});
+
+final repositoryProvider = Provider<Repository>((ref) {
+  final api = ref.read(kApi); // ✅ Não causa recriação
+  return Repository(api);
+});
+
+final serviceProvider = Provider<Service>((ref) {
+  final repo = ref.read(repositoryProvider); // ✅ Não causa recriação
+  return Service(repo);
+});
+
+final controllerProvider = StateNotifierProvider<Controller, State>((ref) {
+  ref.keepAlive(); // ✅ Mantém vivo
+  final service = ref.read(serviceProvider); // ✅ Não causa recriação
+  return Controller(service);
+});
+```
+
+**Por que isso é crítico**:
+- `ref.watch()` cria dependência reativa: quando o provider "watchado" muda, o provider atual é recriado
+- A cadeia `kApi → repository → service → controller` causa dispose de todos os controllers quando authState muda
+- O controller antigo é descartado mas callbacks/timers podem ainda referenciá-lo → "Tried to use after dispose"
+- `ref.keepAlive()` NÃO impede recriação quando dependências mudam, apenas mantém o provider vivo quando não há listeners
+
+**Quando usar ref.watch():**
+- Em WIDGETS (não em providers) para reagir a mudanças de estado
+- Quando você QUER que o provider seja recriado (casos raros)
+
+**Padrão recomendado para todos os callbacks**:
+1. Criar função local no `build()` que busca a referência atual
+2. Verificar `mounted` antes de usar `ref`
+3. Usar `ref.read()` ou `ref.watch()` dentro da função, não no `build()`
+
+## Injeção de Dependências
+
+- Usar **Riverpod** para DI
+- Providers compartilhados (usados por múltiplos módulos) em `shared/providers/` ou `core/providers/`
+- Providers específicos de um módulo DEVEM estar em `pages/{module}/providers/`
+- Dependências DEVEM ser injetadas via construtor
+
+## Validações
+
+- Validação de formulários (campos vazios, formatos) → Controller
+- Validação de regras de negócio (ex: usuário existe) → Service
+- Validação de estrutura de dados → Model
+
+## API Gerada (Swagger/Chopper)
+
+- API gerada automaticamente em `core/api/` a partir de `swagger/api.json`
+- Usar `swagger_dart_code_generator` para gerar código
+- Arquivos gerados: `api.swagger.dart`, `api.swagger.chopper.dart`, `api.swagger.g.dart`
+- Repositories DEVEM usar a classe `Api` gerada para chamadas HTTP
+- NUNCA editar arquivos gerados manualmente
+- Para atualizar API: modificar `api.json` e executar build_runner
+
+## API Client e Autenticação
+
+- O API client (`Api`) DEVE ser criado via Provider do Riverpod em `core/api/api_provider.dart`
+- Para autenticação automática (Bearer token), usar um `AuthenticatedHttpClient` que obtém o token via callback/Provider
+- NUNCA usar Singleton para obter token de autenticação
+- O token DEVE ser obtido de um Provider de estado de autenticação (`authStateProvider`)
+- O estado de autenticação (`AuthState`) DEVE estar em `shared/providers/auth_state_provider.dart`
+- `AuthState` DEVE conter: user, session, token, isLoggedIn
+- Exemplo:
+  ```dart
+  // ✅ CORRETO - api_provider.dart:
+  final apiProvider = Provider<Api>((ref) {
+    final authState = ref.watch(authStateProvider);
+    return Api.create(
+      baseUrl: Uri.parse('https://api.example.com'),
+      httpClient: AuthenticatedHttpClient(
+        http.Client(),
+        () => authState.token,
+      ),
+    );
+  });
+  
+  // ✅ CORRETO - AuthenticatedHttpClient:
+  class AuthenticatedHttpClient extends http.BaseClient {
+    final http.Client _inner;
+    final String? Function() _getToken;
+    
+    AuthenticatedHttpClient(this._inner, this._getToken);
+    
+    @override
+    Future<http.StreamedResponse> send(http.BaseRequest request) {
+      final token = _getToken();
+      if (token != null && token.isNotEmpty) {
+        request.headers['Authorization'] = 'Bearer $token';
+      }
+      return _inner.send(request);
+    }
+  }
+  
+  // ❌ ERRADO - Usar Singleton:
+  final kApi = Api.create(
+    httpClient: AuthenticatedHttpClient(AuthService()),  // Singleton!
+  );
+  ```
+
+## DTOs vs Models de Domínio
+
+- DTOs (Data Transfer Objects) são gerados automaticamente em `core/api/api.swagger.dart`
+- DTOs DEVEM ser usados diretamente quando representam entidades do domínio (ex: `UserDTO`, `StationDTO`)
+- NUNCA criar models de domínio duplicados quando já existe um DTO equivalente gerado pelo Chopper
+- Models de Domínio DEVEM ser criados APENAS quando há necessidade de lógica de negócio adicional ou campos calculados
+- Models de Domínio DEVEM estar em `shared/models/` ou `pages/{module}/models/` quando necessário
+- DTOs gerados podem ser usados diretamente em services, controllers e UI quando representam entidades do domínio
+- NUNCA duplicar estruturas: se `UserDTO` já existe, não criar `User` model separado
+- Usar mappers/extensions APENAS quando necessário transformar ou adicionar lógica aos DTOs
+
+## Layouts Responsivos (Mobile/Web)
+
+- **SEMPRE usar ResponsiveLayout** para páginas que precisam de layouts diferentes para mobile e web
+- Layouts DEVEM estar em `pages/{module}/layouts/web/` e `pages/{module}/layouts/mobile/`
+- A página principal (`{module}_page.dart`) DEVE usar `ResponsiveLayout` para escolher entre mobile e desktop
+- Layouts DEVEM receber controllers e callbacks como parâmetros, não gerenciar estado próprio
+- Layouts web DEVEM usar `AuthCardContainer` e `AuthDecorativeBackground` quando aplicável
+- Layouts mobile podem ser placeholders simples quando não implementados
+- Exemplo:
+  ```dart
+  // ✅ CORRETO - {module}_page.dart:
+  class LoginPage extends ConsumerStatefulWidget {
+    const LoginPage({super.key});
+    
+    @override
+    ConsumerState<LoginPage> createState() => _LoginPageState();
+  }
+  
+  class _LoginPageState extends ConsumerState<LoginPage> {
+    @override
+    Widget build(BuildContext context) {
+      final state = ref.watch(loginControllerProvider);
+      final controller = ref.read(loginControllerProvider.notifier);
+      
+      return ResponsiveLayout(
+        mobile: LoginMobileLayout(
+          formKey: controller.formKey,
+          emailController: controller.emailController,
+          // ... outros parâmetros
+        ),
+        desktop: LoginWebLayout(
+          formKey: controller.formKey,
+          emailController: controller.emailController,
+          // ... outros parâmetros
+        ),
+      );
+    }
+  }
+  
+  // ✅ CORRETO - layouts/web/login_web_layout.dart:
+  class LoginWebLayout extends StatefulWidget {
+    final GlobalKey<FormState> formKey;
+    final TextEditingController emailController;
+    // ... outros parâmetros necessários
+    
+    const LoginWebLayout({
+      super.key,
+      required this.formKey,
+      required this.emailController,
+      // ...
+    });
+    
+    @override
+    State<LoginWebLayout> createState() => _LoginWebLayoutState();
+  }
+  
+  // ✅ CORRETO - layouts/mobile/login_mobile_layout.dart:
+  class LoginMobileLayout extends StatelessWidget {
+    final GlobalKey<FormState> formKey;
+    final TextEditingController emailController;
+    // ... outros parâmetros necessários
+    
+    const LoginMobileLayout({
+      super.key,
+      required this.formKey,
+      required this.emailController,
+      // ...
+    });
+    
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        // ... implementação mobile
+      );
+    }
+  }
+  
+  // ❌ ERRADO - Gerenciar estado no layout:
+  class LoginWebLayout extends StatefulWidget {
+    @override
+    State<LoginWebLayout> createState() => _LoginWebLayoutState();
+  }
+  
+  class _LoginWebLayoutState extends State<LoginWebLayout> {
+    final _controller = LoginController(); // ❌ NUNCA criar controllers no layout
+    
+    @override
+    Widget build(BuildContext context) {
+      // ...
+    }
+  }
+  ```
+
+**REGRAS**:
+- Layouts DEVEM ser widgets puros que recebem dados via parâmetros
+- Layouts NUNCA devem criar ou gerenciar controllers próprios
+- Layouts NUNCA devem fazer chamadas de API ou services diretamente
+- Layouts DEVEM usar widgets compartilhados de `shared/widgets/`
+- ResponsiveLayout está em `core/utils/responsive_layout.dart`
+- Platform utils (isMobileSize, isTabletSize) estão em `core/utils/platform_utils.dart`
+
+## Navegação
+
+- **SEMPRE usar GoRouter** para navegação (`go_router` package)
+- **NUNCA usar Navigator** diretamente (usar `context.go()`, `context.push()`, `context.pop()`)
+- Rotas DEVEM estar definidas em `core/navigation/router_provider.dart`
+- Usar `PageTransitions` de `core/navigation/page_transitions.dart` para transições
+- Rotas DEVEM usar `Kpages` enum de `core/constants/constrants.dart` para paths
+- **TODAS as rotas do sistema DEVEM ter o prefixo `/s/`** para evitar conflitos com rotas dinâmicas (ex: `/usuario`, `/estacao`)
+- Rotas do sistema seguem o padrão: `/s/{nome-da-rota}` (ex: `/s/login`, `/s/register`, `/s/home`)
+- **SEMPRE usar `Kpages.{page}.route`** ao invés de strings hardcoded para navegação
+- Exemplo de navegação:
+  ```dart
+  // ✅ CORRETO:
+  context.go(Kpages.home.route);        // Vai para /s/home
+  context.push(Kpages.register.route);  // Vai para /s/register
+  context.go(Kpages.login.route);       // Vai para /s/login
+  context.pop();
+  
+  // ❌ ERRADO - Strings hardcoded:
+  context.go('/home');
+  context.push('/register');
+  context.go('/login');
+  
+  // ❌ ERRADO - Usar Navigator:
+  Navigator.pushNamed(context, '/home');
+  Navigator.push(context, MaterialPageRoute(...));
+  ```
+
+**REGRAS de Rotas**:
+- Todas as rotas do sistema DEVEM começar com `/s/`
+- Rotas públicas (login, register, etc.) também DEVEM usar `/s/`
+- Rotas dinâmicas (ex: `/usuario`, `/estacao`) ficam na raiz e NÃO usam `/s/`
+- O prefixo `/s/` é adicionado automaticamente pela extension `KpagesExtension.route`
+- NUNCA criar rotas hardcoded sem usar o enum `Kpages`
+
+## Organização de Arquivos
+
+- **State Classes DEVEM estar em `pages/{module}/models/`**
+- NUNCA colocar State classes dentro de arquivos de Controller
+- Cada State class deve ter seu próprio arquivo: `{module}_state.dart`
+- Controllers DEVEM importar State classes de `models/`
+- Exemplo:
+  ```
+  pages/login/
+    ├── models/
+    │   └── login_state.dart  ✅
+    └── controllers/
+        └── login_controller.dart  (importa de models/)
+  ```
+
+## Proibições
+
+### Padrão Singleton (PROIBIDO)
+- NUNCA usar padrão Singleton para estado ou serviços
+- NUNCA criar instâncias globais com `static final _instance` ou `factory` que retorna instância única
+- NUNCA usar variáveis globais (`final kApi = ...`) para instâncias com estado mutável
+- SEMPRE usar Riverpod Providers em vez de Singletons
+- Exemplo do que NÃO fazer:
+  ```dart
+  // ❌ ERRADO - Singleton:
+  class AuthService {
+    static final AuthService _instance = AuthService._internal();
+    factory AuthService() => _instance;
+    AuthService._internal();
+  }
+  
+  // ❌ ERRADO - Variável global:
+  final kApi = Api.create(...);
+  
+  // ✅ CORRETO - Provider:
+  final authServiceProvider = Provider<AuthService>((ref) {
+    return AuthService(ref.watch(authRepositoryProvider));
+  });
+  
+  final apiProvider = Provider<Api>((ref) => Api.create(...));
+  ```
+
+### Outras Proibições
+- NUNCA criar `pages/` dentro de módulos (usar `components/`)
+- NUNCA criar `widgets/` dentro de módulos (usar `components/`)
+- NUNCA usar Navigator diretamente (usar GoRouter)
+- NUNCA usar ChangeNotifier diretamente (usar StateNotifier do Riverpod)
+- NUNCA colocar State classes dentro de arquivos de Controller
+- NUNCA usar `setState` em StatefulWidgets quando há Controller com StateNotifier
+- Providers específicos de um módulo DEVEM estar em `pages/{module}/providers/`
+- Providers compartilhados DEVEM estar em `shared/providers/` ou `core/providers/`
+- NUNCA fazer chamadas de API fora de repositories
+- NUNCA fazer lógica de negócio fora de services
+- NUNCA gerenciar estado global fora de controllers/providers
+- NUNCA criar exceções sem código e mensagem estruturada
+- NUNCA editar arquivos gerados em `core/api/*.swagger*.dart`
+- NUNCA criar models de domínio duplicados quando já existe DTO equivalente gerado pelo Chopper
+- NUNCA duplicar estruturas de dados: usar DTOs gerados diretamente quando representam entidades do domínio
+- NUNCA criar ou gerenciar controllers dentro de layouts (receber via parâmetros)
+- NUNCA fazer chamadas de API ou services diretamente em layouts
+- Layouts DEVEM ser widgets puros que recebem dados e callbacks via parâmetros

@@ -9,6 +9,8 @@ build/
 
 # FVM
 .fvm/flutter_sdk
+.fvm/version
+.fvm/versions/
 
 # IDE
 .idea/
@@ -22,3 +24,4 @@ Thumbs.db
 
 # Generated
 lib/gen/
+.flutter-plugins-dependencies

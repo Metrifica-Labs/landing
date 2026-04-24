@@ -1,0 +1,196 @@
+---
+description: instruções sobre uso de widgets compartilhados para evitar repetição de código e manter consistência visual
+alwaysApply: false
+---
+# Regras de Uso de Widgets Compartilhados
+
+## Princípio Fundamental
+
+**SEMPRE use os widgets compartilhados em `lib/app/shared/widgets/` sempre que possível para evitar repetição de código e manter consistência visual e funcional em toda a aplicação.**
+
+## Widgets Disponíveis
+
+Todos os widgets compartilhados estão disponíveis em `lib/app/shared/widgets/widgets.dart` e podem ser importados via:
+
+```dart
+import 'package:station/app/shared/widgets/widgets.dart';
+```
+
+### Widgets Principais
+
+- **AppText**: Widget de texto padronizado com variantes (displayLarge, headlineLarge, bodyMedium, etc.)
+- **PrimaryButton**: Botão primário padronizado com estados de loading
+- **LinkTextButton**: Botão de texto/link padronizado
+- **FormInputField**: Campo de formulário padronizado com validação
+- **CustomCheckbox**: Checkbox customizado com label
+- **AppDropDownWidget**: Dropdown customizado com overlay
+- **ImageUploadWidget**: Widget para upload de imagens
+- **StationLogo**: Logo da aplicação
+- **WaveformWidget**: Visualizador de waveform de áudio
+
+## Regras Obrigatórias
+
+### 1. Uso de AppText
+
+**SEMPRE use `AppText` ao invés de `Text` do Flutter:**
+
+```dart
+// ❌ NÃO FAÇA:
+Text(
+  'Título',
+  style: TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    color: AppColors.primaryTextDark,
+  ),
+)
+
+// ✅ FAÇA:
+AppText.headlineMedium(
+  'Título',
+  color: AppColors.primaryTextDark,
+)
+```
+
+**Variantes disponíveis:**
+- `AppText.displayLarge()`, `AppText.displayMedium()`, `AppText.displaySmall()`
+- `AppText.headlineLarge()`, `AppText.headlineMedium()`, `AppText.headlineSmall()`
+- `AppText.titleLarge()`, `AppText.titleMedium()`, `AppText.titleSmall()`
+- `AppText.bodyLarge()`, `AppText.bodyMedium()`, `AppText.bodySmall()`
+- `AppText.labelLarge()`, `AppText.labelMedium()`, `AppText.labelSmall()`
+
+### 2. Uso de Botões
+
+**SEMPRE use `PrimaryButton` ou `LinkTextButton` ao invés de criar botões customizados:**
+
+```dart
+// ❌ NÃO FAÇA:
+ElevatedButton(
+  onPressed: () {},
+  child: Text('Salvar'),
+)
+
+// ✅ FAÇA:
+PrimaryButton(
+  text: 'Salvar',
+  onPressed: () {},
+)
+```
+
+### 3. Uso de Campos de Formulário
+
+**SEMPRE use `FormInputField` para campos de formulário:**
+
+```dart
+// ❌ NÃO FAÇA:
+TextFormField(
+  decoration: InputDecoration(
+    labelText: 'Email',
+    hintText: 'Digite seu email',
+    // ... muitas linhas de estilo
+  ),
+)
+
+// ✅ FAÇA:
+FormInputField(
+  controller: emailController,
+  label: 'Email',
+  hintText: 'Digite seu email',
+  keyboardType: TextInputType.emailAddress,
+)
+```
+
+### 4. Uso de Checkbox
+
+**SEMPRE use `CustomCheckbox` ao invés de `Checkbox` padrão:**
+
+```dart
+// ❌ NÃO FAÇA:
+Row(
+  children: [
+    Checkbox(value: value, onChanged: onChanged),
+    Text('Aceito os termos'),
+  ],
+)
+
+// ✅ FAÇA:
+CustomCheckbox(
+  value: value,
+  onChanged: onChanged,
+  label: 'Aceito os termos',
+)
+```
+
+### 5. Uso de Dropdown
+
+**SEMPRE use `AppDropDownWidget` ao invés de criar dropdowns customizados:**
+
+```dart
+// ❌ NÃO FAÇA:
+DropdownButton<String>(
+  items: items.map((item) => DropdownMenuItem(...)).toList(),
+  // ... configuração complexa
+)
+
+// ✅ FAÇA:
+AppDropDownWidget<String>(
+  list: items,
+  selectedItem: selectedItem,
+  onTap: (item) => setState(() => selectedItem = item),
+  valueConverter: (item) => item.toString(),
+)
+```
+
+## Quando Criar Novos Widgets
+
+**Crie novos widgets compartilhados APENAS quando:**
+
+1. O widget será usado em **múltiplos módulos/páginas** (3+ lugares diferentes)
+2. O widget encapsula **lógica complexa** que seria repetida
+3. O widget representa um **padrão visual/funcional** recorrente
+
+**NÃO crie widgets compartilhados para:**
+- Widgets usados apenas em uma página/módulo (use `components/` dentro do módulo)
+- Widgets muito simples que não agregam valor (ex: Container com padding fixo)
+- Widgets específicos de um contexto único
+
+## Estrutura de Widgets Compartilhados
+
+Todos os widgets compartilhados DEVEM estar em `lib/app/shared/widgets/` e DEVEM ser exportados em `widgets.dart`:
+
+```dart
+// widgets.dart
+export 'app_text.dart';
+export 'primary_button.dart';
+export 'form_input_field.dart';
+// ... outros widgets
+```
+
+## Imports
+
+**SEMPRE importe widgets compartilhados usando o barrel export:**
+
+```dart
+// ✅ FAÇA:
+import 'package:station/app/shared/widgets/widgets.dart';
+
+// ❌ NÃO FAÇA (a menos que precise de algo específico):
+import 'package:station/app/shared/widgets/app_text.dart';
+import 'package:station/app/shared/widgets/primary_button.dart';
+```
+
+## Manutenção
+
+- **NUNCA modifique widgets compartilhados** sem verificar impacto em todas as páginas que os usam
+- **SEMPRE teste widgets compartilhados** em múltiplos contextos antes de fazer mudanças
+- **SEMPRE documente** novos parâmetros ou mudanças significativas em widgets compartilhados
+- **SEMPRE mantenha compatibilidade** com versões anteriores quando possível
+
+## Exceções
+
+Você PODE criar widgets locais (em `components/`) quando:
+- O widget é específico de um módulo e não será reutilizado
+- O widget precisa de dependências específicas do módulo
+- O widget é uma variação muito específica que não faz sentido compartilhar
+
+Mas **SEMPRE questione** se não seria melhor adaptar um widget compartilhado existente ou criar um novo compartilhado.

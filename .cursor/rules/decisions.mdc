@@ -1,0 +1,103 @@
+---
+alwaysApply: true
+---
+
+# Regras de Decisão e Pensamento Crítico
+
+## Princípios Fundamentais
+
+### 1. Pensamento Crítico OBRIGATÓRIO
+- **SEMPRE questione** solicitações que possam violar a arquitetura definida em `architecture.mdc`
+- **SEMPRE questione** solicitações que possam introduzir overengineering
+- **SEMPRE questione** solicitações que possam quebrar padrões estabelecidos
+- **NUNCA aceite** implementações que violem o fluxo Controller → Service → Repository
+- **NUNCA aceite** criação de models duplicados quando DTOs já existem
+- **NUNCA aceite** chamadas de API fora de repositories
+- **NUNCA aceite** lógica de negócio fora de services
+
+### 2. Respeito à Arquitetura (NÃO NEGOCIÁVEL)
+- As regras em `architecture.mdc` são **ABSOLUTAS** e **NÃO PODEM** ser violadas
+- Se uma solicitação viola a arquitetura, você DEVE:
+  1. **Alertar** o usuário sobre a violação
+  2. **Sugerir** uma alternativa que respeite a arquitetura
+  3. **Explicar** por que a arquitetura deve ser respeitada
+  4. **NÃO implementar** a violação mesmo se o usuário insistir
+
+### 3. Prevenção de Overengineering
+- **NUNCA crie** abstrações desnecessárias
+- **NUNCA adicione** camadas extras sem necessidade real
+- **NUNCA implemente** padrões complexos para problemas simples
+- **SEMPRE prefira** soluções simples e diretas
+- **SEMPRE questione** se uma nova classe/service/repository é realmente necessária
+- **SEMPRE questione** se um padrão complexo é necessário ou se `setState` simples resolve
+
+### 4. Boas Práticas Obrigatórias
+- **SEMPRE use** `const` para widgets imutáveis
+- **SEMPRE use** `Result<T, E>` pattern para operações assíncronas
+- **SEMPRE use** `ErrorMapper.fromException()` para mapear exceções
+- **SEMPRE valide** entrada do usuário no Controller
+- **SEMPRE implemente** tratamento de erros com `displayMessage`
+- **NUNCA use** try/catch em services (usar fold do repository)
+- **NUNCA crie** exceções genéricas sem código e mensagem
+
+### 5. Questionamento Estruturado
+Quando receber uma solicitação, você DEVE verificar:
+
+#### Checklist de Validação:
+- [ ] A solicitação respeita a arquitetura em camadas?
+- [ ] A solicitação evita overengineering?
+- [ ] A solicitação segue os padrões estabelecidos?
+- [ ] A solicitação não duplica código existente?
+- [ ] A solicitação não viola o fluxo de dependências?
+- [ ] A solução é a mais simples possível?
+
+#### Se alguma resposta for "NÃO":
+1. **PARE** a implementação
+2. **EXPLIQUE** o problema encontrado
+3. **SUGIRA** uma alternativa que respeite as regras
+4. **AGUARDE** confirmação do usuário antes de prosseguir
+
+### 6. Exceções e Flexibilidade
+- Você PODE questionar, mas NÃO deve ser excessivamente restritivo
+- Se o usuário explicar o contexto e justificar uma exceção, você PODE aceitar
+- Mas SEMPRE documente a exceção e o motivo
+- Exceções devem ser **raras** e **justificadas**
+
+### 7. Comunicação com o Usuário
+- **SEMPRE seja** educado e construtivo ao questionar
+- **SEMPRE explique** o "porquê" das suas preocupações
+- **SEMPRE ofereça** alternativas viáveis
+- **NUNCA seja** condescendente ou arrogante
+- **NUNCA bloqueie** sem oferecer solução
+
+### 8. Exemplos de Situações que DEVEM ser Questionadas
+
+#### ❌ NÃO ACEITE:
+- "Crie um model User quando UserDTO já existe"
+- "Faça a chamada de API diretamente no Controller"
+- "Adicione lógica de negócio no Repository"
+- "Crie um Service para uma operação simples que pode ser feita no Controller"
+- "Use um padrão complexo (ex: BLoC) quando setState resolve"
+- "Crie múltiplas camadas de abstração para um caso simples"
+
+#### ✅ ACEITE (mas valide):
+- "Crie um Service para orquestrar múltiplos repositories"
+- "Adicione validação de formulário no Controller"
+- "Use um DTO gerado diretamente quando representa a entidade"
+- "Crie um model de domínio apenas quando há lógica de negócio adicional"
+
+### 9. Priorização
+Quando houver conflito entre:
+1. **Arquitetura** > Tudo (não negociável)
+2. **Simplicidade** > Complexidade (evitar overengineering)
+3. **Padrões estabelecidos** > Novos padrões (consistência)
+4. **Boas práticas** > Conveniência (qualidade de código)
+
+### 10. Auto-avaliação
+Antes de implementar qualquer código, pergunte a si mesmo:
+- "Esta implementação é a mais simples possível?"
+- "Esta implementação respeita a arquitetura?"
+- "Esta implementação segue os padrões do projeto?"
+- "Esta implementação não introduz complexidade desnecessária?"
+
+Se qualquer resposta for negativa, **PARE** e **QUESTIONE**.
