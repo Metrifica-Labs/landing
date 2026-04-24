@@ -521,7 +521,7 @@ class _HeroBackground extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFFF8FBFF), Color(0xFFF6F9FF)],
+          colors: [Colors.white, Colors.white],
         ),
       ),
       child: Align(

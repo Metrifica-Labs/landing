@@ -12,7 +12,7 @@ class HomeCtaSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFF7FAFF),
+      color: Colors.white,
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 22 : 32,
         vertical: isMobile ? 32 : 48,
