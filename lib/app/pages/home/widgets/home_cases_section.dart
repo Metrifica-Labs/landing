@@ -167,14 +167,32 @@ class _AllCasesLink extends StatelessWidget {
   }
 }
 
-class _CaseCard extends StatelessWidget {
+class _CaseCard extends StatefulWidget {
   const _CaseCard({required this.data});
 
   final _CaseData data;
 
   @override
+  State<_CaseCard> createState() => _CaseCardState();
+}
+
+class _CaseCardState extends State<_CaseCard> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0, end: _hovered ? -8 : 0),
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOut,
+        builder: (context, offset, child) => Transform.translate(
+          offset: Offset(0, offset),
+          child: child,
+        ),
+        child: Container(
       constraints: const BoxConstraints(minHeight: 340),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -182,9 +200,16 @@ class _CaseCard extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE4EAFF), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1A2B5E).withValues(alpha: 0.05),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+            color: const Color(0xFF1A2B5E).withValues(alpha: 0.08),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+          BoxShadow(
+            color: _hovered
+                ? const Color(0xFF2864E8).withValues(alpha: 0.1)
+                : const Color(0xFF1A2B5E).withValues(alpha: 0.04),
+            blurRadius: _hovered ? 30 : 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -195,7 +220,7 @@ class _CaseCard extends StatelessWidget {
           Container(
             height: 160,
             decoration: BoxDecoration(
-              color: data.categoryColor.withValues(alpha: 0.06),
+              color: widget.data.categoryColor.withValues(alpha: 0.06),
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(19),
               ),
@@ -204,7 +229,7 @@ class _CaseCard extends StatelessWidget {
               child: Icon(
                 Icons.web_rounded,
                 size: 44,
-                color: data.categoryColor.withValues(alpha: 0.25),
+                color: widget.data.categoryColor.withValues(alpha: 0.25),
               ),
             ),
           ),
@@ -217,16 +242,16 @@ class _CaseCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: data.categoryColor.withValues(alpha: 0.1),
+                    color: widget.data.categoryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    data.category,
+                    widget.data.category,
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.8,
-                      color: data.categoryColor,
+                      color: widget.data.categoryColor,
                     ),
                   ),
                 ),
@@ -234,7 +259,7 @@ class _CaseCard extends StatelessWidget {
                 SizedBox(
                   height: 40,
                   child: Text(
-                    data.title,
+                    widget.data.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.plusJakartaSans(
@@ -250,7 +275,7 @@ class _CaseCard extends StatelessWidget {
                 SizedBox(
                   height: 60,
                   child: Text(
-                    data.description,
+                    widget.data.description,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.plusJakartaSans(
@@ -291,6 +316,8 @@ class _CaseCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      ),
       ),
     );
   }

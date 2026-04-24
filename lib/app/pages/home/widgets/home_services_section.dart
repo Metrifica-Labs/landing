@@ -116,74 +116,88 @@ class _ServiceCardState extends State<_ServiceCard> {
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(28),
-        constraints: const BoxConstraints(minHeight: 260),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: _hovered
-                ? const Color(0xFF2864E8).withValues(alpha: 0.3)
-                : const Color(0xFFE4EAFF),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: _hovered
-                  ? const Color(0xFF2864E8).withValues(alpha: 0.1)
-                  : const Color(0xFF1A2B5E).withValues(alpha: 0.05),
-              blurRadius: _hovered ? 30 : 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0, end: _hovered ? -8 : 0),
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOut,
+        builder: (context, offset, child) => Transform.translate(
+          offset: Offset(0, offset),
+          child: child,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: const Color(0xFFEDF2FF),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(
-                widget.data.icon,
-                color: const Color(0xFF2864E8),
-                size: 26,
-              ),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.all(28),
+          constraints: const BoxConstraints(minHeight: 260),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: _hovered
+                  ? const Color(0xFF2864E8).withValues(alpha: 0.3)
+                  : const Color(0xFFE4EAFF),
+              width: 1.5,
             ),
-            const SizedBox(height: 20),
-            Text(
-              widget.data.title,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                height: 1.2,
-                color: const Color(0xFF0B1C45),
-                letterSpacing: -0.4,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF1A2B5E).withValues(alpha: 0.08),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
               ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              widget.data.description,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w500,
-                height: 1.5,
-                color: const Color(0xFF7A879F),
+              BoxShadow(
+                color: _hovered
+                    ? const Color(0xFF2864E8).withValues(alpha: 0.1)
+                    : const Color(0xFF1A2B5E).withValues(alpha: 0.04),
+                blurRadius: _hovered ? 30 : 16,
+                offset: const Offset(0, 6),
               ),
-            ),
-            const SizedBox(height: 20),
-            const Icon(
-              Icons.arrow_forward_rounded,
-              color: Color(0xFF2864E8),
-              size: 20,
-            ),
-          ],
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEDF2FF),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  widget.data.icon,
+                  color: const Color(0xFF2864E8),
+                  size: 26,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                widget.data.title,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  height: 1.2,
+                  color: const Color(0xFF0B1C45),
+                  letterSpacing: -0.4,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                widget.data.description,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w500,
+                  height: 1.5,
+                  color: const Color(0xFF7A879F),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Icon(
+                Icons.arrow_forward_rounded,
+                color: Color(0xFF2864E8),
+                size: 20,
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -2,14 +2,65 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:metrifica_landing/app/pages/home/widgets/hero_3d_scene.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 
-import 'hero_3d_scene.dart';
-
-class HomeHeroSection extends StatelessWidget {
-  const HomeHeroSection({super.key, required this.isMobile});
+class HomeNavBar extends StatelessWidget {
+  const HomeNavBar({
+    super.key,
+    required this.isMobile,
+    this.onScrollToTop,
+    this.onScrollToServices,
+    this.onScrollToProcess,
+    this.onScrollToCases,
+  });
 
   final bool isMobile;
+  final VoidCallback? onScrollToTop;
+  final VoidCallback? onScrollToServices;
+  final VoidCallback? onScrollToProcess;
+  final VoidCallback? onScrollToCases;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(color: Color(0xFFEBF0FF), width: 1),
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: isMobile ? 13 : 16),
+          child: MaxWidthContainer(
+            maxWidth: 1280,
+            padding: EdgeInsets.symmetric(horizontal: isMobile ? 22 : 32),
+            child: isMobile
+                ? _MobileTopBar(onScrollToTop: onScrollToTop)
+                : _DesktopTopBar(
+                    onScrollToTop: onScrollToTop,
+                    onScrollToServices: onScrollToServices,
+                    onScrollToProcess: onScrollToProcess,
+                    onScrollToCases: onScrollToCases,
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class HomeHeroSection extends StatelessWidget {
+  const HomeHeroSection({
+    super.key,
+    required this.isMobile,
+    this.onScrollToServices,
+  });
+
+  final bool isMobile;
+  final VoidCallback? onScrollToServices;
 
   @override
   Widget build(BuildContext context) {
@@ -21,19 +72,12 @@ class HomeHeroSection extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: isMobile ? 22 : 32),
           child: Padding(
             padding: EdgeInsets.only(
-              top: isMobile ? 16 : 22,
+              top: isMobile ? 36 : 52,
               bottom: isMobile ? 28 : 40,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                isMobile ? const _MobileTopBar() : const _DesktopTopBar(),
-                SizedBox(height: isMobile ? 28 : 48),
-                isMobile
-                    ? const _MobileHeroBody()
-                    : const _DesktopHeroBody(),
-              ],
-            ),
+            child: isMobile
+                ? _MobileHeroBody(onScrollToServices: onScrollToServices)
+                : _DesktopHeroBody(onScrollToServices: onScrollToServices),
           ),
         ),
       ],
@@ -42,7 +86,17 @@ class HomeHeroSection extends StatelessWidget {
 }
 
 class _DesktopTopBar extends StatelessWidget {
-  const _DesktopTopBar();
+  const _DesktopTopBar({
+    this.onScrollToTop,
+    this.onScrollToServices,
+    this.onScrollToProcess,
+    this.onScrollToCases,
+  });
+
+  final VoidCallback? onScrollToTop;
+  final VoidCallback? onScrollToServices;
+  final VoidCallback? onScrollToProcess;
+  final VoidCallback? onScrollToCases;
 
   @override
   Widget build(BuildContext context) {
@@ -53,15 +107,27 @@ class _DesktopTopBar extends StatelessWidget {
       letterSpacing: -0.2,
     );
 
+    final navItems = [
+      ('Serviços', onScrollToServices),
+      ('Processo', onScrollToProcess),
+      ('Cases', onScrollToCases),
+    ];
+
     return Row(
       children: [
-        const _LogoMark(iconSize: 52),
+        _LogoMark(iconSize: 52, onTap: onScrollToTop),
         const Spacer(),
-        for (final item in const [
-          'Servicos',
-          'Processo',
-          'Cases',
-        ]) ...[Text(item, style: navStyle), const SizedBox(width: 46)],
+        for (final item in navItems) ...[
+          InkWell(
+            borderRadius: BorderRadius.circular(6),
+            onTap: item.$2,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              child: Text(item.$1, style: navStyle),
+            ),
+          ),
+          const SizedBox(width: 34),
+        ],
         _PrimaryButton(
           text: 'Vamos conversar',
           onPressed: () {},
@@ -73,13 +139,15 @@ class _DesktopTopBar extends StatelessWidget {
 }
 
 class _MobileTopBar extends StatelessWidget {
-  const _MobileTopBar();
+  const _MobileTopBar({this.onScrollToTop});
+
+  final VoidCallback? onScrollToTop;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const _LogoMark(iconSize: 50),
+        _LogoMark(iconSize: 50, onTap: onScrollToTop),
         const Spacer(),
         Container(
           width: 46,
@@ -101,7 +169,9 @@ class _MobileTopBar extends StatelessWidget {
 }
 
 class _DesktopHeroBody extends StatelessWidget {
-  const _DesktopHeroBody();
+  const _DesktopHeroBody({this.onScrollToServices});
+
+  final VoidCallback? onScrollToServices;
 
   @override
   Widget build(BuildContext context) {
@@ -148,14 +218,16 @@ class _DesktopHeroBody extends StatelessWidget {
 }
 
 class _MobileHeroBody extends StatelessWidget {
-  const _MobileHeroBody();
+  const _MobileHeroBody({this.onScrollToServices});
+
+  final VoidCallback? onScrollToServices;
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _HeroCopy(isMobile: true),
+        _HeroCopy(isMobile: true, onScrollToServices: onScrollToServices),
         SizedBox(height: 12),
         SizedBox(height: 360, child: Hero3DScene()),
       ],
@@ -164,9 +236,10 @@ class _MobileHeroBody extends StatelessWidget {
 }
 
 class _HeroCopy extends StatelessWidget {
-  const _HeroCopy({required this.isMobile});
+  const _HeroCopy({required this.isMobile, this.onScrollToServices});
 
   final bool isMobile;
+  final VoidCallback? onScrollToServices;
 
   @override
   Widget build(BuildContext context) {
@@ -213,19 +286,19 @@ class _HeroCopy extends StatelessWidget {
         ),
         SizedBox(height: isMobile ? 24 : 34),
         isMobile
-            ? const Column(
+            ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _PrimaryButton(text: 'Vamos conversar', onPressed: null),
-                  SizedBox(height: 18),
-                  _GhostLink(text: 'Ver servicos'),
+                  const _PrimaryButton(text: 'Vamos conversar', onPressed: null),
+                  const SizedBox(height: 18),
+                  _GhostLink(text: 'Ver serviços', onTap: onScrollToServices),
                 ],
               )
-            : const Row(
+            : Row(
                 children: [
-                  _PrimaryButton(text: 'Vamos conversar', onPressed: null),
-                  SizedBox(width: 30),
-                  _GhostLink(text: 'Ver servicos'),
+                  const _PrimaryButton(text: 'Vamos conversar', onPressed: null),
+                  const SizedBox(width: 30),
+                  _GhostLink(text: 'Ver serviços', onTap: onScrollToServices),
                 ],
               ),
         SizedBox(height: isMobile ? 26 : 42),
@@ -330,15 +403,16 @@ class _PrimaryButton extends StatelessWidget {
 }
 
 class _GhostLink extends StatelessWidget {
-  const _GhostLink({required this.text});
+  const _GhostLink({required this.text, this.onTap});
 
   final String text;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(8),
-      onTap: () {},
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
@@ -441,7 +515,7 @@ class _TechIcon extends StatelessWidget {
 
   final _TechIconData data;
 
-  Widget _fallbackLabel() {
+  Widget fallbackLabel() {
     return Center(
       child: Text(
         data.label.substring(0, math.min(2, data.label.length)).toUpperCase(),
@@ -460,24 +534,29 @@ class _TechIcon extends StatelessWidget {
       width: 26,
       height: 26,
       child: data.svgUrl == null
-          ? _fallbackLabel()
+          ? fallbackLabel()
           : Image.network(
               data.svgUrl!,
               fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => _fallbackLabel(),
+              errorBuilder: (_, __, ___) => fallbackLabel(),
             ),
     );
   }
 }
 
 class _LogoMark extends StatelessWidget {
-  const _LogoMark({required this.iconSize});
+  const _LogoMark({required this.iconSize, this.onTap});
 
   final double iconSize;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return MouseRegion(
+      cursor: MouseCursor.defer,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
@@ -513,6 +592,8 @@ class _LogoMark extends StatelessWidget {
           ),
         ),
       ],
+    ),
+      ),
     );
   }
 }
@@ -527,7 +608,7 @@ class _HeroBackground extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFFF8FBFF), Color(0xFFF6F9FF)],
+          colors: [Colors.white, Colors.white],
         ),
       ),
       child: Align(

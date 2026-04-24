@@ -37,7 +37,7 @@ class HomeProcessSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFF7FAFF),
+      color: Colors.white,
       padding: EdgeInsets.symmetric(vertical: isMobile ? 64 : 96),
       child: MaxWidthContainer(
         maxWidth: 1280,
