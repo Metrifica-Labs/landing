@@ -5,21 +5,62 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 
+class HomeNavBar extends StatelessWidget {
+  const HomeNavBar({
+    super.key,
+    required this.isMobile,
+    this.onScrollToTop,
+    this.onScrollToServices,
+    this.onScrollToProcess,
+    this.onScrollToCases,
+  });
+
+  final bool isMobile;
+  final VoidCallback? onScrollToTop;
+  final VoidCallback? onScrollToServices;
+  final VoidCallback? onScrollToProcess;
+  final VoidCallback? onScrollToCases;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(color: Color(0xFFEBF0FF), width: 1),
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: isMobile ? 13 : 16),
+          child: MaxWidthContainer(
+            maxWidth: 1280,
+            padding: EdgeInsets.symmetric(horizontal: isMobile ? 22 : 32),
+            child: isMobile
+                ? _MobileTopBar(onScrollToTop: onScrollToTop)
+                : _DesktopTopBar(
+                    onScrollToTop: onScrollToTop,
+                    onScrollToServices: onScrollToServices,
+                    onScrollToProcess: onScrollToProcess,
+                    onScrollToCases: onScrollToCases,
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class HomeHeroSection extends StatelessWidget {
   const HomeHeroSection({
     super.key,
     required this.isMobile,
     this.onScrollToServices,
-    this.onScrollToProcess,
-    this.onScrollToCases,
-    this.onScrollToTop,
   });
 
   final bool isMobile;
   final VoidCallback? onScrollToServices;
-  final VoidCallback? onScrollToProcess;
-  final VoidCallback? onScrollToCases;
-  final VoidCallback? onScrollToTop;
 
   @override
   Widget build(BuildContext context) {
@@ -31,26 +72,12 @@ class HomeHeroSection extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: isMobile ? 22 : 32),
           child: Padding(
             padding: EdgeInsets.only(
-              top: isMobile ? 16 : 22,
+              top: isMobile ? 36 : 52,
               bottom: isMobile ? 28 : 40,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                isMobile
-                    ? _MobileTopBar(onScrollToTop: onScrollToTop)
-                    : _DesktopTopBar(
-                        onScrollToTop: onScrollToTop,
-                        onScrollToServices: onScrollToServices,
-                        onScrollToProcess: onScrollToProcess,
-                        onScrollToCases: onScrollToCases,
-                      ),
-                SizedBox(height: isMobile ? 28 : 48),
-                isMobile
-                    ? _MobileHeroBody(onScrollToServices: onScrollToServices)
-                    : _DesktopHeroBody(onScrollToServices: onScrollToServices),
-              ],
-            ),
+            child: isMobile
+                ? _MobileHeroBody(onScrollToServices: onScrollToServices)
+                : _DesktopHeroBody(onScrollToServices: onScrollToServices),
           ),
         ),
       ],
@@ -520,9 +547,11 @@ class _LogoMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Row(
+    return MouseRegion(
+      cursor: onTap != null ? SystemMouseCursors.click : MouseCursor.defer,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
@@ -559,6 +588,7 @@ class _LogoMark extends StatelessWidget {
         ),
       ],
     ),
+      ),
     );
   }
 }
