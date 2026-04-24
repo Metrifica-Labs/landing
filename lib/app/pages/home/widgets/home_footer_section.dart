@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 
@@ -207,7 +206,7 @@ class HomeFooterSection extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _SocialIconBox(
-          svgUrl: 'https://cdn.simpleicons.org/linkedin/$_iconColor',
+          svgUrl: 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/linkedin.svg',
           label: 'in',
         ),
         const SizedBox(width: 10),
@@ -238,6 +237,14 @@ class _ContactRow extends StatelessWidget {
   final String? label;
   final String text;
 
+  Widget _fallbackDot() {
+    return const Icon(
+      Icons.circle_outlined,
+      size: 14,
+      color: Color(0xFFA0AABD),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -246,14 +253,10 @@ class _ContactRow extends StatelessWidget {
           width: 16,
           height: 16,
           child: svgUrl != null
-              ? SvgPicture.network(
+              ? Image.network(
                   svgUrl!,
                   fit: BoxFit.contain,
-                  placeholderBuilder: (_) => Icon(
-                    Icons.circle_outlined,
-                    size: 14,
-                    color: const Color(0xFFA0AABD),
-                  ),
+                  errorBuilder: (_, __, ___) => _fallbackDot(),
                 )
               : Icon(
                   icon,
@@ -288,6 +291,17 @@ class _SocialIconBox extends StatefulWidget {
 class _SocialIconBoxState extends State<_SocialIconBox> {
   bool _hovered = false;
 
+  Widget _fallbackLabel() {
+    return Text(
+      widget.label.toUpperCase(),
+      style: GoogleFonts.plusJakartaSans(
+        fontSize: 9,
+        fontWeight: FontWeight.w800,
+        color: const Color(0xFFA0AABD),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
@@ -308,19 +322,12 @@ class _SocialIconBoxState extends State<_SocialIconBox> {
           ),
         ),
         child: Center(
-          child: SvgPicture.network(
+          child: Image.network(
             widget.svgUrl,
             width: 15,
             height: 15,
             fit: BoxFit.contain,
-            placeholderBuilder: (_) => Text(
-              widget.label.toUpperCase(),
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 9,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFFA0AABD),
-              ),
-            ),
+            errorBuilder: (_, __, ___) => _fallbackLabel(),
           ),
         ),
       ),

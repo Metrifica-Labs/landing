@@ -269,7 +269,7 @@ class _CtaCubeClusterState extends State<_CtaCubeCluster>
   }
 
   Widget _buildCube(_CubeData cube, double time, Size size) {
-    final wave = math.sin(time + cube.phase) * 7.0 * cube.depth;
+    final wave = math.sin(time + cube.phase) * 10.0 * cube.depth;
     return Positioned(
       left: cube.left * size.width,
       top: cube.top * size.height + wave,

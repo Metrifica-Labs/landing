@@ -6,7 +6,7 @@
 build/
 *.iml
 *.log
-
+.playwright-mcp
 # FVM
 .fvm/flutter_sdk
 .fvm/version
