@@ -12,35 +12,30 @@ class HomeHeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF7FAFF),
-      body: Stack(
-        children: [
-          const Positioned.fill(child: _HeroBackground()),
-          SafeArea(
-            child: SingleChildScrollView(
-              child: MaxWidthContainer(
-                maxWidth: 1280,
-                padding: EdgeInsets.symmetric(horizontal: isMobile ? 22 : 32),
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: isMobile ? 28 : 40),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: isMobile ? 16 : 22),
-                      isMobile ? const _MobileTopBar() : const _DesktopTopBar(),
-                      SizedBox(height: isMobile ? 28 : 48),
-                      isMobile
-                          ? const _MobileHeroBody()
-                          : const _DesktopHeroBody(),
-                    ],
-                  ),
-                ),
-              ),
+    return Stack(
+      children: [
+        const Positioned.fill(child: _HeroBackground()),
+        MaxWidthContainer(
+          maxWidth: 1280,
+          padding: EdgeInsets.symmetric(horizontal: isMobile ? 22 : 32),
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: isMobile ? 16 : 22,
+              bottom: isMobile ? 28 : 40,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                isMobile ? const _MobileTopBar() : const _DesktopTopBar(),
+                SizedBox(height: isMobile ? 28 : 48),
+                isMobile
+                    ? const _MobileHeroBody()
+                    : const _DesktopHeroBody(),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -65,7 +60,6 @@ class _DesktopTopBar extends StatelessWidget {
           'Servicos',
           'Processo',
           'Cases',
-          'Sobre nos',
         ]) ...[Text(item, style: navStyle), const SizedBox(width: 46)],
         _PrimaryButton(
           text: 'Vamos conversar',
