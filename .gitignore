@@ -22,6 +22,9 @@ build/
 .DS_Store
 Thumbs.db
 
+# Environment / secrets
+.env
+
 # Generated
 lib/gen/
 .flutter-plugins-dependencies
