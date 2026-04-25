@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 
@@ -39,10 +40,7 @@ class HomeFooterSection extends StatelessWidget {
             ),
           ),
           // Full-width divider
-          Container(
-            height: 1,
-            color: const Color(0xFFEBF0FF),
-          ),
+          Container(height: 1, color: const Color(0xFFEBF0FF)),
           // Copyright bar
           Padding(
             padding: EdgeInsets.symmetric(
@@ -108,47 +106,33 @@ class HomeFooterSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Logo — same mark as navbar
         GestureDetector(
           onTap: onScrollToTop,
           child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF3690FF), Color(0xFF175BE8)],
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: SvgPicture.asset(
+                  'assets/images/metrifica.svg',
+                  width: 44,
+                  height: 44,
+                  fit: BoxFit.cover,
                 ),
               ),
-              child: Center(
-                child: Text(
-                  'm.',
-                  style: GoogleFonts.dmSerifDisplay(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400,
-                  ),
+              const SizedBox(width: 12),
+              Text(
+                'metrifica\nlabs',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  height: 0.95,
+                  letterSpacing: -0.2,
+                  color: const Color(0xFF0B1C45),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              'metrifica\nlabs',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-                height: 0.95,
-                letterSpacing: -0.2,
-                color: const Color(0xFF0B1C45),
-              ),
-            ),
-          ],
-        ),
+            ],
+          ),
         ),
         const SizedBox(height: 14),
         Text(
@@ -204,10 +188,7 @@ class HomeFooterSection extends StatelessWidget {
           text: 'hello@metricalabs.com',
         ),
         const SizedBox(height: 11),
-        _ContactRow(
-          icon: Icons.phone_outlined,
-          text: '+55 (11) 99999-9999',
-        ),
+        _ContactRow(icon: Icons.phone_outlined, text: '+55 (11) 99999-9999'),
         const SizedBox(height: 11),
         _ContactRow(
           icon: Icons.location_on_outlined,
@@ -222,7 +203,8 @@ class HomeFooterSection extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _SocialIconBox(
-          svgUrl: 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/linkedin.svg',
+          svgUrl:
+              'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/linkedin.svg',
           label: 'in',
         ),
         const SizedBox(width: 10),
@@ -241,12 +223,8 @@ class HomeFooterSection extends StatelessWidget {
 }
 
 class _ContactRow extends StatelessWidget {
-  const _ContactRow({
-    this.svgUrl,
-    this.icon,
-    this.label,
-    required this.text,
-  }) : assert(svgUrl != null || icon != null);
+  const _ContactRow({this.svgUrl, this.icon, this.label, required this.text})
+    : assert(svgUrl != null || icon != null);
 
   final String? svgUrl;
   final IconData? icon;
@@ -274,11 +252,7 @@ class _ContactRow extends StatelessWidget {
                   fit: BoxFit.contain,
                   errorBuilder: (_, __, ___) => _fallbackDot(),
                 )
-              : Icon(
-                  icon,
-                  size: 15,
-                  color: const Color(0xFFA0AABD),
-                ),
+              : Icon(icon, size: 15, color: const Color(0xFFA0AABD)),
         ),
         const SizedBox(width: 9),
         Text(

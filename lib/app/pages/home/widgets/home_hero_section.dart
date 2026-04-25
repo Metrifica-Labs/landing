@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/pages/home/widgets/hero_3d_scene.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
@@ -26,9 +27,7 @@ class HomeNavBar extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFEBF0FF), width: 1),
-        ),
+        border: Border(bottom: BorderSide(color: Color(0xFFEBF0FF), width: 1)),
       ),
       child: SafeArea(
         bottom: false,
@@ -289,14 +288,20 @@ class _HeroCopy extends StatelessWidget {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const _PrimaryButton(text: 'Vamos conversar', onPressed: null),
+                  const _PrimaryButton(
+                    text: 'Vamos conversar',
+                    onPressed: null,
+                  ),
                   const SizedBox(height: 18),
                   _GhostLink(text: 'Ver serviços', onTap: onScrollToServices),
                 ],
               )
             : Row(
                 children: [
-                  const _PrimaryButton(text: 'Vamos conversar', onPressed: null),
+                  const _PrimaryButton(
+                    text: 'Vamos conversar',
+                    onPressed: null,
+                  ),
                   const SizedBox(width: 30),
                   _GhostLink(text: 'Ver serviços', onTap: onScrollToServices),
                 ],
@@ -447,36 +452,33 @@ class _TechnologiesRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = '9FA8BA';
     final icons = <_TechIconData>[
-      _TechIconData(
-        label: 'react',
-        svgUrl: 'https://cdn.simpleicons.org/react/$iconColor',
-      ),
-      _TechIconData(
-        label: 'node',
-        svgUrl: 'https://cdn.simpleicons.org/nodedotjs/$iconColor',
-      ),
+      _TechIconData(label: 'react', assetPath: 'assets/images/tech/react.svg'),
+      _TechIconData(label: 'node', assetPath: 'assets/images/tech/node.svg'),
       _TechIconData(
         label: 'ts',
-        svgUrl: 'https://cdn.simpleicons.org/typescript/$iconColor',
+        assetPath: 'assets/images/tech/typescript.svg',
       ),
       _TechIconData(
         label: 'js',
-        svgUrl: 'https://cdn.simpleicons.org/javascript/$iconColor',
+        assetPath: 'assets/images/tech/javascript.svg',
+      ),
+      _TechIconData(
+        label: 'flutter',
+        assetPath: 'assets/images/tech/flutter.svg',
       ),
       _TechIconData(
         label: 'python',
-        svgUrl: 'https://cdn.simpleicons.org/python/$iconColor',
+        assetPath: 'assets/images/tech/python.svg',
       ),
-      _TechIconData(label: 'aws', svgUrl: null),
+      _TechIconData(label: 'aws', assetPath: 'assets/images/tech/aws.svg'),
       _TechIconData(
         label: 'docker',
-        svgUrl: 'https://cdn.simpleicons.org/docker/$iconColor',
+        assetPath: 'assets/images/tech/docker.svg',
       ),
       _TechIconData(
         label: 'firebase',
-        svgUrl: 'https://cdn.simpleicons.org/firebase/$iconColor',
+        assetPath: 'assets/images/tech/firebase.svg',
       ),
     ];
 
@@ -504,10 +506,10 @@ class _TechnologiesRow extends StatelessWidget {
 }
 
 class _TechIconData {
-  const _TechIconData({required this.label, required this.svgUrl});
+  const _TechIconData({required this.label, required this.assetPath});
 
   final String label;
-  final String? svgUrl;
+  final String assetPath;
 }
 
 class _TechIcon extends StatelessWidget {
@@ -533,13 +535,11 @@ class _TechIcon extends StatelessWidget {
     return SizedBox(
       width: 26,
       height: 26,
-      child: data.svgUrl == null
-          ? fallbackLabel()
-          : Image.network(
-              data.svgUrl!,
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => fallbackLabel(),
-            ),
+      child: SvgPicture.asset(
+        data.assetPath,
+        fit: BoxFit.contain,
+        placeholderBuilder: (_) => fallbackLabel(),
+      ),
     );
   }
 }
@@ -557,42 +557,29 @@ class _LogoMark extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: iconSize,
-          height: iconSize,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF3690FF), Color(0xFF175BE8)],
-            ),
-          ),
-          child: Center(
-            child: Text(
-              'm.',
-              style: GoogleFonts.dmSerifDisplay(
-                fontSize: iconSize * 0.42,
-                color: Colors.white,
-                fontWeight: FontWeight.w400,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(iconSize * 0.28),
+              child: SvgPicture.asset(
+                'assets/images/metrifica.svg',
+                width: iconSize,
+                height: iconSize,
+                fit: BoxFit.cover,
               ),
             ),
-          ),
+            const SizedBox(width: 14),
+            Text(
+              'metrifica\nlabs',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: iconSize * 0.36,
+                color: const Color(0xFF102B58),
+                fontWeight: FontWeight.w800,
+                height: 0.95,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 14),
-        Text(
-          'metrifica\nlabs',
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: iconSize * 0.36,
-            color: const Color(0xFF102B58),
-            fontWeight: FontWeight.w800,
-            height: 0.95,
-          ),
-        ),
-      ],
-    ),
       ),
     );
   }
@@ -629,4 +616,3 @@ class _HeroBackground extends StatelessWidget {
     );
   }
 }
-

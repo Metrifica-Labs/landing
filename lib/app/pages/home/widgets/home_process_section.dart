@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 
@@ -139,7 +140,10 @@ class _DesktopTimeline extends StatelessWidget {
                   ),
                   if (i < steps.length - 1)
                     Expanded(
-                      child: Container(height: 2, color: const Color(0xFFCBD9FF)),
+                      child: Container(
+                        height: 2,
+                        color: const Color(0xFFCBD9FF),
+                      ),
                     ),
                 ],
               ),
@@ -223,7 +227,11 @@ class _MobileTimeline extends StatelessWidget {
                   child: Icon(step.icon, color: Colors.white, size: 22),
                 ),
                 if (i < steps.length - 1)
-                  Container(width: 2, height: 36, color: const Color(0xFFCBD9FF)),
+                  Container(
+                    width: 2,
+                    height: 36,
+                    color: const Color(0xFFCBD9FF),
+                  ),
               ],
             ),
             const SizedBox(width: 16),
@@ -285,96 +293,18 @@ class _BlueprintCard extends StatelessWidget {
     return Container(
       height: 320,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1B4FD8), Color(0xFF0F2D8A)],
-        ),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(24),
       ),
       clipBehavior: Clip.antiAlias,
-      child: CustomPaint(
-        painter: _BlueprintGridPainter(),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 90,
-                height: 90,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.25),
-                    width: 1.5,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    'm.',
-                    style: GoogleFonts.dmSerifDisplay(
-                      fontSize: 38,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'metrifica',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  letterSpacing: -0.3,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'SOFTWARE HOUSE',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white.withValues(alpha: 0.55),
-                  letterSpacing: 2.5,
-                ),
-              ),
-            ],
-          ),
-        ),
+      child: SvgPicture.asset(
+        'assets/images/logo.svg',
+        width: double.infinity,
+        height: double.infinity,
+        fit: BoxFit.cover,
       ),
     );
   }
-}
-
-class _BlueprintGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final gridPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.07)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    for (double x = 0; x < size.width; x += 28) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
-    }
-    for (double y = 0; y < size.height; y += 28) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
-    }
-
-    final circlePaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.12)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    canvas.drawCircle(center, size.width * 0.28, circlePaint);
-    canvas.drawCircle(center, size.width * 0.42, circlePaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _StepData {
