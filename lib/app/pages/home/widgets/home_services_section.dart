@@ -1,217 +1,1224 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 
-class HomeServicesSection extends StatelessWidget {
+class HomeServicesSection extends StatefulWidget {
   const HomeServicesSection({super.key, required this.isMobile});
 
   final bool isMobile;
 
+  @override
+  State<HomeServicesSection> createState() => _HomeServicesSectionState();
+}
+
+class _HomeServicesSectionState extends State<HomeServicesSection> {
+  Timer? _animationTimer;
+  int _activeIndex = 0;
+
   static const _services = [
     _ServiceData(
-      icon: Icons.code_rounded,
-      title: 'Desenvolvimento\nde Software',
-      description: 'Soluções robustas e personalizadas.',
+      type: _ServiceType.software,
+      title: 'Sistemas Complexos',
+      description:
+          'Arquitetura de microsserviços e processamento paralelo para ambientes de missão crítica.',
+      highlights: [
+        _ServiceHighlight(Icons.view_in_ar_rounded, 'Escalabilidade'),
+        _ServiceHighlight(Icons.shield_outlined, 'Alta disponibilidade'),
+        _ServiceHighlight(Icons.speed_rounded, 'Performance'),
+      ],
+      desktopFlex: 7,
     ),
     _ServiceData(
-      icon: Icons.devices_rounded,
-      title: 'Web & Mobile',
-      description: 'Aplicações rápidas, intuitivas e responsivas.',
+      type: _ServiceType.webMobile,
+      title: 'Experiência Digital',
+      description:
+          'Interfaces fluidas e apps nativos focados em retenção e performance perceptual.',
+      highlights: [
+        _ServiceHighlight(Icons.check_circle_outline_rounded, 'UX intuitiva'),
+        _ServiceHighlight(Icons.check_circle_outline_rounded, 'Design system'),
+        _ServiceHighlight(Icons.check_circle_outline_rounded, 'Apps nativos'),
+      ],
+      desktopFlex: 4,
     ),
     _ServiceData(
-      icon: Icons.cloud_rounded,
+      type: _ServiceType.cloud,
       title: 'Cloud & DevOps',
-      description: 'Infraestrutura escalável, segura e eficiente.',
+      description:
+          'Infraestrutura imutável, CI/CD avançado e segurança escalável.',
+      highlights: [
+        _ServiceHighlight(Icons.settings_suggest_rounded, 'CI/CD automatizado'),
+        _ServiceHighlight(Icons.all_inclusive_rounded, 'Infra como código'),
+        _ServiceHighlight(Icons.lock_outline_rounded, 'Segurança integrada'),
+      ],
+      desktopFlex: 5,
     ),
     _ServiceData(
-      icon: Icons.bar_chart_rounded,
-      title: 'Dados & Analytics',
-      description: 'Decisões inteligentes com base em dados reais.',
+      type: _ServiceType.data,
+      title: 'Data Science',
+      description:
+          'Modelagem preditiva e pipelines de Big Data que transformam dados brutos em decisões estratégicas.',
+      highlights: [
+        _ServiceHighlight(Icons.storage_rounded, 'Eventos/dia', value: '+10M'),
+        _ServiceHighlight(
+          Icons.track_changes_rounded,
+          'Acurácia',
+          value: '98%',
+        ),
+        _ServiceHighlight(Icons.av_timer_rounded, 'Produção', value: '24/7'),
+      ],
+      desktopFlex: 7,
     ),
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _animationTimer = Timer.periodic(const Duration(milliseconds: 1800), (_) {
+      if (!mounted) return;
+      setState(() => _activeIndex = (_activeIndex + 1) % _services.length);
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
-      padding: EdgeInsets.symmetric(vertical: isMobile ? 64 : 96),
+      color: const Color(0xFFFBFCFF),
+      padding: EdgeInsets.symmetric(vertical: widget.isMobile ? 72 : 112),
       child: MaxWidthContainer(
         maxWidth: 1280,
-        padding: EdgeInsets.symmetric(horizontal: isMobile ? 22 : 32),
+        padding: EdgeInsets.symmetric(horizontal: widget.isMobile ? 22 : 32),
         child: Column(
+          crossAxisAlignment: widget.isMobile
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
           children: [
-            Text(
-              'O QUE FAZEMOS',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.2,
-                color: const Color(0xFF2864E8),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Soluções completas para cada\netapa do seu negócio.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: isMobile ? 28 : 40,
-                fontWeight: FontWeight.w700,
-                height: 1.1,
-                letterSpacing: -1.2,
-                color: const Color(0xFF0B1C45),
-              ),
-            ),
-            SizedBox(height: isMobile ? 40 : 60),
-            isMobile ? _buildMobileCards() : _buildDesktopCards(),
+            _SectionHeader(isMobile: widget.isMobile),
+            SizedBox(height: widget.isMobile ? 36 : 56),
+            widget.isMobile
+                ? _MobileBentoGrid(
+                    services: _services,
+                    activeIndex: _activeIndex,
+                  )
+                : _DesktopBentoGrid(
+                    services: _services,
+                    activeIndex: _activeIndex,
+                  ),
           ],
         ),
       ),
     );
   }
-
-  Widget _buildDesktopCards() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: _services
-          .map(
-            (s) => Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: _ServiceCard(data: s),
-              ),
-            ),
-          )
-          .toList(),
-    );
-  }
-
-  Widget _buildMobileCards() {
-    return Column(
-      children: _services
-          .map(
-            (s) => Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: _ServiceCard(data: s),
-            ),
-          )
-          .toList(),
-    );
-  }
 }
 
-class _ServiceCard extends StatefulWidget {
-  const _ServiceCard({required this.data});
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.isMobile});
 
-  final _ServiceData data;
-
-  @override
-  State<_ServiceCard> createState() => _ServiceCardState();
-}
-
-class _ServiceCardState extends State<_ServiceCard> {
-  bool _hovered = false;
+  final bool isMobile;
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0, end: _hovered ? -8 : 0),
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeOut,
-        builder: (context, offset, child) => Transform.translate(
-          offset: Offset(0, offset),
-          child: child,
-        ),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.all(28),
-          constraints: const BoxConstraints(minHeight: 260),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: _hovered
-                  ? const Color(0xFF2864E8).withValues(alpha: 0.3)
-                  : const Color(0xFFE4EAFF),
-              width: 1.5,
+    return Flex(
+      direction: isMobile ? Axis.vertical : Axis.horizontal,
+      crossAxisAlignment: isMobile
+          ? CrossAxisAlignment.start
+          : CrossAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: isMobile
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
+          children: [
+            Text(
+              'O QUE FAZEMOS',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.7,
+                color: const Color(0xFF2864E8),
+              ),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF1A2B5E).withValues(alpha: 0.08),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
+            const SizedBox(height: 16),
+            Text.rich(
+              TextSpan(
+                text: 'NOSSA ',
+                children: [
+                  TextSpan(
+                    text: 'STACK.',
+                    style: TextStyle(
+                      color: const Color(0xFF2864E8),
+                      decoration: TextDecoration.underline,
+                      decorationColor: const Color(0xFFBFD0FF),
+                      decorationThickness: 3,
+                    ),
+                  ),
+                ],
               ),
-              BoxShadow(
-                color: _hovered
-                    ? const Color(0xFF2864E8).withValues(alpha: 0.1)
-                    : const Color(0xFF1A2B5E).withValues(alpha: 0.04),
-                blurRadius: _hovered ? 30 : 16,
-                offset: const Offset(0, 6),
+              textAlign: isMobile ? TextAlign.left : TextAlign.center,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: isMobile ? 34 : 44,
+                fontWeight: FontWeight.w900,
+                height: 0.98,
+                letterSpacing: -1.8,
+                color: const Color(0xFF0F172A),
               ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEDF2FF),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(
-                  widget.data.icon,
-                  color: const Color(0xFF2864E8),
-                  size: 26,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                widget.data.title,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  height: 1.2,
-                  color: const Color(0xFF0B1C45),
-                  letterSpacing: -0.4,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                widget.data.description,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w500,
-                  height: 1.5,
-                  color: const Color(0xFF7A879F),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Icon(
-                Icons.arrow_forward_rounded,
-                color: Color(0xFF2864E8),
-                size: 20,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
+        if (!isMobile)
+          SizedBox(
+            width: 330,
+            child: Text(
+              'Soluções integradas para desafios técnicos de escala global.',
+              textAlign: TextAlign.right,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                height: 1.55,
+                color: const Color(0xFF8A95AA),
+              ),
+            ),
+          ),
+        if (isMobile) ...[
+          const SizedBox(height: 14),
+          Text(
+            'Soluções integradas para desafios técnicos de escala global.',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              height: 1.55,
+              color: const Color(0xFF8A95AA),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _DesktopBentoGrid extends StatelessWidget {
+  const _DesktopBentoGrid({required this.services, required this.activeIndex});
+
+  final List<_ServiceData> services;
+  final int activeIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: services[0].desktopFlex,
+              child: _BentoServiceCard(
+                data: services[0],
+                active: activeIndex == 0,
+              ),
+            ),
+            const SizedBox(width: 24),
+            Expanded(
+              flex: services[1].desktopFlex,
+              child: _BentoServiceCard(
+                data: services[1],
+                active: activeIndex == 1,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: services[2].desktopFlex,
+              child: _BentoServiceCard(
+                data: services[2],
+                active: activeIndex == 2,
+              ),
+            ),
+            const SizedBox(width: 24),
+            Expanded(
+              flex: services[3].desktopFlex,
+              child: _BentoServiceCard(
+                data: services[3],
+                active: activeIndex == 3,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _MobileBentoGrid extends StatelessWidget {
+  const _MobileBentoGrid({required this.services, required this.activeIndex});
+
+  final List<_ServiceData> services;
+  final int activeIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (var i = 0; i < services.length; i++) ...[
+          _BentoServiceCard(
+            data: services[i],
+            compact: true,
+            active: activeIndex == i,
+          ),
+          const SizedBox(height: 18),
+        ],
+      ],
+    );
+  }
+}
+
+class _BentoServiceCard extends StatefulWidget {
+  const _BentoServiceCard({
+    required this.data,
+    required this.active,
+    this.compact = false,
+  });
+
+  final _ServiceData data;
+  final bool active;
+  final bool compact;
+
+  @override
+  State<_BentoServiceCard> createState() => _BentoServiceCardState();
+}
+
+class _BentoServiceCardState extends State<_BentoServiceCard> {
+  @override
+  Widget build(BuildContext context) {
+    final isCompact = widget.compact;
+    final active = widget.active;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeOutCubic,
+      height: isCompact ? null : 290,
+      padding: EdgeInsets.all(isCompact ? 20 : 24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(
+          color: active ? const Color(0xFFD7E2FF) : const Color(0xFFEAF0FB),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0B1C45).withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: const Color(
+              0xFF2864E8,
+            ).withValues(alpha: active ? 0.09 : 0.02),
+            blurRadius: active ? 42 : 20,
+            offset: Offset(0, active ? 22 : 10),
+          ),
+        ],
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Flex(
+            direction: isCompact ? Axis.vertical : Axis.horizontal,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (isCompact)
+                _ServiceCopy(data: widget.data, hovered: active, compact: true)
+              else
+                Expanded(
+                  flex: 5,
+                  child: _ServiceCopy(data: widget.data, hovered: active),
+                ),
+              SizedBox(width: isCompact ? 0 : 26, height: isCompact ? 22 : 0),
+              SizedBox(
+                width: isCompact ? double.infinity : 210,
+                height: isCompact ? 180 : double.infinity,
+                child: _VisualShowcase(type: widget.data.type, hovered: active),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-class _ServiceData {
-  const _ServiceData({
-    required this.icon,
-    required this.title,
-    required this.description,
+class _ServiceCopy extends StatelessWidget {
+  const _ServiceCopy({
+    required this.data,
+    required this.hovered,
+    this.compact = false,
   });
 
-  final IconData icon;
+  final _ServiceData data;
+  final bool hovered;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final dense = compact || constraints.maxWidth < 245;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: compact ? MainAxisSize.min : MainAxisSize.max,
+          mainAxisAlignment: compact
+              ? MainAxisAlignment.start
+              : MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 360),
+                    curve: Curves.easeOutCubic,
+                    width: hovered ? 48 : 24,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2864E8),
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                  ),
+                ),
+                SizedBox(height: dense ? 20 : 24),
+                Text(
+                  data.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: dense ? 20 : 21,
+                    fontWeight: FontWeight.w900,
+                    height: 1.1,
+                    letterSpacing: -0.7,
+                    color: const Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  data.description,
+                  maxLines: dense ? 3 : 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: dense ? 13 : 13.5,
+                    fontWeight: FontWeight.w600,
+                    height: 1.42,
+                    color: const Color(0xFF69758B),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: compact ? 16 : 0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(height: 1, color: const Color(0xFFE5ECFA)),
+                SizedBox(height: dense ? 12 : 16),
+                _ServiceHighlights(highlights: data.highlights, dense: dense),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ServiceHighlights extends StatelessWidget {
+  const _ServiceHighlights({required this.highlights, required this.dense});
+
+  final List<_ServiceHighlight> highlights;
+  final bool dense;
+
+  @override
+  Widget build(BuildContext context) {
+    if (dense) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final highlight in highlights) ...[
+            _ServiceHighlightItem(highlight: highlight, dense: true),
+            if (highlight != highlights.last) const SizedBox(height: 8),
+          ],
+        ],
+      );
+    }
+
+    return Wrap(
+      spacing: 14,
+      runSpacing: 12,
+      children: [
+        for (final highlight in highlights)
+          _ServiceHighlightItem(highlight: highlight, dense: false),
+      ],
+    );
+  }
+}
+
+class _ServiceHighlightItem extends StatelessWidget {
+  const _ServiceHighlightItem({required this.highlight, required this.dense});
+
+  final _ServiceHighlight highlight;
+  final bool dense;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasValue = highlight.value != null;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: dense ? 18 : 30,
+          height: dense ? 18 : 30,
+          decoration: BoxDecoration(
+            color: dense ? Colors.transparent : const Color(0xFFF4F7FF),
+            borderRadius: BorderRadius.circular(dense ? 99 : 8),
+            border: dense ? null : Border.all(color: const Color(0xFFDDE8FF)),
+          ),
+          child: Icon(
+            highlight.icon,
+            color: const Color(0xFF2864E8),
+            size: dense ? 15 : 16,
+          ),
+        ),
+        SizedBox(width: dense ? 6 : 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (hasValue)
+              Text(
+                highlight.value!,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  height: 1,
+                  color: const Color(0xFF2864E8),
+                ),
+              ),
+            Text(
+              highlight.label,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: dense ? 11.5 : (hasValue ? 11.5 : 12),
+                fontWeight: FontWeight.w700,
+                height: 1.25,
+                color: const Color(0xFF66758D),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _VisualShowcase extends StatelessWidget {
+  const _VisualShowcase({required this.type, required this.hovered});
+
+  final _ServiceType type;
+  final bool hovered;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeOutCubic,
+      decoration: BoxDecoration(
+        color: hovered ? Colors.white : const Color(0xFFF8FAFE),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFEAF0FB)),
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: CustomPaint(painter: _DotGridPainter()),
+            ),
+          ),
+          switch (type) {
+            _ServiceType.software => _SoftwareShowcase(hovered: hovered),
+            _ServiceType.webMobile => _WebMobileShowcase(hovered: hovered),
+            _ServiceType.cloud => _CloudShowcase(hovered: hovered),
+            _ServiceType.data => _DataShowcase(hovered: hovered),
+          },
+        ],
+      ),
+    );
+  }
+}
+
+class _SoftwareShowcase extends StatelessWidget {
+  const _SoftwareShowcase({required this.hovered});
+
+  final bool hovered;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(end: hovered ? 1 : 0),
+      duration: const Duration(milliseconds: 620),
+      curve: Curves.easeOutCubic,
+      builder: (context, t, _) {
+        return Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.001)
+            ..rotateY(0.18 * t)
+            ..translate(0.0, -8.0 * t),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                width: 84 + (34 * t),
+                height: 62 + (14 * t),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0F172A),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFF334155)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF0F172A).withValues(alpha: 0.24),
+                      blurRadius: 24,
+                      offset: const Offset(0, 14),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        _WindowDot(color: Color(0xFFEF4444)),
+                        SizedBox(width: 4),
+                        _WindowDot(color: Color(0xFFFACC15)),
+                        SizedBox(width: 4),
+                        _WindowDot(color: Color(0xFF22C55E)),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _AnimatedLine(
+                      width: 62 * t,
+                      color: const Color(0xFF3B82F6),
+                    ),
+                    const SizedBox(height: 7),
+                    _AnimatedLine(
+                      width: 48 * t,
+                      color: const Color(0xFF8B5CF6),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                right: -12,
+                bottom: -10,
+                child: Transform.scale(
+                  scale: 0.5 + (0.5 * t),
+                  child: Opacity(
+                    opacity: t,
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2864E8),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFF2864E8,
+                            ).withValues(alpha: 0.28),
+                            blurRadius: 16,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.memory_rounded,
+                        color: Colors.white,
+                        size: 17,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _WebMobileShowcase extends StatelessWidget {
+  const _WebMobileShowcase({required this.hovered});
+
+  final bool hovered;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(end: hovered ? 1 : 0),
+      duration: const Duration(milliseconds: 620),
+      curve: Curves.easeOutCubic,
+      builder: (context, t, _) {
+        return Transform.scale(
+          scale: 1 + (0.08 * t),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Transform.translate(
+                offset: Offset(-7 * t, 0),
+                child: Container(
+                  width: 104,
+                  height: 74,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.75),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Color.lerp(
+                        const Color(0xFFE2E8F0),
+                        const Color(0xFF60A5FA),
+                        t,
+                      )!,
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF0F172A).withValues(alpha: 0.12),
+                        blurRadius: 20,
+                        offset: const Offset(0, 12),
+                      ),
+                    ],
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        bottom: 60,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 12,
+                        top: 28,
+                        child: Transform.scale(
+                          scale: 1 + (0.22 * t),
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFDBEAFE),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 10,
+                        bottom: 13,
+                        child: _AnimatedLine(
+                          width: 44 + (20 * t),
+                          color: const Color(0xFFE2E8F0),
+                          height: 7,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                right: -12,
+                bottom: -16,
+                child: Transform.rotate(
+                  angle: -0.08 * t,
+                  child: Transform.translate(
+                    offset: Offset(0, -7 * t),
+                    child: Container(
+                      width: 38,
+                      height: 66,
+                      padding: const EdgeInsets.only(top: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F172A),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFF0F172A,
+                            ).withValues(alpha: 0.24),
+                            blurRadius: 20,
+                            offset: const Offset(0, 12),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 16,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF334155),
+                              borderRadius: BorderRadius.circular(99),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Transform.scale(
+                            scale: t,
+                            child: Container(
+                              width: 18,
+                              height: 18,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF2864E8),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CloudShowcase extends StatelessWidget {
+  const _CloudShowcase({required this.hovered});
+
+  final bool hovered;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(end: hovered ? 1 : 0),
+      duration: const Duration(milliseconds: 760),
+      curve: Curves.easeOutCubic,
+      builder: (context, t, _) {
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 38),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    for (var i = 0; i < 3; i++)
+                      Container(
+                        width: 1,
+                        height: 128 * t * (0.72 + (i * 0.14)),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                              const Color(0xFF2864E8).withValues(alpha: 0.32),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            Transform.translate(
+              offset: Offset(0, -14 * t),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 76,
+                    height: 76,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.78),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF2864E8).withValues(alpha: 0.1),
+                          blurRadius: 28,
+                          spreadRadius: 4,
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.cloud_rounded,
+                      size: 39,
+                      color: Color.lerp(
+                        const Color(0xFF94A3B8),
+                        const Color(0xFF2864E8),
+                        t,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: -12,
+                    right: -12,
+                    child: Opacity(
+                      opacity: t,
+                      child: Transform.rotate(
+                        angle: 3.14 * t,
+                        child: const Icon(
+                          Icons.settings_rounded,
+                          color: Color(0xFF60A5FA),
+                          size: 25,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _DataShowcase extends StatelessWidget {
+  const _DataShowcase({required this.hovered});
+
+  final bool hovered;
+
+  static const _bars = [0.42, 0.74, 0.54, 0.96, 0.68, 0.88];
+  static const _line = [0.72, 0.46, 0.58, 0.28, 0.42, 0.2];
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(end: hovered ? 1 : 0),
+      duration: const Duration(milliseconds: 820),
+      curve: Curves.easeOutCubic,
+      builder: (context, t, _) {
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(30, 54, 30, 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    for (var i = 0; i < _bars.length; i++) ...[
+                      Expanded(
+                        child: _DataBar(
+                          hovered: hovered,
+                          value: _bars[i],
+                          index: i,
+                        ),
+                      ),
+                      if (i != _bars.length - 1) const SizedBox(width: 8),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(28, 34, 28, 24),
+                child: CustomPaint(
+                  painter: _DataLinePainter(points: _line, progress: t),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 18 - (6 * t),
+              right: 18 - (4 * t),
+              child: Opacity(
+                opacity: t.clamp(0, 1),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F172A),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF0F172A).withValues(alpha: 0.18),
+                        blurRadius: 16,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 5,
+                        height: 5,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF22C55E),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        '+37.8%',
+                        style: GoogleFonts.robotoMono(
+                          color: Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _DataBar extends StatelessWidget {
+  const _DataBar({
+    required this.hovered,
+    required this.value,
+    required this.index,
+  });
+
+  final bool hovered;
+  final double value;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(end: hovered ? value : 0.16),
+      duration: Duration(milliseconds: 560 + (index * 80)),
+      curve: Curves.easeOutCubic,
+      builder: (context, height, _) {
+        return Container(
+          alignment: Alignment.bottomCenter,
+          decoration: BoxDecoration(
+            color: const Color(0xFFEFF6FF),
+            borderRadius: BorderRadius.circular(7),
+          ),
+          child: FractionallySizedBox(
+            heightFactor: height.clamp(0.12, 1),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF60A5FA), Color(0xFF2864E8)],
+                ),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(7),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF2864E8).withValues(alpha: 0.22),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _DataLinePainter extends CustomPainter {
+  const _DataLinePainter({required this.points, required this.progress});
+
+  final List<double> points;
+  final double progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (points.length < 2 || progress <= 0) return;
+
+    final offsets = [
+      for (var i = 0; i < points.length; i++)
+        Offset(
+          points.length == 1
+              ? size.width / 2
+              : (size.width / (points.length - 1)) * i,
+          size.height * points[i],
+        ),
+    ];
+    final path = Path()..moveTo(offsets.first.dx, offsets.first.dy);
+    for (var i = 0; i < offsets.length - 1; i++) {
+      final current = offsets[i];
+      final next = offsets[i + 1];
+      final controlDistance = (next.dx - current.dx) * 0.48;
+      path.cubicTo(
+        current.dx + controlDistance,
+        current.dy,
+        next.dx - controlDistance,
+        next.dy,
+        next.dx,
+        next.dy,
+      );
+    }
+
+    final metric = path.computeMetrics().first;
+    final visiblePath = metric.extractPath(
+      0,
+      metric.length * progress.clamp(0, 1),
+    );
+    final glowPaint = Paint()
+      ..color = const Color(0xFF60A5FA).withValues(alpha: 0.18 * progress)
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..strokeWidth = 8;
+    final linePaint = Paint()
+      ..color = const Color(0xFF1D4ED8).withValues(alpha: 0.78 * progress)
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..strokeWidth = 2.2;
+
+    canvas.drawPath(visiblePath, glowPaint);
+    canvas.drawPath(visiblePath, linePaint);
+
+    for (var i = 0; i < points.length; i++) {
+      final localProgress = ((progress * points.length) - i).clamp(0.0, 1.0);
+      if (localProgress <= 0) continue;
+      final center = offsets[i];
+      canvas.drawCircle(
+        center,
+        4.8 * localProgress,
+        Paint()..color = Colors.white.withValues(alpha: localProgress),
+      );
+      canvas.drawCircle(
+        center,
+        2.5 * localProgress,
+        Paint()
+          ..color = const Color(0xFF2864E8).withValues(alpha: localProgress),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DataLinePainter oldDelegate) =>
+      oldDelegate.progress != progress || oldDelegate.points != points;
+}
+
+class _AnimatedLine extends StatelessWidget {
+  const _AnimatedLine({
+    required this.width,
+    required this.color,
+    this.height = 6,
+  });
+
+  final double width;
+  final double height;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(99),
+      ),
+    );
+  }
+}
+
+class _WindowDot extends StatelessWidget {
+  const _WindowDot({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 5,
+      height: 5,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+  }
+}
+
+class _DotGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFCBD5E1).withValues(alpha: 0.38);
+    for (double x = 4; x < size.width; x += 10) {
+      for (double y = 4; y < size.height; y += 10) {
+        canvas.drawCircle(Offset(x, y), 0.7, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _ServiceData {
+  const _ServiceData({
+    required this.type,
+    required this.title,
+    required this.description,
+    required this.highlights,
+    required this.desktopFlex,
+  });
+
+  final _ServiceType type;
   final String title;
   final String description;
+  final List<_ServiceHighlight> highlights;
+  final int desktopFlex;
 }
+
+class _ServiceHighlight {
+  const _ServiceHighlight(this.icon, this.label, {this.value});
+
+  final IconData icon;
+  final String label;
+  final String? value;
+}
+
+enum _ServiceType { software, webMobile, cloud, data }
