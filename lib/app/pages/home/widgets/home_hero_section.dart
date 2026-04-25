@@ -182,8 +182,8 @@ class _DesktopHeroBody extends StatelessWidget {
         children: [
           const Positioned(
             top: -118,
-            right: -96,
-            width: 990,
+            right: -260,
+            width: 1040,
             height: 850,
             child: Hero3DScene(),
           ),

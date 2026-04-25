@@ -9,7 +9,9 @@ import 'package:flutter/material.dart';
 /// Embeds the Three.js crystal-cube 3D scene via an HtmlElementView.
 /// Only works on Flutter Web.
 class Hero3DScene extends StatefulWidget {
-  const Hero3DScene({super.key});
+  const Hero3DScene({super.key, this.variant = 'hero'});
+
+  final String variant;
 
   @override
   State<Hero3DScene> createState() => _Hero3DSceneState();
@@ -21,7 +23,7 @@ class _Hero3DSceneState extends State<Hero3DScene> {
 
   void _initWhenJsReady(html.DivElement container, [int attempt = 0]) {
     if (js.context.hasProperty('initHero3D')) {
-      js.context.callMethod('initHero3D', [container]);
+      js.context.callMethod('initHero3D', [container, _options]);
       return;
     }
 
@@ -56,6 +58,10 @@ class _Hero3DSceneState extends State<Hero3DScene> {
       return container;
     });
   }
+
+  late final js.JsObject _options = js.JsObject.jsify({
+    'variant': widget.variant,
+  });
 
   @override
   Widget build(BuildContext context) {
