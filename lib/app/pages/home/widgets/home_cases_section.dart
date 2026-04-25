@@ -57,19 +57,7 @@ class HomeCasesSection extends ConsumerWidget {
         ),
         const SizedBox(width: 48),
         Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: cases
-                .map(
-                  (c) => Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 16),
-                      child: _CaseCard(data: c),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
+          child: _CasesCarousel(cases: cases, cardWidth: 300),
         ),
       ],
     );
@@ -83,12 +71,8 @@ class HomeCasesSection extends ConsumerWidget {
         const SizedBox(height: 16),
         _title(28),
         const SizedBox(height: 32),
-        ...cases.map(
-          (c) => Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: _CaseCard(data: c),
-          ),
-        ),
+        _CasesCarousel(cases: cases, cardWidth: 272),
+        const SizedBox(height: 24),
         _AllCasesLink(),
       ],
     );
@@ -171,6 +155,182 @@ class HomeCasesSection extends ConsumerWidget {
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// Carousel
+// ---------------------------------------------------------------------------
+
+class _CasesCarousel extends StatefulWidget {
+  const _CasesCarousel({required this.cases, required this.cardWidth});
+
+  final List<CaseModel> cases;
+  final double cardWidth;
+
+  @override
+  State<_CasesCarousel> createState() => _CasesCarouselState();
+}
+
+class _CasesCarouselState extends State<_CasesCarousel> {
+  late final ScrollController _scrollController;
+  bool _canScrollLeft = false;
+  bool _canScrollRight = false;
+
+  static const _cardGap = 16.0;
+
+  double get _scrollStep => (widget.cardWidth + _cardGap) * 3;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onScroll());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final offset = _scrollController.offset;
+    final max = _scrollController.position.maxScrollExtent;
+    final canLeft = offset > 0;
+    final canRight = offset < max;
+    if (canLeft != _canScrollLeft || canRight != _canScrollRight) {
+      setState(() {
+        _canScrollLeft = canLeft;
+        _canScrollRight = canRight;
+      });
+    }
+  }
+
+  void _scrollBy(double delta) {
+    final target = (_scrollController.offset + delta)
+        .clamp(0.0, _scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // Cards list
+        SingleChildScrollView(
+          controller: _scrollController,
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.only(top: 8, bottom: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (int i = 0; i < widget.cases.length; i++)
+                Padding(
+                  padding: EdgeInsets.only(
+                    right: i < widget.cases.length - 1 ? _cardGap : 0,
+                  ),
+                  child: SizedBox(
+                    width: widget.cardWidth,
+                    child: _CaseCard(data: widget.cases[i]),
+                  ),
+                ),
+            ],
+          ),
+        ),
+
+        // Left button
+        if (_canScrollLeft)
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: _NavButton(
+              icon: Icons.arrow_back_rounded,
+              onTap: () => _scrollBy(-_scrollStep),
+            ),
+          ),
+
+        // Right button
+        if (_canScrollRight)
+          Positioned(
+            right: 0,
+            top: 0,
+            bottom: 0,
+            child: _NavButton(
+              icon: Icons.arrow_forward_rounded,
+              onTap: () => _scrollBy(_scrollStep),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _NavButton extends StatefulWidget {
+  const _NavButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  State<_NavButton> createState() => _NavButtonState();
+}
+
+class _NavButtonState extends State<_NavButton> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: _hovered
+                ? const Color(0xFF2864E8)
+                : Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: _hovered
+                  ? const Color(0xFF2864E8)
+                  : const Color(0xFFE4EAFF),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF1A2B5E).withValues(alpha: 0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Icon(
+            widget.icon,
+            size: 18,
+            color: _hovered ? Colors.white : const Color(0xFF2864E8),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Shared widgets
+// ---------------------------------------------------------------------------
 
 class _AllCasesLink extends StatelessWidget {
   @override
