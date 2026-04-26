@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "mcp__ide__getDiagnostics",
-      "Bash(fvm flutter:*)"
+      "Bash(fvm flutter:*)",
+      "Bash(flutter analyze:*)"
     ]
   }
 }

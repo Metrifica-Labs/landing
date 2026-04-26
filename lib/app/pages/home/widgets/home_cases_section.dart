@@ -495,7 +495,7 @@ class _CaseCardState extends State<_CaseCard> {
         ),
       ),
     ),
-    );
+  );
   }
 }
 
@@ -1396,13 +1396,12 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(24),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Image
-          GestureDetector(
-            onTap: () {}, // absorb taps on image itself
-            child: InteractiveViewer(
+      child: SizedBox.expand(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Image
+            InteractiveViewer(
               minScale: 1.0,
               maxScale: 4.0,
               child: Image.network(
@@ -1410,49 +1409,56 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
                 fit: BoxFit.contain,
               ),
             ),
-          ),
 
-          // Counter
-          if (widget.images.length > 1)
-            Positioned(
-              bottom: 16,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.55),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  '${_current + 1} / ${widget.images.length}',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+            // Counter
+            if (widget.images.length > 1)
+              Positioned(
+                bottom: 16,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.55),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${_current + 1} / ${widget.images.length}',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
 
-          // Prev button
-          if (hasPrev)
-            Positioned(
-              left: 0,
-              child: _NavButton(
-                icon: Icons.arrow_back_rounded,
-                onTap: () => _go(_current - 1),
+            // Prev button
+            if (hasPrev)
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: _NavButton(
+                    icon: Icons.arrow_back_rounded,
+                    onTap: () => _go(_current - 1),
+                  ),
+                ),
               ),
-            ),
 
-          // Next button
-          if (hasNext)
-            Positioned(
-              right: 0,
-              child: _NavButton(
-                icon: Icons.arrow_forward_rounded,
-                onTap: () => _go(_current + 1),
+            // Next button
+            if (hasNext)
+              Positioned(
+                right: 0,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: _NavButton(
+                    icon: Icons.arrow_forward_rounded,
+                    onTap: () => _go(_current + 1),
+                  ),
+                ),
               ),
-            ),
 
           // Close button
           Positioned(
@@ -1475,7 +1481,8 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
               ),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
