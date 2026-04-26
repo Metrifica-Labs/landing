@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class HomeFooterSection extends StatelessWidget {
   const HomeFooterSection({
@@ -152,7 +153,6 @@ class HomeFooterSection extends StatelessWidget {
     final links = [
       ('Serviços', onScrollToServices),
       ('Cases', onScrollToCases),
-      ('Carreiras', null),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,24 +199,14 @@ class HomeFooterSection extends StatelessWidget {
   }
 
   Widget _buildSocial() {
-    return Row(
+    return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _SocialIconBox(
-          svgUrl:
-              'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/linkedin.svg',
-          label: 'in',
-        ),
-        const SizedBox(width: 10),
-        _SocialIconBox(
-          svgUrl: 'https://cdn.simpleicons.org/github/$_iconColor',
-          label: 'gh',
-        ),
-        const SizedBox(width: 10),
-        _SocialIconBox(
-          svgUrl: 'https://cdn.simpleicons.org/instagram/$_iconColor',
-          label: 'ig',
-        ),
+        _SocialIconBox(icon: PhosphorIcons.linkedinLogo()),
+        const SizedBox(height: 10),
+        _SocialIconBox(icon: PhosphorIcons.githubLogo()),
+        const SizedBox(height: 10),
+        _SocialIconBox(icon: PhosphorIcons.instagramLogo()),
       ],
     );
   }
@@ -269,10 +259,9 @@ class _ContactRow extends StatelessWidget {
 }
 
 class _SocialIconBox extends StatefulWidget {
-  const _SocialIconBox({required this.svgUrl, required this.label});
+  const _SocialIconBox({required this.icon});
 
-  final String svgUrl;
-  final String label;
+  final IconData icon;
 
   @override
   State<_SocialIconBox> createState() => _SocialIconBoxState();
@@ -281,20 +270,10 @@ class _SocialIconBox extends StatefulWidget {
 class _SocialIconBoxState extends State<_SocialIconBox> {
   bool _hovered = false;
 
-  Widget _fallbackLabel() {
-    return Text(
-      widget.label.toUpperCase(),
-      style: GoogleFonts.plusJakartaSans(
-        fontSize: 9,
-        fontWeight: FontWeight.w800,
-        color: const Color(0xFFA0AABD),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
@@ -312,12 +291,12 @@ class _SocialIconBoxState extends State<_SocialIconBox> {
           ),
         ),
         child: Center(
-          child: Image.network(
-            widget.svgUrl,
-            width: 15,
-            height: 15,
-            fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => _fallbackLabel(),
+          child: Icon(
+            widget.icon,
+            size: 17,
+            color: _hovered
+                ? const Color(0xFF2864E8)
+                : const Color(0xFFA0AABD),
           ),
         ),
       ),

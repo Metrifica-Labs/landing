@@ -717,33 +717,33 @@ class _CaseDetailDialog extends StatelessWidget {
                                               ),
                                             ),
                                             // Stack chips
-                                            ...data.stack.map((s) => Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                          horizontal: 8,
-                                                          vertical: 3),
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        const Color(0xFFF4F7FF),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            6),
-                                                    border: Border.all(
-                                                      color: const Color(
-                                                          0xFFE4EAFF),
+                                            ...data.stack.map((s) {
+                                                  final color = _techColor(s);
+                                                  return Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                            horizontal: 8,
+                                                            vertical: 3),
+                                                    decoration: BoxDecoration(
+                                                      color: color.withValues(
+                                                          alpha: 0.1),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              6),
                                                     ),
-                                                  ),
-                                                  child: Text(
-                                                    s,
-                                                    style: GoogleFonts
-                                                        .plusJakartaSans(
-                                                      fontSize: 11,
-                                                      fontWeight: FontWeight.w600,
-                                                      color: const Color(
-                                                          0xFF4A5568),
+                                                    child: Text(
+                                                      s,
+                                                      style: GoogleFonts
+                                                          .plusJakartaSans(
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        letterSpacing: 0.4,
+                                                        color: color,
+                                                      ),
                                                     ),
-                                                  ),
-                                                )),
+                                                  );
+                                                }),
                                           ],
                                         ),
                                       ),
@@ -1486,4 +1486,57 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
       ),
     );
   }
+}
+
+// ---------------------------------------------------------------------------
+// Tech stack color map
+// ---------------------------------------------------------------------------
+
+Color _techColor(String tech) {
+  const map = <String, int>{
+    'Python': 0xFF3776AB,
+    'FastAPI': 0xFF009688,
+    'Flask': 0xFF5A5A5A,
+    'Django': 0xFF0C4B33,
+    'Django REST framework': 0xFFA30000,
+    'SQLAlchemy': 0xFFD71F00,
+    'Celery': 0xFF37814A,
+    'Node.js': 0xFF339933,
+    'TypeScript': 0xFF3178C6,
+    'JavaScript': 0xFFB8860B,
+    'Next.js': 0xFF444444,
+    'React': 0xFF0EA5C8,
+    'Prisma': 0xFF2D3748,
+    'Go': 0xFF00ADD8,
+    'Gin': 0xFF00ADD8,
+    'GORM': 0xFF00ACD7,
+    'Java': 0xFFED8B00,
+    'Spring Boot': 0xFF6DB33F,
+    'JPA': 0xFF6DB33F,
+    'C#': 0xFF239120,
+    'ASP.NET Core': 0xFF512BD4,
+    'Entity Framework': 0xFF512BD4,
+    'Ruby on Rails': 0xFFCC0000,
+    'Ruby': 0xFFCC0000,
+    'Sidekiq': 0xFFCC0000,
+    'Heroku': 0xFF430098,
+    'Laravel': 0xFFFF2D20,
+    'PHP': 0xFF777BB4,
+    'Forge': 0xFF19B394,
+    'Queue': 0xFFFF2D20,
+    'PostgreSQL': 0xFF336791,
+    'MySQL': 0xFF4479A1,
+    'Redis': 0xFFDC382D,
+    'Docker': 0xFF2496ED,
+    'AWS': 0xFFE07B00,
+    'Supabase': 0xFF1A9E6A,
+    'Stripe': 0xFF635BFF,
+    'REST API': 0xFF6BA3BE,
+  };
+
+  final hex = map[tech];
+  if (hex != null) return Color(hex);
+
+  final hue = (tech.codeUnits.fold(0, (a, b) => a + b) % 360).toDouble();
+  return HSLColor.fromAHSL(1.0, hue, 0.55, 0.40).toColor();
 }
