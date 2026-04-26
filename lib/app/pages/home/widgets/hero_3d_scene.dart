@@ -7,7 +7,16 @@ import 'dart:ui_web' as ui_web;
 import 'package:flutter/material.dart';
 
 class Hero3DScene extends StatefulWidget {
-  const Hero3DScene({super.key});
+  const Hero3DScene({
+    super.key,
+    this.pointerEvents = true,
+    this.opacity = 1,
+    this.variant = 'hero',
+  });
+
+  final bool pointerEvents;
+  final double opacity;
+  final String variant;
 
   @override
   State<Hero3DScene> createState() => _Hero3DSceneState();
@@ -19,7 +28,10 @@ class _Hero3DSceneState extends State<Hero3DScene> {
 
   void _initWhenJsReady(html.DivElement container, [int attempt = 0]) {
     if (js.context.hasProperty('initHero3D')) {
-      js.context.callMethod('initHero3D', [container]);
+      js.context.callMethod('initHero3D', [
+        container,
+        js.JsObject.jsify({'variant': widget.variant}),
+      ]);
       return;
     }
     if (attempt > 240) {
@@ -40,7 +52,9 @@ class _Hero3DSceneState extends State<Hero3DScene> {
       final container = html.DivElement()
         ..style.width = '100%'
         ..style.height = '100%'
-        ..style.overflow = 'hidden';
+        ..style.overflow = 'hidden'
+        ..style.pointerEvents = widget.pointerEvents ? 'auto' : 'none'
+        ..style.opacity = widget.opacity.toString();
 
       html.window.requestAnimationFrame((_) {
         _initWhenJsReady(container);

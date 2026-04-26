@@ -4,18 +4,20 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 (function () {
   'use strict';
 
-  window.initHero3D = function (container) {
+  window.initHero3D = function (container, options) {
+    options = options || {};
+
     function tryInit() {
       if (!container || container.clientWidth === 0) {
         requestAnimationFrame(tryInit);
         return;
       }
-      setup(container);
+      setup(container, options);
     }
     requestAnimationFrame(tryInit);
   };
 
-  function setup(container) {
+  function setup(container, options) {
     var W = container.clientWidth;
     var H = container.clientHeight || W;
 
@@ -277,8 +279,14 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     var maxDim = Math.max(size.x, size.y, size.z);
     var fovRad = camera.fov * (Math.PI / 180);
     var dist   = (maxDim * 0.5) / Math.tan(fovRad * 0.5) * 1.16;
-    camera.position.set(dist * 0.58, dist * 0.42, dist * 0.78);
-    camera.lookAt(0, 0, 0);
+    if (options.variant === 'cta') {
+      camera.position.set(-dist * 0.62, dist * 0.34, dist * 0.82);
+      camera.lookAt(0.12, -0.16, 0);
+      modelRoot.rotation.z = -0.05;
+    } else {
+      camera.position.set(dist * 0.58, dist * 0.42, dist * 0.78);
+      camera.lookAt(0, 0, 0);
+    }
 
     scene.add(modelRoot);
 
@@ -303,7 +311,8 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
       var t = clock.getElapsedTime();
 
       modelRoot.position.y = Math.sin(t * 0.42) * 0.06;
-      modelRoot.rotation.y = Math.sin(t * 0.18) * 0.08;
+      var baseRotationY = options.variant === 'cta' ? -0.34 : 0;
+      modelRoot.rotation.y = baseRotationY + Math.sin(t * 0.18) * 0.08;
 
       var pointerIsMoving = performance.now() - lastPointerMoveAt < 140;
       if (pointerIsMoving) {

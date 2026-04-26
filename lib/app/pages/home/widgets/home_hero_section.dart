@@ -205,12 +205,17 @@ class _MobileHeroBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Stack(
+      clipBehavior: Clip.none,
       children: [
+        const Positioned(
+          top: 12,
+          right: -178,
+          width: 560,
+          height: 520,
+          child: Hero3DScene(pointerEvents: false, opacity: 0.24),
+        ),
         _HeroCopy(isMobile: true, onScrollToServices: onScrollToServices),
-        const SizedBox(height: 8),
-        const SizedBox(height: 340, child: Hero3DScene()),
       ],
     );
   }

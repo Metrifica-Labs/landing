@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:metrifica_landing/app/pages/home/widgets/hero_3d_scene.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 
 class HomeCtaSection extends StatelessWidget {
@@ -9,10 +10,11 @@ class HomeCtaSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+   
     return Container(
-      color: Colors.white,
+     
       padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 22 : 32,
+        horizontal: isMobile ? 20 : 32,
         vertical: isMobile ? 32 : 48,
       ),
       child: MaxWidthContainer(
@@ -40,16 +42,22 @@ class HomeCtaSection extends StatelessWidget {
           child: narrow
               ? Stack(
                   children: [
-                    // Positioned(
-                    //   right: -20,
-                    //   top: -20,
-                    //   width: 220,
-                    //   height: 220,
-                    //   child: _CtaHero3DDecor(),
-                    // ),
+                    const Positioned(
+                      right: -88,
+                      top: -64,
+                      width: 420,
+                      height: 360,
+                      child: Hero3DScene(
+                        variant: 'cta',
+                        pointerEvents: false,
+                        opacity: 0.34,
+                      ),
+                    ),
                     Padding(
                       padding: EdgeInsets.symmetric(
-                          horizontal: hPad, vertical: vPad),
+                        horizontal: hPad,
+                        vertical: vPad,
+                      ),
                       child: _buildContent(false),
                     ),
                   ],
@@ -61,14 +69,13 @@ class HomeCtaSection extends StatelessWidget {
                       flex: 46,
                       child: Padding(
                         padding: EdgeInsets.symmetric(
-                            horizontal: hPad, vertical: vPad),
+                          horizontal: hPad,
+                          vertical: vPad,
+                        ),
                         child: _buildContent(false),
                       ),
                     ),
-                    // const Expanded(
-                    //   flex: 54,
-                    //   child: _CtaHero3DDecor(),
-                    // ),
+                    const Expanded(flex: 54, child: _CtaHero3DDecor()),
                   ],
                 ),
         );
@@ -78,14 +85,31 @@ class HomeCtaSection extends StatelessWidget {
 
   Widget _buildMobile() {
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
+        // color: const Color(0xFF1650D4),
         color: const Color(0xFF1650D4),
         borderRadius: BorderRadius.circular(20),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
-        child: _buildContent(true),
+      child: Stack(
+        children: [
+          const Positioned(
+            right: -168,
+            top: -52,
+            width: 460,
+            height: 360,
+            child: Hero3DScene(
+              variant: 'cta',
+              pointerEvents: false,
+              opacity: 0.24,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 32),
+            child: _buildContent(true),
+          ),
+        ],
       ),
     );
   }
@@ -133,6 +157,22 @@ class HomeCtaSection extends StatelessWidget {
         // Button
         _CtaButton(),
       ],
+    );
+  }
+}
+
+class _CtaHero3DDecor extends StatelessWidget {
+  const _CtaHero3DDecor();
+
+  @override
+  Widget build(BuildContext context) {
+    return const OverflowBox(
+      alignment: Alignment.centerRight,
+      minWidth: 620,
+      maxWidth: 620,
+      minHeight: 430,
+      maxHeight: 430,
+      child: Hero3DScene(variant: 'cta'),
     );
   }
 }
@@ -205,4 +245,3 @@ class _CtaButtonState extends State<_CtaButton> {
     );
   }
 }
-
