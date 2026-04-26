@@ -70,15 +70,11 @@ class HomeFooterSection extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Brand
         Expanded(flex: 30, child: _buildBrand()),
         const SizedBox(width: 48),
-        // Nav links
         Expanded(flex: 16, child: _buildLinks()),
         const SizedBox(width: 32),
-        // Contact
         Expanded(flex: 34, child: _buildContact()),
-        // Social icons flush to right
         _buildSocial(),
       ],
     );
@@ -203,9 +199,9 @@ class HomeFooterSection extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _SocialIconBox(icon: PhosphorIcons.linkedinLogo()),
-        const SizedBox(height: 10),
+        const SizedBox(height: 7),
         _SocialIconBox(icon: PhosphorIcons.githubLogo()),
-        const SizedBox(height: 10),
+        const SizedBox(height: 7),
         _SocialIconBox(icon: PhosphorIcons.instagramLogo()),
       ],
     );
@@ -278,8 +274,8 @@ class _SocialIconBoxState extends State<_SocialIconBox> {
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        width: 36,
-        height: 36,
+        width: 28,
+        height: 28,
         decoration: BoxDecoration(
           color: _hovered ? const Color(0xFFEDF2FF) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
@@ -293,7 +289,7 @@ class _SocialIconBoxState extends State<_SocialIconBox> {
         child: Center(
           child: Icon(
             widget.icon,
-            size: 17,
+            size: 14,
             color: _hovered
                 ? const Color(0xFF2864E8)
                 : const Color(0xFFA0AABD),
