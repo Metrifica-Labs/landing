@@ -26,30 +26,55 @@ class HomeCtaSection extends StatelessWidget {
   }
 
   Widget _buildDesktop() {
-    return Container(
-      height: 310,
-      decoration: BoxDecoration(
-        color: const Color(0xFF1650D4),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Content left
-          Expanded(
-            flex: 46,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 56, vertical: 44),
-              child: _buildContent(false),
-            ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final narrow = constraints.maxWidth < 860;
+        final hPad = narrow ? 36.0 : 56.0;
+        final vPad = narrow ? 36.0 : 44.0;
+
+        return Container(
+          height: narrow ? null : 310,
+          decoration: BoxDecoration(
+            color: const Color(0xFF1650D4),
+            borderRadius: BorderRadius.circular(24),
           ),
-          const Expanded(
-            flex: 54,
-            child: _CtaHero3DDecor(),
-          ),
-        ],
-      ),
+          clipBehavior: Clip.antiAlias,
+          child: narrow
+              ? Stack(
+                  children: [
+                    const Positioned(
+                      right: -20,
+                      top: -20,
+                      width: 220,
+                      height: 220,
+                      child: _CtaHero3DDecor(),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: hPad, vertical: vPad),
+                      child: _buildContent(false),
+                    ),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      flex: 46,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: hPad, vertical: vPad),
+                        child: _buildContent(false),
+                      ),
+                    ),
+                    const Expanded(
+                      flex: 54,
+                      child: _CtaHero3DDecor(),
+                    ),
+                  ],
+                ),
+        );
+      },
     );
   }
 

@@ -67,16 +67,43 @@ class HomeFooterSection extends StatelessWidget {
   }
 
   Widget _buildDesktop(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(flex: 30, child: _buildBrand()),
-        const SizedBox(width: 48),
-        Expanded(flex: 16, child: _buildLinks()),
-        const SizedBox(width: 32),
-        Expanded(flex: 34, child: _buildContact()),
-        _buildSocial(),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final narrow = constraints.maxWidth < 860;
+
+        if (narrow) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildBrand(),
+              const SizedBox(height: 32),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: _buildLinks()),
+                  const SizedBox(width: 24),
+                  Expanded(flex: 2, child: _buildContact()),
+                  const SizedBox(width: 24),
+                  _buildSocial(),
+                ],
+              ),
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(flex: 30, child: _buildBrand()),
+            const SizedBox(width: 48),
+            Expanded(flex: 16, child: _buildLinks()),
+            const SizedBox(width: 32),
+            Expanded(flex: 34, child: _buildContact()),
+            const SizedBox(width: 32),
+            _buildSocial(),
+          ],
+        );
+      },
     );
   }
 
@@ -241,12 +268,15 @@ class _ContactRow extends StatelessWidget {
               : Icon(icon, size: 15, color: const Color(0xFFA0AABD)),
         ),
         const SizedBox(width: 9),
-        Text(
-          text,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFF6B7A99),
+        Flexible(
+          child: Text(
+            text,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF6B7A99),
+            ),
           ),
         ),
       ],
