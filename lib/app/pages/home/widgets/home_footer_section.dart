@@ -118,10 +118,9 @@ class HomeFooterSection extends StatelessWidget {
           children: [
             Expanded(child: _buildLinks()),
             Expanded(child: _buildContact()),
+            Expanded(child: _buildSocial()),
           ],
         ),
-        const SizedBox(height: 28),
-        _buildSocial(),
       ],
     );
   }

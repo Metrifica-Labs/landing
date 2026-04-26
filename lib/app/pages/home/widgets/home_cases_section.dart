@@ -73,7 +73,7 @@ class HomeCasesSection extends ConsumerWidget {
         const SizedBox(height: 16),
         _title(28),
         const SizedBox(height: 32),
-        _CasesCarousel(cases: cases, cardWidth: 272),
+        _CasesCarousel(cases: cases, cardWidth: 272, isMobile: true),
         const SizedBox(height: 24),
         _AllCasesLink(),
       ],
@@ -163,10 +163,15 @@ class HomeCasesSection extends ConsumerWidget {
 // ---------------------------------------------------------------------------
 
 class _CasesCarousel extends StatefulWidget {
-  const _CasesCarousel({required this.cases, required this.cardWidth});
+  const _CasesCarousel({
+    required this.cases,
+    required this.cardWidth,
+    this.isMobile = false,
+  });
 
   final List<CaseModel> cases;
   final double cardWidth;
+  final bool isMobile;
 
   @override
   State<_CasesCarousel> createState() => _CasesCarouselState();
@@ -179,7 +184,9 @@ class _CasesCarouselState extends State<_CasesCarousel> {
 
   static const _cardGap = 16.0;
 
-  double get _scrollStep => (widget.cardWidth + _cardGap) * 3;
+  double get _scrollStep => widget.isMobile
+      ? widget.cardWidth + _cardGap
+      : (widget.cardWidth + _cardGap) * 3;
 
   @override
   void initState() {
@@ -222,56 +229,65 @@ class _CasesCarouselState extends State<_CasesCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        // Cards list
-        SingleChildScrollView(
-          controller: _scrollController,
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.only(top: 8, bottom: 8),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (int i = 0; i < widget.cases.length; i++)
-                Padding(
-                  padding: EdgeInsets.only(
-                    right: i < widget.cases.length - 1 ? _cardGap : 0,
-                  ),
-                  child: SizedBox(
-                    width: widget.cardWidth,
-                    child: _CaseCard(data: widget.cases[i]),
-                  ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // On mobile, only show arrows when a single card fills the viewport
+        // (i.e. the screen is too narrow to show more than ~1 card at once).
+        final showArrows = !widget.isMobile ||
+            constraints.maxWidth < widget.cardWidth * 1.4;
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Cards list
+            SingleChildScrollView(
+              controller: _scrollController,
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.only(top: 8, bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (int i = 0; i < widget.cases.length; i++)
+                    Padding(
+                      padding: EdgeInsets.only(
+                        right: i < widget.cases.length - 1 ? _cardGap : 0,
+                      ),
+                      child: SizedBox(
+                        width: widget.cardWidth,
+                        child: _CaseCard(data: widget.cases[i]),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // Left button
+            if (showArrows && _canScrollLeft)
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: _NavButton(
+                  icon: Icons.arrow_back_rounded,
+                  onTap: () => _scrollBy(-_scrollStep),
                 ),
-            ],
-          ),
-        ),
+              ),
 
-        // Left button
-        if (_canScrollLeft)
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            child: _NavButton(
-              icon: Icons.arrow_back_rounded,
-              onTap: () => _scrollBy(-_scrollStep),
-            ),
-          ),
-
-        // Right button
-        if (_canScrollRight)
-          Positioned(
-            right: 0,
-            top: 0,
-            bottom: 0,
-            child: _NavButton(
-              icon: Icons.arrow_forward_rounded,
-              onTap: () => _scrollBy(_scrollStep),
-            ),
-          ),
-      ],
+            // Right button
+            if (showArrows && _canScrollRight)
+              Positioned(
+                right: 0,
+                top: 0,
+                bottom: 0,
+                child: _NavButton(
+                  icon: Icons.arrow_forward_rounded,
+                  onTap: () => _scrollBy(_scrollStep),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
@@ -654,186 +670,412 @@ class _CaseDetailDialog extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: Container(
               color: Colors.white,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Scrollable body
-                Flexible(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Top row: image (left) + category & title (right)
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Flexible(
+                    child: isMobile
+                        ? _buildMobileBody()
+                        : _buildDesktopBody(),
+                  ),
+                  Container(
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        top: BorderSide(color: Color(0xFFEBF0FF)),
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 14),
+                    child: Builder(
+                      builder: (ctx) => GestureDetector(
+                        onTap: () => Navigator.of(ctx).pop(),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Image
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(6),
-                              child: _buildImage(
-                                width: isMobile ? 180 : 220,
-                                height: isMobile ? 180 : 220,
+                            Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF0F4FF),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                    color: const Color(0xFFDDE8FF)),
+                              ),
+                              child: const Icon(
+                                Icons.arrow_back_rounded,
+                                size: 16,
+                                color: Color(0xFF2864E8),
                               ),
                             ),
-                            const SizedBox(width: 20),
-
-                            // Category + title + description
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: Wrap(
-                                          spacing: 6,
-                                          runSpacing: 6,
-                                          children: [
-                                            // Category badge
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 4),
-                                              decoration: BoxDecoration(
-                                                color: data.categoryColor
-                                                    .withValues(alpha: 0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                              ),
-                                              child: Text(
-                                                data.category,
-                                                style:
-                                                    GoogleFonts.plusJakartaSans(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w800,
-                                                  letterSpacing: 0.8,
-                                                  color: data.categoryColor,
-                                                ),
-                                              ),
-                                            ),
-                                            // Stack chips
-                                            ...data.stack.map((s) {
-                                                  final color = _techColor(s);
-                                                  return Container(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                            horizontal: 8,
-                                                            vertical: 3),
-                                                    decoration: BoxDecoration(
-                                                      color: color.withValues(
-                                                          alpha: 0.1),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              6),
-                                                    ),
-                                                    child: Text(
-                                                      s,
-                                                      style: GoogleFonts
-                                                          .plusJakartaSans(
-                                                        fontSize: 11,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        letterSpacing: 0.4,
-                                                        color: color,
-                                                      ),
-                                                    ),
-                                                  );
-                                                }),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      _CloseButton(),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    data.name,
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: isMobile ? 18 : 22,
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.2,
-                                      letterSpacing: -0.5,
-                                      color: const Color(0xFF0B1C45),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    data.description,
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 14,
-                                      height: 1.6,
-                                      color: const Color(0xFF4A5568),
-                                    ),
-                                  ),
-                                ],
+                            const SizedBox(width: 10),
+                            Text(
+                              'Voltar',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF2864E8),
+                                letterSpacing: -0.2,
                               ),
                             ),
                           ],
                         ),
-
-                        // Proof images
-                        if (data.images.isNotEmpty) ...[
-                          const SizedBox(height: 24),
-                          const Divider(color: Color(0xFFE4EAFF)),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Imagens do projeto',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.6,
-                              color: const Color(0xFF7A879F),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          RepaintBoundary(
-                            child: _BentoGrid(
-                              images: data.images,
-                              categoryColor: data.categoryColor,
-                            ),
-                          ),
-                        ],
-
-                        // Project link
-                        if (data.link != null && data.link!.isNotEmpty) ...[
-                          const SizedBox(height: 24),
-                          const Divider(color: Color(0xFFE4EAFF)),
-                          const SizedBox(height: 16),
-                          _ProjectLink(url: data.link!),
-                        ],
-
-                        // URL
-                        if (data.url != null && data.url!.isNotEmpty) ...[
-                          const SizedBox(height: 24),
-                          const Divider(color: Color(0xFFE4EAFF)),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Acesse o case',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.6,
-                              color: const Color(0xFF7A879F),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          _UrlRow(url: data.url!),
-                        ],
-                      ],
+                      ),
                     ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileBody() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Full-width image with close button overlaid
+          Stack(
+            children: [
+              _buildFullWidthImage(height: 220),
+              Positioned(
+                top: 12,
+                right: 12,
+                child: _CloseButton(),
+              ),
+            ],
+          ),
+
+          // Category + stacks + title + description
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: data.categoryColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        data.category,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
+                          color: data.categoryColor,
+                        ),
+                      ),
+                    ),
+                    ...data.stack.map((s) {
+                      final color = _techColor(s);
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: color.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          s,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.4,
+                            color: color,
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  data.name,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    height: 1.2,
+                    letterSpacing: -0.5,
+                    color: const Color(0xFF0B1C45),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  data.description,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14,
+                    height: 1.6,
+                    color: const Color(0xFF4A5568),
                   ),
                 ),
               ],
             ),
           ),
-        ),
+
+          // Proof images
+          if (data.images.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Divider(color: Color(0xFFE4EAFF)),
+            ),
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Imagens do projeto',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.6,
+                  color: const Color(0xFF7A879F),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: RepaintBoundary(
+                child: _BentoGrid(
+                  images: data.images,
+                  categoryColor: data.categoryColor,
+                ),
+              ),
+            ),
+          ],
+
+          // Project link
+          if (data.link != null && data.link!.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Divider(color: Color(0xFFE4EAFF)),
+            ),
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _ProjectLink(url: data.link!),
+            ),
+          ],
+
+          // URL
+          if (data.url != null && data.url!.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Divider(color: Color(0xFFE4EAFF)),
+            ),
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Acesse o case',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.6,
+                  color: const Color(0xFF7A879F),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _UrlRow(url: data.url!),
+            ),
+          ],
+
+          const SizedBox(height: 28),
+        ],
       ),
+    );
+  }
+
+  Widget _buildDesktopBody() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: _buildImage(width: 220, height: 220),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color:
+                                      data.categoryColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  data.category,
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.8,
+                                    color: data.categoryColor,
+                                  ),
+                                ),
+                              ),
+                              ...data.stack.map((s) {
+                                final color = _techColor(s);
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: color.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    s,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.4,
+                                      color: color,
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        _CloseButton(),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      data.name,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                        letterSpacing: -0.5,
+                        color: const Color(0xFF0B1C45),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      data.description,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 14,
+                        height: 1.6,
+                        color: const Color(0xFF4A5568),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          if (data.images.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            const Divider(color: Color(0xFFE4EAFF)),
+            const SizedBox(height: 16),
+            Text(
+              'Imagens do projeto',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.6,
+                color: const Color(0xFF7A879F),
+              ),
+            ),
+            const SizedBox(height: 12),
+            RepaintBoundary(
+              child: _BentoGrid(
+                images: data.images,
+                categoryColor: data.categoryColor,
+              ),
+            ),
+          ],
+
+          if (data.link != null && data.link!.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            const Divider(color: Color(0xFFE4EAFF)),
+            const SizedBox(height: 16),
+            _ProjectLink(url: data.link!),
+          ],
+
+          if (data.url != null && data.url!.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            const Divider(color: Color(0xFFE4EAFF)),
+            const SizedBox(height: 16),
+            Text(
+              'Acesse o case',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.6,
+                color: const Color(0xFF7A879F),
+              ),
+            ),
+            const SizedBox(height: 8),
+            _UrlRow(url: data.url!),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFullWidthImage({required double height}) {
+    if (data.imageUrl != null && data.imageUrl!.isNotEmpty) {
+      return Image.network(
+        data.imageUrl!,
+        height: height,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+          if (wasSynchronouslyLoaded || frame != null) return child;
+          return _fullWidthPlaceholder(height);
+        },
+        errorBuilder: (_, __, ___) => _fullWidthPlaceholder(height),
+      );
+    }
+    return _fullWidthPlaceholder(height);
+  }
+
+  Widget _fullWidthPlaceholder(double height) {
+    return Container(
+      height: height,
+      width: double.infinity,
+      color: data.categoryColor.withValues(alpha: 0.06),
+      child: Center(
+        child: Icon(
+          Icons.web_rounded,
+          size: 44,
+          color: data.categoryColor.withValues(alpha: 0.25),
+        ),
       ),
     );
   }
