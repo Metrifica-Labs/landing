@@ -381,9 +381,12 @@ class _CaseCardState extends State<_CaseCard> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
-      child: TweenAnimationBuilder<double>(
+      child: GestureDetector(
+        onTap: () => _CaseDetailDialog.show(context, widget.data),
+        child: TweenAnimationBuilder<double>(
         tween: Tween(begin: 0, end: _hovered ? -8 : 0),
         duration: const Duration(milliseconds: 280),
         curve: Curves.easeOut,
@@ -472,31 +475,24 @@ class _CaseCardState extends State<_CaseCard> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    InkWell(
-                      onTap: () => _CaseDetailDialog.show(context, widget.data),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Ver mais',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: const Color(0xFF2864E8),
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            const Icon(
-                              Icons.arrow_forward_rounded,
-                              size: 14,
-                              color: Color(0xFF2864E8),
-                            ),
-                          ],
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Ver mais',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF2864E8),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 6),
+                        const Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 14,
+                          color: Color(0xFF2864E8),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -505,6 +501,7 @@ class _CaseCardState extends State<_CaseCard> {
           ),
         ),
       ),
+    ),
     );
   }
 }
@@ -685,66 +682,69 @@ class _CaseDetailDialog extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: data.categoryColor
-                                              .withValues(alpha: 0.1),
-                                          borderRadius:
-                                              BorderRadius.circular(6),
-                                        ),
-                                        child: Text(
-                                          data.category,
-                                          style: GoogleFonts.plusJakartaSans(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w800,
-                                            letterSpacing: 0.8,
-                                            color: data.categoryColor,
-                                          ),
-                                        ),
-                                      ),
-                                      if (data.stack.isNotEmpty) ...[
-                                        const SizedBox(width: 8),
-                                        Flexible(
-                                          child: Wrap(
-                                            spacing: 6,
-                                            runSpacing: 4,
-                                            children: data.stack
-                                                .map((s) => Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
+                                      Expanded(
+                                        child: Wrap(
+                                          spacing: 6,
+                                          runSpacing: 6,
+                                          children: [
+                                            // Category badge
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: data.categoryColor
+                                                    .withValues(alpha: 0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              child: Text(
+                                                data.category,
+                                                style:
+                                                    GoogleFonts.plusJakartaSans(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w800,
+                                                  letterSpacing: 0.8,
+                                                  color: data.categoryColor,
+                                                ),
+                                              ),
+                                            ),
+                                            // Stack chips
+                                            ...data.stack.map((s) => Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
                                                           horizontal: 8,
                                                           vertical: 3),
-                                                      decoration: BoxDecoration(
-                                                        color: const Color(
-                                                            0xFFF4F7FF),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(6),
-                                                        border: Border.all(
-                                                          color: const Color(
-                                                              0xFFE4EAFF),
-                                                        ),
-                                                      ),
-                                                      child: Text(
-                                                        s,
-                                                        style: GoogleFonts
-                                                            .plusJakartaSans(
-                                                          fontSize: 11,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color: const Color(
-                                                              0xFF4A5568),
-                                                        ),
-                                                      ),
-                                                    ))
-                                                .toList(),
-                                          ),
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        const Color(0xFFF4F7FF),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            6),
+                                                    border: Border.all(
+                                                      color: const Color(
+                                                          0xFFE4EAFF),
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    s,
+                                                    style: GoogleFonts
+                                                        .plusJakartaSans(
+                                                      fontSize: 11,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: const Color(
+                                                          0xFF4A5568),
+                                                    ),
+                                                  ),
+                                                )),
+                                          ],
                                         ),
-                                      ],
-                                      const Spacer(),
+                                      ),
+                                      const SizedBox(width: 8),
                                       _CloseButton(),
                                     ],
                                   ),
@@ -789,9 +789,48 @@ class _CaseDetailDialog extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          _ImagesCarousel(
-                            images: data.images,
-                            categoryColor: data.categoryColor,
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              childAspectRatio: 16 / 10,
+                            ),
+                            itemCount: data.images.length,
+                            itemBuilder: (context, i) => GestureDetector(
+                              onTap: () => _ImageViewerDialog.show(
+                                context,
+                                images: data.images,
+                                initialIndex: i,
+                              ),
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    data.images[i],
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Container(
+                                      decoration: BoxDecoration(
+                                        color: data.categoryColor
+                                            .withValues(alpha: 0.06),
+                                        borderRadius:
+                                            BorderRadius.circular(8),
+                                      ),
+                                      child: Icon(
+                                        Icons.broken_image_rounded,
+                                        size: 28,
+                                        color: data.categoryColor
+                                            .withValues(alpha: 0.25),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
 
