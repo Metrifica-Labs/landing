@@ -9,6 +9,10 @@ class CaseModel {
     required this.categoryColor,
     required this.imageUrl,
     required this.order,
+    this.url,
+    this.images = const [],
+    this.stack = const [],
+    this.link,
   });
 
   final String id;
@@ -18,6 +22,10 @@ class CaseModel {
   final Color categoryColor;
   final String? imageUrl;
   final int order;
+  final String? url;
+  final List<String> images;
+  final List<String> stack;
+  final String? link;
 
   factory CaseModel.fromJson(Map<String, dynamic> json) {
     return CaseModel(
@@ -28,6 +36,14 @@ class CaseModel {
       categoryColor: _parseColor(json['category_color'] as String? ?? '#2864E8'),
       imageUrl: json['image_url'] as String?,
       order: json['order'] as int? ?? 0,
+      url: json['url'] as String?,
+      images: (json['images'] as List<dynamic>? ?? [])
+          .map((e) => e as String)
+          .toList(),
+      stack: (json['stack'] as List<dynamic>? ?? [])
+          .map((e) => e as String)
+          .toList(),
+      link: json['link'] as String?,
     );
   }
 

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/pages/home/models/case_model.dart';
 import 'package:metrifica_landing/app/pages/home/providers/cases_provider.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeCasesSection extends ConsumerWidget {
   const HomeCasesSection({super.key, required this.isMobile});
@@ -471,7 +473,7 @@ class _CaseCardState extends State<_CaseCard> {
                     ),
                     const SizedBox(height: 16),
                     InkWell(
-                      onTap: () {},
+                      onTap: () => _CaseDetailDialog.show(context, widget.data),
                       borderRadius: BorderRadius.circular(8),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),
@@ -479,7 +481,7 @@ class _CaseCardState extends State<_CaseCard> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Ver case',
+                              'Ver mais',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -612,6 +614,709 @@ class _SkeletonBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFE4EAFF).withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(radius),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Case detail dialog
+// ---------------------------------------------------------------------------
+
+class _CaseDetailDialog extends StatelessWidget {
+  const _CaseDetailDialog({required this.data});
+
+  final CaseModel data;
+
+  static void show(BuildContext context, CaseModel data) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.55),
+      builder: (_) => _CaseDetailDialog(data: data),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    final dialogWidth = isMobile ? screenWidth * 0.95 : 680.0;
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 12 : 32,
+        vertical: 48,
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: dialogWidth),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            color: Colors.white,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Scrollable body
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Top row: image (left) + category & title (right)
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Image
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: _buildImage(
+                                width: isMobile ? 180 : 220,
+                                height: isMobile ? 180 : 220,
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+
+                            // Category + title + description
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: data.categoryColor
+                                              .withValues(alpha: 0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                        ),
+                                        child: Text(
+                                          data.category,
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w800,
+                                            letterSpacing: 0.8,
+                                            color: data.categoryColor,
+                                          ),
+                                        ),
+                                      ),
+                                      if (data.stack.isNotEmpty) ...[
+                                        const SizedBox(width: 8),
+                                        Flexible(
+                                          child: Wrap(
+                                            spacing: 6,
+                                            runSpacing: 4,
+                                            children: data.stack
+                                                .map((s) => Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 3),
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(
+                                                            0xFFF4F7FF),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(6),
+                                                        border: Border.all(
+                                                          color: const Color(
+                                                              0xFFE4EAFF),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        s,
+                                                        style: GoogleFonts
+                                                            .plusJakartaSans(
+                                                          fontSize: 11,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: const Color(
+                                                              0xFF4A5568),
+                                                        ),
+                                                      ),
+                                                    ))
+                                                .toList(),
+                                          ),
+                                        ),
+                                      ],
+                                      const Spacer(),
+                                      _CloseButton(),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    data.name,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: isMobile ? 18 : 22,
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.2,
+                                      letterSpacing: -0.5,
+                                      color: const Color(0xFF0B1C45),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    data.description,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 14,
+                                      height: 1.6,
+                                      color: const Color(0xFF4A5568),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Proof images
+                        if (data.images.isNotEmpty) ...[
+                          const SizedBox(height: 24),
+                          const Divider(color: Color(0xFFE4EAFF)),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Imagens do projeto',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.6,
+                              color: const Color(0xFF7A879F),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          _ImagesCarousel(
+                            images: data.images,
+                            categoryColor: data.categoryColor,
+                          ),
+                        ],
+
+                        // Project link
+                        if (data.link != null && data.link!.isNotEmpty) ...[
+                          const SizedBox(height: 24),
+                          const Divider(color: Color(0xFFE4EAFF)),
+                          const SizedBox(height: 16),
+                          _ProjectLink(url: data.link!),
+                        ],
+
+                        // URL
+                        if (data.url != null && data.url!.isNotEmpty) ...[
+                          const SizedBox(height: 24),
+                          const Divider(color: Color(0xFFE4EAFF)),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Acesse o case',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.6,
+                              color: const Color(0xFF7A879F),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          _UrlRow(url: data.url!),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImage({required double width, required double height}) {
+    if (data.imageUrl != null && data.imageUrl!.isNotEmpty) {
+      return Image.network(
+        data.imageUrl!,
+        width: width,
+        height: height,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _imagePlaceholder(width, height),
+      );
+    }
+    return _imagePlaceholder(width, height);
+  }
+
+  Widget _imagePlaceholder(double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      color: data.categoryColor.withValues(alpha: 0.06),
+      child: Center(
+        child: Icon(
+          Icons.web_rounded,
+          size: 36,
+          color: data.categoryColor.withValues(alpha: 0.25),
+        ),
+      ),
+    );
+  }
+}
+
+class _CloseButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).pop(),
+      child: Container(
+        width: 34,
+        height: 34,
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.45),
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(Icons.close_rounded, size: 18, color: Colors.white),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Project link
+// ---------------------------------------------------------------------------
+
+class _ProjectLink extends StatefulWidget {
+  const _ProjectLink({required this.url});
+
+  final String url;
+
+  @override
+  State<_ProjectLink> createState() => _ProjectLinkState();
+}
+
+class _ProjectLinkState extends State<_ProjectLink> {
+  bool _hovered = false;
+
+  Future<void> _launch() async {
+    final uri = Uri.parse(widget.url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: _launch,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 150),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: _hovered
+                    ? const Color(0xFF1A4FBF)
+                    : const Color(0xFF2864E8),
+                decoration:
+                    _hovered ? TextDecoration.underline : TextDecoration.none,
+              ),
+              child: const Text('Link para o projeto'),
+            ),
+            const SizedBox(width: 6),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              transform: Matrix4.translationValues(_hovered ? 3 : 0, 0, 0),
+              child: Icon(
+                Icons.arrow_forward_rounded,
+                size: 16,
+                color: _hovered
+                    ? const Color(0xFF1A4FBF)
+                    : const Color(0xFF2864E8),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                widget.url,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13,
+                  color: const Color(0xFF7A879F),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Images carousel (dialog proof images)
+// ---------------------------------------------------------------------------
+
+class _ImagesCarousel extends StatefulWidget {
+  const _ImagesCarousel({
+    required this.images,
+    required this.categoryColor,
+  });
+
+  final List<String> images;
+  final Color categoryColor;
+
+  @override
+  State<_ImagesCarousel> createState() => _ImagesCarouselState();
+}
+
+class _ImagesCarouselState extends State<_ImagesCarousel> {
+  late final ScrollController _scrollController;
+  bool _canScrollLeft = false;
+  bool _canScrollRight = false;
+
+  static const _imageWidth = 260.0;
+  static const _imageGap = 12.0;
+
+  double get _scrollStep => (_imageWidth + _imageGap) * 2;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onScroll());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final offset = _scrollController.offset;
+    final max = _scrollController.position.maxScrollExtent;
+    final canLeft = offset > 0;
+    final canRight = offset < max;
+    if (canLeft != _canScrollLeft || canRight != _canScrollRight) {
+      setState(() {
+        _canScrollLeft = canLeft;
+        _canScrollRight = canRight;
+      });
+    }
+  }
+
+  void _scrollBy(double delta) {
+    final target = (_scrollController.offset + delta)
+        .clamp(0.0, _scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        SingleChildScrollView(
+          controller: _scrollController,
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              for (int i = 0; i < widget.images.length; i++)
+                Padding(
+                  padding: EdgeInsets.only(
+                    right: i < widget.images.length - 1 ? _imageGap : 0,
+                  ),
+                  child: GestureDetector(
+                    onTap: () => _ImageViewerDialog.show(
+                      context,
+                      images: widget.images,
+                      initialIndex: i,
+                    ),
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          widget.images[i],
+                          height: 180,
+                          width: _imageWidth,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            height: 180,
+                            width: _imageWidth,
+                            decoration: BoxDecoration(
+                              color:
+                                  widget.categoryColor.withValues(alpha: 0.06),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.broken_image_rounded,
+                              size: 32,
+                              color: widget.categoryColor
+                                  .withValues(alpha: 0.25),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+
+        if (_canScrollLeft)
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: _NavButton(
+              icon: Icons.arrow_back_rounded,
+              onTap: () => _scrollBy(-_scrollStep),
+            ),
+          ),
+
+        if (_canScrollRight)
+          Positioned(
+            right: 0,
+            top: 0,
+            bottom: 0,
+            child: _NavButton(
+              icon: Icons.arrow_forward_rounded,
+              onTap: () => _scrollBy(_scrollStep),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _UrlRow extends StatefulWidget {
+  const _UrlRow({required this.url});
+
+  final String url;
+
+  @override
+  State<_UrlRow> createState() => _UrlRowState();
+}
+
+class _UrlRowState extends State<_UrlRow> {
+  bool _hovered = false;
+  bool _copied = false;
+
+  Future<void> _launch() async {
+    final uri = Uri.parse(widget.url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> _copy() async {
+    await Clipboard.setData(ClipboardData(text: widget.url));
+    setState(() => _copied = true);
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) setState(() => _copied = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF4F7FF),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFE4EAFF)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.link_rounded, size: 16, color: Color(0xFF2864E8)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              onEnter: (_) => setState(() => _hovered = true),
+              onExit: (_) => setState(() => _hovered = false),
+              child: GestureDetector(
+                onTap: _launch,
+                child: Text(
+                  widget.url,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    color: _hovered
+                        ? const Color(0xFF2864E8)
+                        : const Color(0xFF4A5568),
+                    decoration:
+                        _hovered ? TextDecoration.underline : TextDecoration.none,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: _copy,
+            child: Tooltip(
+              message: _copied ? 'Copiado!' : 'Copiar URL',
+              child: Icon(
+                _copied ? Icons.check_rounded : Icons.copy_rounded,
+                size: 16,
+                color: _copied
+                    ? const Color(0xFF22C55E)
+                    : const Color(0xFF7A879F),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Full-screen image viewer
+// ---------------------------------------------------------------------------
+
+class _ImageViewerDialog extends StatefulWidget {
+  const _ImageViewerDialog({
+    required this.images,
+    required this.initialIndex,
+  });
+
+  final List<String> images;
+  final int initialIndex;
+
+  static void show(
+    BuildContext context, {
+    required List<String> images,
+    required int initialIndex,
+  }) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.88),
+      builder: (_) => _ImageViewerDialog(
+        images: images,
+        initialIndex: initialIndex,
+      ),
+    );
+  }
+
+  @override
+  State<_ImageViewerDialog> createState() => _ImageViewerDialogState();
+}
+
+class _ImageViewerDialogState extends State<_ImageViewerDialog> {
+  late int _current;
+
+  @override
+  void initState() {
+    super.initState();
+    _current = widget.initialIndex;
+  }
+
+  void _go(int index) => setState(() => _current = index);
+
+  @override
+  Widget build(BuildContext context) {
+    final hasPrev = _current > 0;
+    final hasNext = _current < widget.images.length - 1;
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.all(24),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Image
+          GestureDetector(
+            onTap: () {}, // absorb taps on image itself
+            child: InteractiveViewer(
+              minScale: 1.0,
+              maxScale: 4.0,
+              child: Image.network(
+                widget.images[_current],
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+
+          // Counter
+          if (widget.images.length > 1)
+            Positioned(
+              bottom: 16,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.55),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '${_current + 1} / ${widget.images.length}',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+
+          // Prev button
+          if (hasPrev)
+            Positioned(
+              left: 0,
+              child: _NavButton(
+                icon: Icons.arrow_back_rounded,
+                onTap: () => _go(_current - 1),
+              ),
+            ),
+
+          // Next button
+          if (hasNext)
+            Positioned(
+              right: 0,
+              child: _NavButton(
+                icon: Icons.arrow_forward_rounded,
+                onTap: () => _go(_current + 1),
+              ),
+            ),
+
+          // Close button
+          Positioned(
+            top: 0,
+            right: 0,
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.55),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.close_rounded,
+                  size: 18,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
