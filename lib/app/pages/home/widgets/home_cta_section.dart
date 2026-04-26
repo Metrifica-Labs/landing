@@ -40,13 +40,13 @@ class HomeCtaSection extends StatelessWidget {
           child: narrow
               ? Stack(
                   children: [
-                    const Positioned(
-                      right: -20,
-                      top: -20,
-                      width: 220,
-                      height: 220,
-                      child: _CtaHero3DDecor(),
-                    ),
+                    // Positioned(
+                    //   right: -20,
+                    //   top: -20,
+                    //   width: 220,
+                    //   height: 220,
+                    //   child: _CtaHero3DDecor(),
+                    // ),
                     Padding(
                       padding: EdgeInsets.symmetric(
                           horizontal: hPad, vertical: vPad),
@@ -65,10 +65,10 @@ class HomeCtaSection extends StatelessWidget {
                         child: _buildContent(false),
                       ),
                     ),
-                    const Expanded(
-                      flex: 54,
-                      child: _CtaHero3DDecor(),
-                    ),
+                    // const Expanded(
+                    //   flex: 54,
+                    //   child: _CtaHero3DDecor(),
+                    // ),
                   ],
                 ),
         );

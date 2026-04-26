@@ -52,7 +52,7 @@ class HomeProcessSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
-          flex: 55,
+          flex: 68,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -64,12 +64,12 @@ class HomeProcessSection extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 48),
+        const SizedBox(width: 32),
         const Expanded(
-          flex: 60,
+          flex: 42,
           child: Align(
             alignment: Alignment.centerRight,
-            child: _BlueprintCard(),
+            child: _BlueprintCard(maxSize: 340),
           ),
         ),
       ],
@@ -105,7 +105,7 @@ class HomeProcessSection extends StatelessWidget {
 
   Widget _title(double fontSize) {
     return Text(
-      'Do conceito ao código.\nCom clareza e colaboração.',
+      'Do conceito ao código. Com clareza e colaboração.',
       style: GoogleFonts.plusJakartaSans(
         fontSize: fontSize,
         fontWeight: FontWeight.w700,
@@ -124,84 +124,192 @@ class _DesktopTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Icons row with connecting lines
-        Row(
-          children: steps.asMap().entries.map((entry) {
-            final i = entry.key;
-            final step = entry.value;
-            return Expanded(
-              child: Row(
-                children: [
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFF2864E8),
-                    ),
-                    child: Icon(step.icon, color: Colors.white, size: 24),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 720) {
+          return _CompactDesktopTimeline(steps: steps);
+        }
+
+        return Column(
+          children: [
+            // Icons row with connecting lines
+            Row(
+              children: steps.asMap().entries.map((entry) {
+                final i = entry.key;
+                final step = entry.value;
+                return Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFF2864E8),
+                        ),
+                        child: Icon(step.icon, color: Colors.white, size: 24),
+                      ),
+                      if (i < steps.length - 1)
+                        Expanded(
+                          child: Container(
+                            height: 2,
+                            color: const Color(0xFFCBD9FF),
+                          ),
+                        ),
+                    ],
                   ),
-                  if (i < steps.length - 1)
-                    Expanded(
-                      child: Container(
-                        height: 2,
-                        color: const Color(0xFFCBD9FF),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 20),
+            // Text row
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: steps
+                  .map(
+                    (step) => Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _StepNumber(number: step.number),
+                            const SizedBox(height: 6),
+                            _StepTitle(title: step.title),
+                            const SizedBox(height: 6),
+                            _StepDescription(description: step.description),
+                          ],
+                        ),
                       ),
                     ),
-                ],
-              ),
-            );
-          }).toList(),
+                  )
+                  .toList(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _CompactDesktopTimeline extends StatelessWidget {
+  const _CompactDesktopTimeline({required this.steps});
+
+  final List<_StepData> steps;
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = [steps.take(2).toList(), steps.skip(2).toList()];
+
+    return Column(
+      children: [
+        for (final row in rows) ...[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = 0; i < row.length; i++) ...[
+                Expanded(child: _CompactStep(step: row[i])),
+                if (i < row.length - 1) const SizedBox(width: 18),
+              ],
+            ],
+          ),
+          if (row != rows.last) const SizedBox(height: 22),
+        ],
+      ],
+    );
+  }
+}
+
+class _CompactStep extends StatelessWidget {
+  const _CompactStep({required this.step});
+
+  final _StepData step;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Color(0xFF2864E8),
+          ),
+          child: Icon(step.icon, color: Colors.white, size: 20),
         ),
-        const SizedBox(height: 20),
-        // Text row
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: steps
-              .map(
-                (step) => Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          step.number,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                            color: const Color(0xFF2864E8),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          step.title,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF0B1C45),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          step.description,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 13,
-                            height: 1.4,
-                            color: const Color(0xFF7A879F),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _StepNumber(number: step.number),
+              const SizedBox(height: 4),
+              _StepTitle(title: step.title),
+              const SizedBox(height: 5),
+              _StepDescription(description: step.description),
+            ],
+          ),
         ),
       ],
+    );
+  }
+}
+
+class _StepNumber extends StatelessWidget {
+  const _StepNumber({required this.number});
+
+  final String number;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      number,
+      style: GoogleFonts.plusJakartaSans(
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.5,
+        color: const Color(0xFF2864E8),
+      ),
+    );
+  }
+}
+
+class _StepTitle extends StatelessWidget {
+  const _StepTitle({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: GoogleFonts.plusJakartaSans(
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+        color: const Color(0xFF0B1C45),
+      ),
+    );
+  }
+}
+
+class _StepDescription extends StatelessWidget {
+  const _StepDescription({required this.description});
+
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      description,
+      style: GoogleFonts.plusJakartaSans(
+        fontSize: 13,
+        height: 1.4,
+        color: const Color(0xFF7A879F),
+      ),
     );
   }
 }
@@ -291,13 +399,17 @@ class _MobileTimeline extends StatelessWidget {
 }
 
 class _BlueprintCard extends StatelessWidget {
-  const _BlueprintCard();
+  const _BlueprintCard({this.maxSize = 400});
+
+  final double maxSize;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final size = constraints.maxWidth < 400 ? constraints.maxWidth : 400.0;
+        final size = constraints.maxWidth < maxSize
+            ? constraints.maxWidth
+            : maxSize;
 
         return SizedBox(
           height: size,

@@ -212,50 +212,95 @@ class _DesktopBentoGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 1120) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 1,
+                child: Column(
+                  children: [
+                    _BentoServiceCard(
+                      data: services[0],
+                      active: activeIndex == 0,
+                    ),
+                    const SizedBox(height: 24),
+                    _BentoServiceCard(
+                      data: services[2],
+                      active: activeIndex == 2,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 24),
+              Expanded(
+                flex: 1,
+                child: Column(
+                  children: [
+                    _BentoServiceCard(
+                      data: services[1],
+                      active: activeIndex == 1,
+                    ),
+                    const SizedBox(height: 24),
+                    _BentoServiceCard(
+                      data: services[3],
+                      active: activeIndex == 3,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
+
+        return Column(
           children: [
-            Expanded(
-              flex: services[0].desktopFlex,
-              child: _BentoServiceCard(
-                data: services[0],
-                active: activeIndex == 0,
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: services[0].desktopFlex,
+                  child: _BentoServiceCard(
+                    data: services[0],
+                    active: activeIndex == 0,
+                  ),
+                ),
+                const SizedBox(width: 24),
+                Expanded(
+                  flex: services[1].desktopFlex,
+                  child: _BentoServiceCard(
+                    data: services[1],
+                    active: activeIndex == 1,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 24),
-            Expanded(
-              flex: services[1].desktopFlex,
-              child: _BentoServiceCard(
-                data: services[1],
-                active: activeIndex == 1,
-              ),
+            const SizedBox(height: 24),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: services[2].desktopFlex,
+                  child: _BentoServiceCard(
+                    data: services[2],
+                    active: activeIndex == 2,
+                  ),
+                ),
+                const SizedBox(width: 24),
+                Expanded(
+                  flex: services[3].desktopFlex,
+                  child: _BentoServiceCard(
+                    data: services[3],
+                    active: activeIndex == 3,
+                  ),
+                ),
+              ],
             ),
           ],
-        ),
-        const SizedBox(height: 24),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: services[2].desktopFlex,
-              child: _BentoServiceCard(
-                data: services[2],
-                active: activeIndex == 2,
-              ),
-            ),
-            const SizedBox(width: 24),
-            Expanded(
-              flex: services[3].desktopFlex,
-              child: _BentoServiceCard(
-                data: services[3],
-                active: activeIndex == 3,
-              ),
-            ),
-          ],
-        ),
-      ],
+        );
+      },
     );
   }
 }
@@ -303,9 +348,13 @@ class _BentoServiceCardState extends State<_BentoServiceCard> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isCompact = widget.compact || constraints.maxWidth < 500;
+        final isCompact = widget.compact || constraints.maxWidth < 380;
         final active = widget.active;
         final cardHeight = widget.compact ? null : (isCompact ? 520.0 : 290.0);
+        final visualWidth = isCompact
+            ? double.infinity
+            : (constraints.maxWidth * 0.38).clamp(150.0, 210.0).toDouble();
+        final contentGap = constraints.maxWidth < 500 ? 20.0 : 26.0;
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 420),
@@ -354,11 +403,12 @@ class _BentoServiceCardState extends State<_BentoServiceCard> {
                       child: _ServiceCopy(data: widget.data, hovered: active),
                     ),
                   SizedBox(
-                    width: isCompact ? 0 : 26,
+                    width: isCompact ? 0 : contentGap,
                     height: isCompact ? 22 : 0,
                   ),
+                  if (isCompact && !widget.compact) const Spacer(),
                   SizedBox(
-                    width: isCompact ? double.infinity : 210,
+                    width: visualWidth,
                     height: isCompact ? 180 : double.infinity,
                     child: _VisualShowcase(
                       type: widget.data.type,
