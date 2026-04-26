@@ -789,48 +789,9 @@ class _CaseDetailDialog extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                              childAspectRatio: 16 / 10,
-                            ),
-                            itemCount: data.images.length,
-                            itemBuilder: (context, i) => GestureDetector(
-                              onTap: () => _ImageViewerDialog.show(
-                                context,
-                                images: data.images,
-                                initialIndex: i,
-                              ),
-                              child: MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.network(
-                                    data.images[i],
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Container(
-                                      decoration: BoxDecoration(
-                                        color: data.categoryColor
-                                            .withValues(alpha: 0.06),
-                                        borderRadius:
-                                            BorderRadius.circular(8),
-                                      ),
-                                      child: Icon(
-                                        Icons.broken_image_rounded,
-                                        size: 28,
-                                        color: data.categoryColor
-                                            .withValues(alpha: 0.25),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
+                          _BentoGrid(
+                            images: data.images,
+                            categoryColor: data.categoryColor,
                           ),
                         ],
 
@@ -993,6 +954,155 @@ class _ProjectLinkState extends State<_ProjectLink> {
         ),
       ),
     );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Bento grid (dialog proof images)
+// ---------------------------------------------------------------------------
+
+class _BentoGrid extends StatelessWidget {
+  const _BentoGrid({required this.images, required this.categoryColor});
+
+  final List<String> images;
+  final Color categoryColor;
+
+  static const _gap = 8.0;
+  static const _heroHeight = 200.0;
+  static const _smallHeight = 130.0;
+  static const _rowHeight = 140.0;
+
+  Widget _tile(BuildContext context, int index) {
+    return GestureDetector(
+      onTap: () => _ImageViewerDialog.show(
+        context,
+        images: images,
+        initialIndex: index,
+      ),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.network(
+            images[index],
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+            errorBuilder: (_, __, ___) => Container(
+              color: categoryColor.withValues(alpha: 0.06),
+              child: Icon(
+                Icons.broken_image_rounded,
+                size: 28,
+                color: categoryColor.withValues(alpha: 0.25),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final n = images.length;
+
+    if (n == 1) {
+      // Single image: full width
+      return SizedBox(height: _heroHeight, child: _tile(context, 0));
+    }
+
+    if (n == 2) {
+      // Two images side by side, first slightly wider
+      return SizedBox(
+        height: _heroHeight,
+        child: Row(children: [
+          Expanded(flex: 3, child: _tile(context, 0)),
+          const SizedBox(width: _gap),
+          Expanded(flex: 2, child: _tile(context, 1)),
+        ]),
+      );
+    }
+
+    if (n == 3) {
+      // Hero left, two stacked right
+      return SizedBox(
+        height: _heroHeight,
+        child: Row(children: [
+          Expanded(flex: 3, child: _tile(context, 0)),
+          const SizedBox(width: _gap),
+          Expanded(
+            flex: 2,
+            child: Column(children: [
+              Expanded(child: _tile(context, 1)),
+              const SizedBox(height: _gap),
+              Expanded(child: _tile(context, 2)),
+            ]),
+          ),
+        ]),
+      );
+    }
+
+    if (n == 4) {
+      // Hero top-left, small top-right, two equal bottom
+      return Column(children: [
+        SizedBox(
+          height: _heroHeight,
+          child: Row(children: [
+            Expanded(flex: 3, child: _tile(context, 0)),
+            const SizedBox(width: _gap),
+            Expanded(flex: 2, child: _tile(context, 1)),
+          ]),
+        ),
+        const SizedBox(height: _gap),
+        SizedBox(
+          height: _smallHeight,
+          child: Row(children: [
+            Expanded(child: _tile(context, 2)),
+            const SizedBox(width: _gap),
+            Expanded(child: _tile(context, 3)),
+          ]),
+        ),
+      ]);
+    }
+
+    // 5+ images: hero top-left, small top-right + stacked, rest in 2-col rows
+    final remaining = images.sublist(3);
+    final rows = <Widget>[];
+    for (int i = 0; i < remaining.length; i += 2) {
+      if (rows.isNotEmpty) rows.add(const SizedBox(height: _gap));
+      rows.add(SizedBox(
+        height: _rowHeight,
+        child: Row(children: [
+          Expanded(child: _tile(context, 3 + i)),
+          const SizedBox(width: _gap),
+          Expanded(
+            child: i + 1 < remaining.length
+                ? _tile(context, 3 + i + 1)
+                : const SizedBox.shrink(),
+          ),
+        ]),
+      ));
+    }
+
+    return Column(children: [
+      SizedBox(
+        height: _heroHeight,
+        child: Row(children: [
+          Expanded(flex: 3, child: _tile(context, 0)),
+          const SizedBox(width: _gap),
+          Expanded(
+            flex: 2,
+            child: Column(children: [
+              Expanded(child: _tile(context, 1)),
+              const SizedBox(height: _gap),
+              Expanded(child: _tile(context, 2)),
+            ]),
+          ),
+        ]),
+      ),
+      const SizedBox(height: _gap),
+      ...rows,
+    ]);
   }
 }
 
