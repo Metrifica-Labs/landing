@@ -75,7 +75,11 @@ class _HomeServicesSectionState extends State<HomeServicesSection> {
   @override
   void initState() {
     super.initState();
-    _animationTimer = Timer.periodic(const Duration(milliseconds: 1800), (_) {
+    // Slower cadence on mobile — reduces unnecessary rebuilds on low-end devices.
+    final interval = widget.isMobile
+        ? const Duration(milliseconds: 3200)
+        : const Duration(milliseconds: 1800);
+    _animationTimer = Timer.periodic(interval, (_) {
       if (!mounted) return;
       setState(() => _activeIndex = (_activeIndex + 1) % _services.length);
     });
@@ -222,14 +226,18 @@ class _DesktopBentoGrid extends StatelessWidget {
                 flex: 1,
                 child: Column(
                   children: [
-                    _BentoServiceCard(
-                      data: services[0],
-                      active: activeIndex == 0,
+                    RepaintBoundary(
+                      child: _BentoServiceCard(
+                        data: services[0],
+                        active: activeIndex == 0,
+                      ),
                     ),
                     const SizedBox(height: 24),
-                    _BentoServiceCard(
-                      data: services[2],
-                      active: activeIndex == 2,
+                    RepaintBoundary(
+                      child: _BentoServiceCard(
+                        data: services[2],
+                        active: activeIndex == 2,
+                      ),
                     ),
                   ],
                 ),
@@ -239,14 +247,18 @@ class _DesktopBentoGrid extends StatelessWidget {
                 flex: 1,
                 child: Column(
                   children: [
-                    _BentoServiceCard(
-                      data: services[1],
-                      active: activeIndex == 1,
+                    RepaintBoundary(
+                      child: _BentoServiceCard(
+                        data: services[1],
+                        active: activeIndex == 1,
+                      ),
                     ),
                     const SizedBox(height: 24),
-                    _BentoServiceCard(
-                      data: services[3],
-                      active: activeIndex == 3,
+                    RepaintBoundary(
+                      child: _BentoServiceCard(
+                        data: services[3],
+                        active: activeIndex == 3,
+                      ),
                     ),
                   ],
                 ),
@@ -262,17 +274,21 @@ class _DesktopBentoGrid extends StatelessWidget {
               children: [
                 Expanded(
                   flex: services[0].desktopFlex,
-                  child: _BentoServiceCard(
-                    data: services[0],
-                    active: activeIndex == 0,
+                  child: RepaintBoundary(
+                    child: _BentoServiceCard(
+                      data: services[0],
+                      active: activeIndex == 0,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 24),
                 Expanded(
                   flex: services[1].desktopFlex,
-                  child: _BentoServiceCard(
-                    data: services[1],
-                    active: activeIndex == 1,
+                  child: RepaintBoundary(
+                    child: _BentoServiceCard(
+                      data: services[1],
+                      active: activeIndex == 1,
+                    ),
                   ),
                 ),
               ],
@@ -283,17 +299,21 @@ class _DesktopBentoGrid extends StatelessWidget {
               children: [
                 Expanded(
                   flex: services[2].desktopFlex,
-                  child: _BentoServiceCard(
-                    data: services[2],
-                    active: activeIndex == 2,
+                  child: RepaintBoundary(
+                    child: _BentoServiceCard(
+                      data: services[2],
+                      active: activeIndex == 2,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 24),
                 Expanded(
                   flex: services[3].desktopFlex,
-                  child: _BentoServiceCard(
-                    data: services[3],
-                    active: activeIndex == 3,
+                  child: RepaintBoundary(
+                    child: _BentoServiceCard(
+                      data: services[3],
+                      active: activeIndex == 3,
+                    ),
                   ),
                 ),
               ],
@@ -316,10 +336,12 @@ class _MobileBentoGrid extends StatelessWidget {
     return Column(
       children: [
         for (var i = 0; i < services.length; i++) ...[
-          _BentoServiceCard(
-            data: services[i],
-            compact: true,
-            active: activeIndex == i,
+          RepaintBoundary(
+            child: _BentoServiceCard(
+              data: services[i],
+              compact: true,
+              active: activeIndex == i,
+            ),
           ),
           const SizedBox(height: 18),
         ],
@@ -622,7 +644,7 @@ class _VisualShowcase extends StatelessWidget {
           Positioned.fill(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(24),
-              child: CustomPaint(painter: _DotGridPainter()),
+              child: const CustomPaint(painter: _DotGridPainter()),
             ),
           ),
           switch (type) {
@@ -1249,6 +1271,8 @@ class _WindowDot extends StatelessWidget {
 }
 
 class _DotGridPainter extends CustomPainter {
+  const _DotGridPainter();
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()

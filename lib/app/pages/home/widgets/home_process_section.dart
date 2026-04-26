@@ -436,7 +436,7 @@ class _BlueprintCard extends StatelessWidget {
                 height: size,
                 fit: BoxFit.cover,
                 isAntiAlias: true,
-                filterQuality: FilterQuality.high,
+                filterQuality: FilterQuality.medium,
               ),
             ),
           ),

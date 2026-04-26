@@ -1,23 +1,55 @@
-import * as THREE from 'three';
-import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-
 (function () {
   'use strict';
 
-  window.initHero3D = function (container, options) {
-    options = options || {};
+  // Skip 3D entirely on mobile/touch — avoids downloading THREE.js (~700 KB)
+  // and eliminates the continuous WebGL render loop on low-end devices.
+  var isMobile = ('ontouchstart' in window) || window.innerWidth < 900;
+  if (isMobile) {
+    window.initHero3D = function () {};
+    return;
+  }
 
+  // Queue calls that arrive before the async import resolves.
+  var _queue = [];
+  var _setupFn = null;
+
+  window.initHero3D = function (container, options) {
+    if (_setupFn) {
+      _setupFn(container, options || {});
+    } else {
+      _queue.push([container, options || {}]);
+    }
+  };
+
+  // Dynamic imports — THREE.js is only downloaded on desktop.
+  Promise.all([
+    import('three'),
+    import('three/addons/geometries/RoundedBoxGeometry.js'),
+  ]).then(function (modules) {
+    var THREE = modules[0];
+    var RoundedBoxGeometry = modules[1].RoundedBoxGeometry;
+
+    _setupFn = function (container, options) {
+      setup(container, options, THREE, RoundedBoxGeometry);
+    };
+
+    _queue.forEach(function (args) { _setupFn(args[0], args[1]); });
+    _queue = [];
+  });
+
+  // ── SETUP ────────────────────────────────────────────────────────────────────
+  function setup(container, options, THREE, RoundedBoxGeometry) {
     function tryInit() {
       if (!container || container.clientWidth === 0) {
         requestAnimationFrame(tryInit);
         return;
       }
-      setup(container, options);
+      init(container, options, THREE, RoundedBoxGeometry);
     }
     requestAnimationFrame(tryInit);
-  };
+  }
 
-  function setup(container, options) {
+  function init(container, options, THREE, RoundedBoxGeometry) {
     var W = container.clientWidth;
     var H = container.clientHeight || W;
 
@@ -35,6 +67,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.25;
     renderer.domElement.style.display = 'block';
+    renderer.domElement.style.willChange = 'transform';
 
     var mask = 'radial-gradient(ellipse 70% 66% at 56% 50%, #000 42%, rgba(0,0,0,0.70) 62%, rgba(0,0,0,0.14) 82%, transparent 100%)';
     renderer.domElement.style.webkitMaskImage = mask;
@@ -308,6 +341,10 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 
     function animate() {
       requestAnimationFrame(animate);
+
+      // Pause rendering when tab is not visible — saves battery/CPU
+      if (document.hidden) return;
+
       var t = clock.getElapsedTime();
 
       modelRoot.position.y = Math.sin(t * 0.42) * 0.06;

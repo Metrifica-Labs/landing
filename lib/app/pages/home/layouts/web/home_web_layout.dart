@@ -62,10 +62,16 @@ class _HomeWebLayoutState extends State<HomeWebLayout> {
                     isMobile: false,
                     onScrollToServices: () => _scrollTo(_servicesKey),
                   ),
-                  HomeServicesSection(key: _servicesKey, isMobile: false),
-                  HomeProcessSection(key: _processKey, isMobile: false),
-                  HomeCasesSection(key: _casesKey, isMobile: false),
-                  const HomeCtaSection(isMobile: false),
+                  RepaintBoundary(
+                    child: HomeServicesSection(key: _servicesKey, isMobile: false),
+                  ),
+                  RepaintBoundary(
+                    child: HomeProcessSection(key: _processKey, isMobile: false),
+                  ),
+                  RepaintBoundary(
+                    child: HomeCasesSection(key: _casesKey, isMobile: false),
+                  ),
+                  const RepaintBoundary(child: HomeCtaSection(isMobile: false)),
                   HomeFooterSection(
                     isMobile: false,
                     onScrollToTop: _scrollToTop,
