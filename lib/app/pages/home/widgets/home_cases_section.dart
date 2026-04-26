@@ -52,8 +52,6 @@ class HomeCasesSection extends ConsumerWidget {
                   height: 1.5,
                 ),
               ),
-              const SizedBox(height: 24),
-              _AllCasesLink(),
             ],
           ),
         ),
@@ -74,8 +72,6 @@ class HomeCasesSection extends ConsumerWidget {
         _title(28),
         const SizedBox(height: 32),
         _CasesCarousel(cases: cases, cardWidth: 272, isMobile: true),
-        const SizedBox(height: 24),
-        _AllCasesLink(),
       ],
     );
   }
@@ -231,38 +227,66 @@ class _CasesCarouselState extends State<_CasesCarousel> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // On mobile, only show arrows when a single card fills the viewport
-        // (i.e. the screen is too narrow to show more than ~1 card at once).
         final showArrows = !widget.isMobile ||
             constraints.maxWidth < widget.cardWidth * 1.4;
 
+        final scrollView = SingleChildScrollView(
+          controller: _scrollController,
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.only(top: 8, bottom: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (int i = 0; i < widget.cases.length; i++)
+                Padding(
+                  padding: EdgeInsets.only(
+                    right: i < widget.cases.length - 1 ? _cardGap : 0,
+                  ),
+                  child: SizedBox(
+                    width: widget.cardWidth,
+                    child: _CaseCard(data: widget.cases[i]),
+                  ),
+                ),
+            ],
+          ),
+        );
+
+        // Mobile: arrows rendered below the cards
+        if (widget.isMobile && showArrows) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              scrollView,
+              if (_canScrollLeft || _canScrollRight) ...[
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (_canScrollLeft)
+                      _NavButton(
+                        icon: Icons.arrow_back_rounded,
+                        onTap: () => _scrollBy(-_scrollStep),
+                      ),
+                    if (_canScrollLeft && _canScrollRight)
+                      const SizedBox(width: 8),
+                    if (_canScrollRight)
+                      _NavButton(
+                        icon: Icons.arrow_forward_rounded,
+                        onTap: () => _scrollBy(_scrollStep),
+                      ),
+                  ],
+                ),
+              ],
+            ],
+          );
+        }
+
+        // Desktop: arrows overlaid on the cards
         return Stack(
           clipBehavior: Clip.none,
           children: [
-            // Cards list
-            SingleChildScrollView(
-              controller: _scrollController,
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.only(top: 8, bottom: 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (int i = 0; i < widget.cases.length; i++)
-                    Padding(
-                      padding: EdgeInsets.only(
-                        right: i < widget.cases.length - 1 ? _cardGap : 0,
-                      ),
-                      child: SizedBox(
-                        width: widget.cardWidth,
-                        child: _CaseCard(data: widget.cases[i]),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-
-            // Left button
+            scrollView,
             if (showArrows && _canScrollLeft)
               Positioned(
                 left: 0,
@@ -273,8 +297,6 @@ class _CasesCarouselState extends State<_CasesCarousel> {
                   onTap: () => _scrollBy(-_scrollStep),
                 ),
               ),
-
-            // Right button
             if (showArrows && _canScrollRight)
               Positioned(
                 right: 0,
@@ -350,37 +372,6 @@ class _NavButtonState extends State<_NavButton> {
 // Shared widgets
 // ---------------------------------------------------------------------------
 
-class _AllCasesLink extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {},
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Ver todos os cases',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF2864E8),
-              ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.arrow_forward_rounded,
-              size: 16,
-              color: Color(0xFF2864E8),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _CaseCard extends StatefulWidget {
   const _CaseCard({required this.data});
@@ -1621,20 +1612,146 @@ class _ImageViewerDialog extends StatefulWidget {
 
 class _ImageViewerDialogState extends State<_ImageViewerDialog> {
   late int _current;
+  Size? _imageSize;
 
   @override
   void initState() {
     super.initState();
     _current = widget.initialIndex;
+    _loadImageSize(_current);
   }
 
-  void _go(int index) => setState(() => _current = index);
+  void _loadImageSize(int index) {
+    final stream = NetworkImage(widget.images[index])
+        .resolve(ImageConfiguration.empty);
+    stream.addListener(ImageStreamListener(
+      (info, _) {
+        if (mounted) {
+          setState(() => _imageSize = Size(
+                info.image.width.toDouble(),
+                info.image.height.toDouble(),
+              ));
+        }
+      },
+      onError: (_, __) {},
+    ));
+  }
+
+  void _go(int index) {
+    setState(() {
+      _current = index;
+      _imageSize = null;
+    });
+    _loadImageSize(index);
+  }
+
+  /// Returns (top, right) offsets so the X sits at the top-right corner
+  /// of the image as rendered by BoxFit.contain inside [screen].
+  (double top, double right) _xOffset(Size screen) {
+    if (_imageSize == null) return (8, 8);
+    final imgAspect = _imageSize!.width / _imageSize!.height;
+    final screenAspect = screen.width / screen.height;
+    if (imgAspect >= screenAspect) {
+      // Width-constrained → letterboxed top/bottom
+      final renderH = screen.width / imgAspect;
+      return ((screen.height - renderH) / 2 + 8, 8);
+    } else {
+      // Height-constrained → pillarboxed left/right
+      final renderW = screen.height * imgAspect;
+      return (8, (screen.width - renderW) / 2 + 8);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final hasPrev = _current > 0;
     final hasNext = _current < widget.images.length - 1;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
 
+    final closeButton = GestureDetector(
+      onTap: () => Navigator.of(context).pop(),
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.55),
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(Icons.close_rounded, size: 18, color: Colors.white),
+      ),
+    );
+
+    final counter = widget.images.length > 1
+        ? Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.55),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              '${_current + 1} / ${widget.images.length}',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          )
+        : null;
+
+    if (isMobile) {
+      final screen = MediaQuery.of(context).size;
+      final (xTop, xRight) = _xOffset(screen);
+
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.zero,
+        child: SizedBox.expand(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              InteractiveViewer(
+                minScale: 1.0,
+                maxScale: 4.0,
+                child: Image.network(
+                  widget.images[_current],
+                  fit: BoxFit.contain,
+                ),
+              ),
+              // X positioned over the image, not the screen
+              Positioned(top: xTop, right: xRight, child: closeButton),
+              if (counter != null)
+                Positioned(
+                    bottom: 16, left: 0, right: 0,
+                    child: Center(child: counter)),
+              if (hasPrev)
+                Positioned(
+                  left: 0, top: 0, bottom: 0,
+                  child: Center(
+                    child: _NavButton(
+                      icon: Icons.arrow_back_rounded,
+                      onTap: () => _go(_current - 1),
+                    ),
+                  ),
+                ),
+              if (hasNext)
+                Positioned(
+                  right: 0, top: 0, bottom: 0,
+                  child: Center(
+                    child: _NavButton(
+                      icon: Icons.arrow_forward_rounded,
+                      onTap: () => _go(_current + 1),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Desktop: centered image with contain, X at top-right corner
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(24),
@@ -1642,7 +1759,6 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Image
             InteractiveViewer(
               minScale: 1.0,
               maxScale: 4.0,
@@ -1651,35 +1767,11 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
                 fit: BoxFit.contain,
               ),
             ),
-
-            // Counter
-            if (widget.images.length > 1)
-              Positioned(
-                bottom: 16,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.55),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${_current + 1} / ${widget.images.length}',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-
-            // Prev button
+            if (counter != null)
+              Positioned(bottom: 16, child: counter),
             if (hasPrev)
               Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0,
+                left: 0, top: 0, bottom: 0,
                 child: Center(
                   child: _NavButton(
                     icon: Icons.arrow_back_rounded,
@@ -1687,13 +1779,9 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
                   ),
                 ),
               ),
-
-            // Next button
             if (hasNext)
               Positioned(
-                right: 0,
-                top: 0,
-                bottom: 0,
+                right: 0, top: 0, bottom: 0,
                 child: Center(
                   child: _NavButton(
                     icon: Icons.arrow_forward_rounded,
@@ -1701,28 +1789,7 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
                   ),
                 ),
               ),
-
-          // Close button
-          Positioned(
-            top: 0,
-            right: 0,
-            child: GestureDetector(
-              onTap: () => Navigator.of(context).pop(),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.55),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.close_rounded,
-                  size: 18,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
+            Positioned(top: 0, right: 0, child: closeButton),
           ],
         ),
       ),
