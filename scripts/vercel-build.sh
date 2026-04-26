@@ -7,7 +7,14 @@ fi
 
 export PATH="$HOME/flutter/bin:$PATH"
 
+SUPABASE_URL_VALUE="${SUPABASE_URL:-}"
+SUPABASE_ANON_KEY_VALUE="${SUPABASE_ANON_KEY:-}"
+
+if [ -z "$SUPABASE_URL_VALUE" ] || [ -z "$SUPABASE_ANON_KEY_VALUE" ]; then
+  echo "Warning: SUPABASE_URL or SUPABASE_ANON_KEY is not configured in Vercel."
+fi
+
 flutter pub get
 flutter build web --release \
-  --dart-define=SUPABASE_URL="$SUPABASE_URL" \
-  --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY"
+  --dart-define=SUPABASE_URL="$SUPABASE_URL_VALUE" \
+  --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY_VALUE"
