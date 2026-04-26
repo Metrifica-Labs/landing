@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 
@@ -50,7 +49,7 @@ class HomeProcessSection extends StatelessWidget {
 
   Widget _buildDesktop() {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           flex: 55,
@@ -66,7 +65,13 @@ class HomeProcessSection extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 48),
-        const Expanded(flex: 45, child: _BlueprintCard()),
+        const Expanded(
+          flex: 60,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: _BlueprintCard(),
+          ),
+        ),
       ],
     );
   }
@@ -81,7 +86,7 @@ class HomeProcessSection extends StatelessWidget {
         const SizedBox(height: 40),
         _MobileTimeline(steps: _steps),
         const SizedBox(height: 40),
-        const _BlueprintCard(),
+        const Center(child: _BlueprintCard()),
       ],
     );
   }
@@ -290,19 +295,41 @@ class _BlueprintCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 320,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: SvgPicture.asset(
-        'assets/images/logo.svg',
-        width: double.infinity,
-        height: double.infinity,
-        fit: BoxFit.cover,
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = constraints.maxWidth < 400 ? constraints.maxWidth : 400.0;
+
+        return SizedBox(
+          height: size,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                color: const Color(0xFF082B62),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0B1C45).withValues(alpha: 0.12),
+                    blurRadius: 32,
+                    offset: const Offset(0, 18),
+                  ),
+                ],
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Image.asset(
+                'assets/images/blueprint.png',
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
+                isAntiAlias: true,
+                filterQuality: FilterQuality.high,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

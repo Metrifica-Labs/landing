@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 
-import 'hero_3d_scene.dart';
-
 class HomeCtaSection extends StatelessWidget {
   const HomeCtaSection({super.key, required this.isMobile});
 
@@ -33,22 +31,9 @@ class HomeCtaSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Content left
-          Expanded(
-            flex: 46,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 56, vertical: 44),
-              child: _buildContent(false),
-            ),
-          ),
-          const Expanded(
-            flex: 54,
-            child: _CtaHero3DDecor(),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 56, vertical: 44),
+        child: _buildContent(false),
       ),
     );
   }
@@ -60,20 +45,9 @@ class HomeCtaSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Stack(
-        children: [
-          const Positioned(
-            right: -20,
-            top: -20,
-            width: 200,
-            height: 200,
-            child: _CtaHero3DDecor(),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
-            child: _buildContent(true),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
+        child: _buildContent(true),
       ),
     );
   }
@@ -194,13 +168,3 @@ class _CtaButtonState extends State<_CtaButton> {
   }
 }
 
-class _CtaHero3DDecor extends StatelessWidget {
-  const _CtaHero3DDecor();
-
-  @override
-  Widget build(BuildContext context) {
-    return const IgnorePointer(
-      child: Hero3DScene(variant: 'cta'),
-    );
-  }
-}

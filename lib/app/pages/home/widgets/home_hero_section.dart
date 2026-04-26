@@ -180,10 +180,10 @@ class _DesktopHeroBody extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           const Positioned(
-            top: -118,
-            right: -260,
-            width: 1040,
-            height: 850,
+            top: -100,
+            right: -240,
+            width: 1000,
+            height: 840,
             child: Hero3DScene(),
           ),
           const Positioned(
@@ -191,24 +191,6 @@ class _DesktopHeroBody extends StatelessWidget {
             left: 0,
             width: 535,
             child: _HeroCopy(isMobile: false),
-          ),
-          Positioned(
-            right: 64,
-            bottom: 28,
-            child: IgnorePointer(
-              child: Container(
-                width: 300,
-                height: 140,
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    colors: [
-                      const Color(0xFF2A74FF).withValues(alpha: 0.14),
-                      const Color(0xFF2A74FF).withValues(alpha: 0),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           ),
         ],
       ),
@@ -227,8 +209,8 @@ class _MobileHeroBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _HeroCopy(isMobile: true, onScrollToServices: onScrollToServices),
-        SizedBox(height: 12),
-        SizedBox(height: 360, child: Hero3DScene()),
+        const SizedBox(height: 8),
+        const SizedBox(height: 340, child: Hero3DScene()),
       ],
     );
   }

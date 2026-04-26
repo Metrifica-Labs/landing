@@ -301,59 +301,76 @@ class _BentoServiceCard extends StatefulWidget {
 class _BentoServiceCardState extends State<_BentoServiceCard> {
   @override
   Widget build(BuildContext context) {
-    final isCompact = widget.compact;
-    final active = widget.active;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact = widget.compact || constraints.maxWidth < 500;
+        final active = widget.active;
+        final cardHeight = widget.compact ? null : (isCompact ? 520.0 : 290.0);
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 420),
-      curve: Curves.easeOutCubic,
-      height: isCompact ? null : 290,
-      padding: EdgeInsets.all(isCompact ? 20 : 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(
-          color: active ? const Color(0xFFD7E2FF) : const Color(0xFFEAF0FB),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF0B1C45).withValues(alpha: 0.04),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-          BoxShadow(
-            color: const Color(
-              0xFF2864E8,
-            ).withValues(alpha: active ? 0.09 : 0.02),
-            blurRadius: active ? 42 : 20,
-            offset: Offset(0, active ? 22 : 10),
-          ),
-        ],
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Flex(
-            direction: isCompact ? Axis.vertical : Axis.horizontal,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (isCompact)
-                _ServiceCopy(data: widget.data, hovered: active, compact: true)
-              else
-                Expanded(
-                  flex: 5,
-                  child: _ServiceCopy(data: widget.data, hovered: active),
-                ),
-              SizedBox(width: isCompact ? 0 : 26, height: isCompact ? 22 : 0),
-              SizedBox(
-                width: isCompact ? double.infinity : 210,
-                height: isCompact ? 180 : double.infinity,
-                child: _VisualShowcase(type: widget.data.type, hovered: active),
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 420),
+          curve: Curves.easeOutCubic,
+          height: cardHeight,
+          padding: EdgeInsets.all(isCompact ? 20 : 24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(
+              color: active
+                  ? const Color(0xFFD7E2FF)
+                  : const Color(0xFFEAF0FB),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF0B1C45).withValues(alpha: 0.04),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: const Color(
+                  0xFF2864E8,
+                ).withValues(alpha: active ? 0.09 : 0.02),
+                blurRadius: active ? 42 : 20,
+                offset: Offset(0, active ? 22 : 10),
               ),
             ],
           ),
-        ],
-      ),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Flex(
+                direction: isCompact ? Axis.vertical : Axis.horizontal,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (isCompact)
+                    _ServiceCopy(
+                      data: widget.data,
+                      hovered: active,
+                      compact: true,
+                    )
+                  else
+                    Expanded(
+                      flex: 5,
+                      child: _ServiceCopy(data: widget.data, hovered: active),
+                    ),
+                  SizedBox(
+                    width: isCompact ? 0 : 26,
+                    height: isCompact ? 22 : 0,
+                  ),
+                  SizedBox(
+                    width: isCompact ? double.infinity : 210,
+                    height: isCompact ? 180 : double.infinity,
+                    child: _VisualShowcase(
+                      type: widget.data.type,
+                      hovered: active,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -373,7 +390,7 @@ class _ServiceCopy extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final dense = compact || constraints.maxWidth < 245;
+        final dense = compact || constraints.maxWidth < 300;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
