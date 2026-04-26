@@ -406,13 +406,6 @@ class _CaseCardState extends State<_CaseCard> {
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
-              BoxShadow(
-                color: _hovered
-                    ? const Color(0xFF2864E8).withValues(alpha: 0.1)
-                    : const Color(0xFF1A2B5E).withValues(alpha: 0.04),
-                blurRadius: _hovered ? 30 : 16,
-                offset: const Offset(0, 6),
-              ),
             ],
           ),
           child: Column(
@@ -626,10 +619,19 @@ class _CaseDetailDialog extends StatelessWidget {
   final CaseModel data;
 
   static void show(BuildContext context, CaseModel data) {
-    showDialog(
+    showGeneralDialog(
       context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Fechar',
       barrierColor: Colors.black.withValues(alpha: 0.55),
-      builder: (_) => _CaseDetailDialog(data: data),
+      transitionDuration: const Duration(milliseconds: 160),
+      transitionBuilder: (context, animation, _, child) {
+        return FadeTransition(
+          opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+          child: child,
+        );
+      },
+      pageBuilder: (context, _, __) => _CaseDetailDialog(data: data),
     );
   }
 
@@ -647,10 +649,11 @@ class _CaseDetailDialog extends StatelessWidget {
       ),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: dialogWidth),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            color: Colors.white,
+        child: RepaintBoundary(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              color: Colors.white,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -789,9 +792,11 @@ class _CaseDetailDialog extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          _BentoGrid(
-                            images: data.images,
-                            categoryColor: data.categoryColor,
+                          RepaintBoundary(
+                            child: _BentoGrid(
+                              images: data.images,
+                              categoryColor: data.categoryColor,
+                            ),
                           ),
                         ],
 
@@ -829,6 +834,7 @@ class _CaseDetailDialog extends StatelessWidget {
           ),
         ),
       ),
+      ),
     );
   }
 
@@ -839,6 +845,10 @@ class _CaseDetailDialog extends StatelessWidget {
         width: width,
         height: height,
         fit: BoxFit.cover,
+        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+          if (wasSynchronouslyLoaded || frame != null) return child;
+          return _imagePlaceholder(width, height);
+        },
         errorBuilder: (_, __, ___) => _imagePlaceholder(width, height),
       );
     }
