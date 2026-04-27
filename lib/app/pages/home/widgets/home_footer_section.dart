@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:metrifica_landing/app/core/theme/theme.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -137,14 +138,26 @@ class HomeFooterSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                'metrifica\nlabs',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  height: 0.95,
-                  letterSpacing: -0.2,
-                  color: const Color(0xFF0B1C45),
+              RichText(
+                text: TextSpan(
+                  text: 'Metrifica',
+                  children: [
+                    TextSpan(
+                      text: ' Labs',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 50 * 0.36,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w800,
+                        height: 0.95,
+                      ),
+                    ),
+                  ],
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 50 * 0.36,
+                    color: const Color(0xFF102B58),
+                    fontWeight: FontWeight.w800,
+                    height: 0.95,
+                  ),
                 ),
               ),
             ],
@@ -243,9 +256,7 @@ class _SocialIconBoxState extends State<_SocialIconBox> {
           child: Icon(
             widget.icon,
             size: 14,
-            color: _hovered
-                ? const Color(0xFF2864E8)
-                : const Color(0xFFA0AABD),
+            color: _hovered ? const Color(0xFF2864E8) : const Color(0xFFA0AABD),
           ),
         ),
       ),

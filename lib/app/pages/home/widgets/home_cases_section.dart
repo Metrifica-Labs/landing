@@ -12,6 +12,42 @@ class HomeCasesSection extends ConsumerWidget {
 
   final bool isMobile;
 
+  static const _fallbackCases = [
+    CaseModel(
+      id: 'fallback-automation',
+      name: 'Automacao de processos comerciais',
+      description:
+          'Sistema sob medida para reduzir etapas manuais e dar visibilidade operacional em tempo real.',
+      category: 'Software',
+      categoryColor: Color(0xFF2864E8),
+      imageUrl: null,
+      order: 1,
+      stack: ['React', 'Node.js', 'PostgreSQL'],
+    ),
+    CaseModel(
+      id: 'fallback-data',
+      name: 'Dashboard executivo com dados integrados',
+      description:
+          'Pipeline de dados e indicadores para acompanhamento de performance, metas e gargalos.',
+      category: 'Data',
+      categoryColor: Color(0xFF1A9E6A),
+      imageUrl: null,
+      order: 2,
+      stack: ['Python', 'Supabase', 'REST API'],
+    ),
+    CaseModel(
+      id: 'fallback-mobile',
+      name: 'Experiencia mobile para operacao em campo',
+      description:
+          'Aplicacao responsiva para equipes externas registrarem atividades com mais agilidade.',
+      category: 'Mobile',
+      categoryColor: Color(0xFFE07B00),
+      imageUrl: null,
+      order: 3,
+      stack: ['Flutter', 'TypeScript', 'Docker'],
+    ),
+  ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final casesAsync = ref.watch(casesProvider);
@@ -23,9 +59,17 @@ class HomeCasesSection extends ConsumerWidget {
         maxWidth: 1280,
         padding: EdgeInsets.symmetric(horizontal: isMobile ? 22 : 32),
         child: casesAsync.when(
-          loading: () => isMobile ? _buildMobileLoading() : _buildDesktopLoading(),
-          error: (_, __) => isMobile ? _buildMobile([]) : _buildDesktop([]),
-          data: (cases) => isMobile ? _buildMobile(cases) : _buildDesktop(cases),
+          loading: () =>
+              isMobile ? _buildMobileLoading() : _buildDesktopLoading(),
+          error: (_, __) => isMobile
+              ? _buildMobile(_fallbackCases)
+              : _buildDesktop(_fallbackCases),
+          data: (cases) {
+            final visibleCases = cases.isEmpty ? _fallbackCases : cases;
+            return isMobile
+                ? _buildMobile(visibleCases)
+                : _buildDesktop(visibleCases);
+          },
         ),
       ),
     );
@@ -56,9 +100,7 @@ class HomeCasesSection extends ConsumerWidget {
           ),
         ),
         const SizedBox(width: 48),
-        Expanded(
-          child: _CasesCarousel(cases: cases, cardWidth: 300),
-        ),
+        Expanded(child: _CasesCarousel(cases: cases, cardWidth: 300)),
       ],
     );
   }
@@ -84,11 +126,7 @@ class HomeCasesSection extends ConsumerWidget {
           width: 220,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _sectionLabel(),
-              const SizedBox(height: 16),
-              _title(32),
-            ],
+            children: [_sectionLabel(), const SizedBox(height: 16), _title(32)],
           ),
         ),
         const SizedBox(width: 48),
@@ -214,8 +252,10 @@ class _CasesCarouselState extends State<_CasesCarousel> {
   }
 
   void _scrollBy(double delta) {
-    final target = (_scrollController.offset + delta)
-        .clamp(0.0, _scrollController.position.maxScrollExtent);
+    final target = (_scrollController.offset + delta).clamp(
+      0.0,
+      _scrollController.position.maxScrollExtent,
+    );
     _scrollController.animateTo(
       target,
       duration: const Duration(milliseconds: 350),
@@ -227,8 +267,8 @@ class _CasesCarouselState extends State<_CasesCarousel> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final showArrows = !widget.isMobile ||
-            constraints.maxWidth < widget.cardWidth * 1.4;
+        final showArrows =
+            !widget.isMobile || constraints.maxWidth < widget.cardWidth * 1.4;
 
         final scrollView = SingleChildScrollView(
           controller: _scrollController,
@@ -339,9 +379,7 @@ class _NavButtonState extends State<_NavButton> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: _hovered
-                ? const Color(0xFF2864E8)
-                : Colors.white,
+            color: _hovered ? const Color(0xFF2864E8) : Colors.white,
             shape: BoxShape.circle,
             border: Border.all(
               color: _hovered
@@ -372,7 +410,6 @@ class _NavButtonState extends State<_NavButton> {
 // Shared widgets
 // ---------------------------------------------------------------------------
 
-
 class _CaseCard extends StatefulWidget {
   const _CaseCard({required this.data});
 
@@ -394,115 +431,117 @@ class _CaseCardState extends State<_CaseCard> {
       child: GestureDetector(
         onTap: () => _CaseDetailDialog.show(context, widget.data),
         child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0, end: _hovered ? -8 : 0),
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeOut,
-        builder: (context, offset, child) => Transform.translate(
-          offset: Offset(0, offset),
-          child: child,
-        ),
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 340),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFE4EAFF), width: 1.5),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF1A2B5E).withValues(alpha: 0.08),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _CaseImage(
-                imageUrl: widget.data.imageUrl,
-                categoryColor: widget.data.categoryColor,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: widget.data.categoryColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        widget.data.category,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.8,
-                          color: widget.data.categoryColor,
+          tween: Tween(begin: 0, end: _hovered ? -8 : 0),
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeOut,
+          builder: (context, offset, child) =>
+              Transform.translate(offset: Offset(0, offset), child: child),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 340),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE4EAFF), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF1A2B5E).withValues(alpha: 0.08),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _CaseImage(
+                  imageUrl: widget.data.imageUrl,
+                  categoryColor: widget.data.categoryColor,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      height: 40,
-                      child: Text(
-                        widget.data.name,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          height: 1.25,
-                          letterSpacing: -0.3,
-                          color: const Color(0xFF0B1C45),
+                        decoration: BoxDecoration(
+                          color: widget.data.categoryColor.withValues(
+                            alpha: 0.1,
+                          ),
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 60,
-                      child: Text(
-                        widget.data.description,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 13,
-                          height: 1.5,
-                          color: const Color(0xFF7A879F),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Ver mais',
+                        child: Text(
+                          widget.data.category,
                           style: GoogleFonts.plusJakartaSans(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF2864E8),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                            color: widget.data.categoryColor,
                           ),
                         ),
-                        const SizedBox(width: 6),
-                        const Icon(
-                          Icons.arrow_forward_rounded,
-                          size: 14,
-                          color: Color(0xFF2864E8),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height: 40,
+                        child: Text(
+                          widget.data.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            height: 1.25,
+                            letterSpacing: -0.3,
+                            color: const Color(0xFF0B1C45),
+                          ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 60,
+                        child: Text(
+                          widget.data.description,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            height: 1.5,
+                            color: const Color(0xFF7A879F),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Ver mais',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF2864E8),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 14,
+                            color: Color(0xFF2864E8),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
   }
 }
 
@@ -522,6 +561,11 @@ class _CaseImage extends StatelessWidget {
           height: 160,
           width: double.infinity,
           fit: BoxFit.cover,
+          filterQuality: FilterQuality.medium,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return _placeholder();
+          },
           errorBuilder: (_, __, ___) => _placeholder(),
         ),
       );
@@ -566,8 +610,9 @@ class _CaseCardSkeleton extends StatelessWidget {
             height: 160,
             decoration: BoxDecoration(
               color: const Color(0xFFE4EAFF).withValues(alpha: 0.5),
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(19)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(19),
+              ),
             ),
           ),
           Padding(
@@ -596,8 +641,11 @@ class _CaseCardSkeleton extends StatelessWidget {
 }
 
 class _SkeletonBox extends StatelessWidget {
-  const _SkeletonBox(
-      {required this.width, required this.height, required this.radius});
+  const _SkeletonBox({
+    required this.width,
+    required this.height,
+    required this.radius,
+  });
 
   final double width;
   final double height;
@@ -666,18 +714,16 @@ class _CaseDetailDialog extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Flexible(
-                    child: isMobile
-                        ? _buildMobileBody()
-                        : _buildDesktopBody(),
+                    child: isMobile ? _buildMobileBody() : _buildDesktopBody(),
                   ),
                   Container(
                     decoration: const BoxDecoration(
-                      border: Border(
-                        top: BorderSide(color: Color(0xFFEBF0FF)),
-                      ),
+                      border: Border(top: BorderSide(color: Color(0xFFEBF0FF))),
                     ),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 14),
+                      horizontal: 20,
+                      vertical: 14,
+                    ),
                     child: Builder(
                       builder: (ctx) => GestureDetector(
                         onTap: () => Navigator.of(ctx).pop(),
@@ -691,7 +737,8 @@ class _CaseDetailDialog extends StatelessWidget {
                                 color: const Color(0xFFF0F4FF),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                    color: const Color(0xFFDDE8FF)),
+                                  color: const Color(0xFFDDE8FF),
+                                ),
                               ),
                               child: const Icon(
                                 Icons.arrow_back_rounded,
@@ -732,11 +779,7 @@ class _CaseDetailDialog extends StatelessWidget {
           Stack(
             children: [
               _buildFullWidthImage(height: 220),
-              Positioned(
-                top: 12,
-                right: 12,
-                child: _CloseButton(),
-              ),
+              Positioned(top: 12, right: 12, child: _CloseButton()),
             ],
           ),
 
@@ -752,7 +795,9 @@ class _CaseDetailDialog extends StatelessWidget {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: data.categoryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
@@ -771,7 +816,9 @@ class _CaseDetailDialog extends StatelessWidget {
                       final color = _techColor(s);
                       return Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: color.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
@@ -920,10 +967,13 @@ class _CaseDetailDialog extends StatelessWidget {
                             children: [
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
-                                  color:
-                                      data.categoryColor.withValues(alpha: 0.1),
+                                  color: data.categoryColor.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
@@ -940,7 +990,9 @@ class _CaseDetailDialog extends StatelessWidget {
                                 final color = _techColor(s);
                                 return Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 3),
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: color.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(6),
@@ -1165,8 +1217,9 @@ class _ProjectLinkState extends State<_ProjectLink> {
                 color: _hovered
                     ? const Color(0xFF1A4FBF)
                     : const Color(0xFF2864E8),
-                decoration:
-                    _hovered ? TextDecoration.underline : TextDecoration.none,
+                decoration: _hovered
+                    ? TextDecoration.underline
+                    : TextDecoration.none,
               ),
               child: const Text('Link para o projeto'),
             ),
@@ -1217,11 +1270,8 @@ class _BentoGrid extends StatelessWidget {
 
   Widget _tile(BuildContext context, int index) {
     return GestureDetector(
-      onTap: () => _ImageViewerDialog.show(
-        context,
-        images: images,
-        initialIndex: index,
-      ),
+      onTap: () =>
+          _ImageViewerDialog.show(context, images: images, initialIndex: index),
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: ClipRRect(
@@ -1258,11 +1308,13 @@ class _BentoGrid extends StatelessWidget {
       // Two images side by side, first slightly wider
       return SizedBox(
         height: _heroHeight,
-        child: Row(children: [
-          Expanded(flex: 3, child: _tile(context, 0)),
-          const SizedBox(width: _gap),
-          Expanded(flex: 2, child: _tile(context, 1)),
-        ]),
+        child: Row(
+          children: [
+            Expanded(flex: 3, child: _tile(context, 0)),
+            const SizedBox(width: _gap),
+            Expanded(flex: 2, child: _tile(context, 1)),
+          ],
+        ),
       );
     }
 
@@ -1270,42 +1322,52 @@ class _BentoGrid extends StatelessWidget {
       // Hero left, two stacked right
       return SizedBox(
         height: _heroHeight,
-        child: Row(children: [
-          Expanded(flex: 3, child: _tile(context, 0)),
-          const SizedBox(width: _gap),
-          Expanded(
-            flex: 2,
-            child: Column(children: [
-              Expanded(child: _tile(context, 1)),
-              const SizedBox(height: _gap),
-              Expanded(child: _tile(context, 2)),
-            ]),
-          ),
-        ]),
+        child: Row(
+          children: [
+            Expanded(flex: 3, child: _tile(context, 0)),
+            const SizedBox(width: _gap),
+            Expanded(
+              flex: 2,
+              child: Column(
+                children: [
+                  Expanded(child: _tile(context, 1)),
+                  const SizedBox(height: _gap),
+                  Expanded(child: _tile(context, 2)),
+                ],
+              ),
+            ),
+          ],
+        ),
       );
     }
 
     if (n == 4) {
       // Hero top-left, small top-right, two equal bottom
-      return Column(children: [
-        SizedBox(
-          height: _heroHeight,
-          child: Row(children: [
-            Expanded(flex: 3, child: _tile(context, 0)),
-            const SizedBox(width: _gap),
-            Expanded(flex: 2, child: _tile(context, 1)),
-          ]),
-        ),
-        const SizedBox(height: _gap),
-        SizedBox(
-          height: _smallHeight,
-          child: Row(children: [
-            Expanded(child: _tile(context, 2)),
-            const SizedBox(width: _gap),
-            Expanded(child: _tile(context, 3)),
-          ]),
-        ),
-      ]);
+      return Column(
+        children: [
+          SizedBox(
+            height: _heroHeight,
+            child: Row(
+              children: [
+                Expanded(flex: 3, child: _tile(context, 0)),
+                const SizedBox(width: _gap),
+                Expanded(flex: 2, child: _tile(context, 1)),
+              ],
+            ),
+          ),
+          const SizedBox(height: _gap),
+          SizedBox(
+            height: _smallHeight,
+            child: Row(
+              children: [
+                Expanded(child: _tile(context, 2)),
+                const SizedBox(width: _gap),
+                Expanded(child: _tile(context, 3)),
+              ],
+            ),
+          ),
+        ],
+      );
     }
 
     // 5+ images: hero top-left, small top-right + stacked, rest in 2-col rows
@@ -1313,39 +1375,49 @@ class _BentoGrid extends StatelessWidget {
     final rows = <Widget>[];
     for (int i = 0; i < remaining.length; i += 2) {
       if (rows.isNotEmpty) rows.add(const SizedBox(height: _gap));
-      rows.add(SizedBox(
-        height: _rowHeight,
-        child: Row(children: [
-          Expanded(child: _tile(context, 3 + i)),
-          const SizedBox(width: _gap),
-          Expanded(
-            child: i + 1 < remaining.length
-                ? _tile(context, 3 + i + 1)
-                : const SizedBox.shrink(),
+      rows.add(
+        SizedBox(
+          height: _rowHeight,
+          child: Row(
+            children: [
+              Expanded(child: _tile(context, 3 + i)),
+              const SizedBox(width: _gap),
+              Expanded(
+                child: i + 1 < remaining.length
+                    ? _tile(context, 3 + i + 1)
+                    : const SizedBox.shrink(),
+              ),
+            ],
           ),
-        ]),
-      ));
+        ),
+      );
     }
 
-    return Column(children: [
-      SizedBox(
-        height: _heroHeight,
-        child: Row(children: [
-          Expanded(flex: 3, child: _tile(context, 0)),
-          const SizedBox(width: _gap),
-          Expanded(
-            flex: 2,
-            child: Column(children: [
-              Expanded(child: _tile(context, 1)),
-              const SizedBox(height: _gap),
-              Expanded(child: _tile(context, 2)),
-            ]),
+    return Column(
+      children: [
+        SizedBox(
+          height: _heroHeight,
+          child: Row(
+            children: [
+              Expanded(flex: 3, child: _tile(context, 0)),
+              const SizedBox(width: _gap),
+              Expanded(
+                flex: 2,
+                child: Column(
+                  children: [
+                    Expanded(child: _tile(context, 1)),
+                    const SizedBox(height: _gap),
+                    Expanded(child: _tile(context, 2)),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ]),
-      ),
-      const SizedBox(height: _gap),
-      ...rows,
-    ]);
+        ),
+        const SizedBox(height: _gap),
+        ...rows,
+      ],
+    );
   }
 }
 
@@ -1353,10 +1425,7 @@ class _BentoGrid extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _ImagesCarousel extends StatefulWidget {
-  const _ImagesCarousel({
-    required this.images,
-    required this.categoryColor,
-  });
+  const _ImagesCarousel({required this.images, required this.categoryColor});
 
   final List<String> images;
   final Color categoryColor;
@@ -1405,8 +1474,10 @@ class _ImagesCarouselState extends State<_ImagesCarousel> {
   }
 
   void _scrollBy(double delta) {
-    final target = (_scrollController.offset + delta)
-        .clamp(0.0, _scrollController.position.maxScrollExtent);
+    final target = (_scrollController.offset + delta).clamp(
+      0.0,
+      _scrollController.position.maxScrollExtent,
+    );
     _scrollController.animateTo(
       target,
       duration: const Duration(milliseconds: 350),
@@ -1450,15 +1521,17 @@ class _ImagesCarouselState extends State<_ImagesCarousel> {
                             height: 180,
                             width: _imageWidth,
                             decoration: BoxDecoration(
-                              color:
-                                  widget.categoryColor.withValues(alpha: 0.06),
+                              color: widget.categoryColor.withValues(
+                                alpha: 0.06,
+                              ),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
                               Icons.broken_image_rounded,
                               size: 32,
-                              color: widget.categoryColor
-                                  .withValues(alpha: 0.25),
+                              color: widget.categoryColor.withValues(
+                                alpha: 0.25,
+                              ),
                             ),
                           ),
                         ),
@@ -1551,8 +1624,9 @@ class _UrlRowState extends State<_UrlRow> {
                     color: _hovered
                         ? const Color(0xFF2864E8)
                         : const Color(0xFF4A5568),
-                    decoration:
-                        _hovered ? TextDecoration.underline : TextDecoration.none,
+                    decoration: _hovered
+                        ? TextDecoration.underline
+                        : TextDecoration.none,
                   ),
                 ),
               ),
@@ -1583,10 +1657,7 @@ class _UrlRowState extends State<_UrlRow> {
 // ---------------------------------------------------------------------------
 
 class _ImageViewerDialog extends StatefulWidget {
-  const _ImageViewerDialog({
-    required this.images,
-    required this.initialIndex,
-  });
+  const _ImageViewerDialog({required this.images, required this.initialIndex});
 
   final List<String> images;
   final int initialIndex;
@@ -1599,10 +1670,8 @@ class _ImageViewerDialog extends StatefulWidget {
     showDialog(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.88),
-      builder: (_) => _ImageViewerDialog(
-        images: images,
-        initialIndex: initialIndex,
-      ),
+      builder: (_) =>
+          _ImageViewerDialog(images: images, initialIndex: initialIndex),
     );
   }
 
@@ -1622,19 +1691,21 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
   }
 
   void _loadImageSize(int index) {
-    final stream = NetworkImage(widget.images[index])
-        .resolve(ImageConfiguration.empty);
-    stream.addListener(ImageStreamListener(
-      (info, _) {
+    final stream = NetworkImage(
+      widget.images[index],
+    ).resolve(ImageConfiguration.empty);
+    stream.addListener(
+      ImageStreamListener((info, _) {
         if (mounted) {
-          setState(() => _imageSize = Size(
-                info.image.width.toDouble(),
-                info.image.height.toDouble(),
-              ));
+          setState(
+            () => _imageSize = Size(
+              info.image.width.toDouble(),
+              info.image.height.toDouble(),
+            ),
+          );
         }
-      },
-      onError: (_, __) {},
-    ));
+      }, onError: (_, __) {}),
+    );
   }
 
   void _go(int index) {
@@ -1723,11 +1794,16 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
               Positioned(top: xTop, right: xRight, child: closeButton),
               if (counter != null)
                 Positioned(
-                    bottom: 16, left: 0, right: 0,
-                    child: Center(child: counter)),
+                  bottom: 16,
+                  left: 0,
+                  right: 0,
+                  child: Center(child: counter),
+                ),
               if (hasPrev)
                 Positioned(
-                  left: 0, top: 0, bottom: 0,
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
                   child: Center(
                     child: _NavButton(
                       icon: Icons.arrow_back_rounded,
@@ -1737,7 +1813,9 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
                 ),
               if (hasNext)
                 Positioned(
-                  right: 0, top: 0, bottom: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
                   child: Center(
                     child: _NavButton(
                       icon: Icons.arrow_forward_rounded,
@@ -1767,11 +1845,12 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
                 fit: BoxFit.contain,
               ),
             ),
-            if (counter != null)
-              Positioned(bottom: 16, child: counter),
+            if (counter != null) Positioned(bottom: 16, child: counter),
             if (hasPrev)
               Positioned(
-                left: 0, top: 0, bottom: 0,
+                left: 0,
+                top: 0,
+                bottom: 0,
                 child: Center(
                   child: _NavButton(
                     icon: Icons.arrow_back_rounded,
@@ -1781,7 +1860,9 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
               ),
             if (hasNext)
               Positioned(
-                right: 0, top: 0, bottom: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
                 child: Center(
                   child: _NavButton(
                     icon: Icons.arrow_forward_rounded,

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:metrifica_landing/app/core/theme/theme.dart';
 import 'package:metrifica_landing/app/pages/home/widgets/hero_3d_scene.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 
@@ -525,6 +526,7 @@ class _TechIcon extends StatelessWidget {
       child: SvgPicture.asset(
         data.assetPath,
         fit: BoxFit.contain,
+        colorFilter: const ColorFilter.mode(Color(0xFFA0AABD), BlendMode.srcIn),
         placeholderBuilder: (_) => fallbackLabel(),
       ),
     );
@@ -546,23 +548,36 @@ class _LogoMark extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(iconSize * 0.28),
-              child: SvgPicture.asset(
-                'assets/images/metrifica.svg',
-                width: iconSize,
-                height: iconSize,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Text(
-              'metrifica\nlabs',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: iconSize * 0.36,
-                color: const Color(0xFF102B58),
-                fontWeight: FontWeight.w800,
-                height: 0.95,
+            // ClipRRect(
+            //   borderRadius: BorderRadius.circular(iconSize * 0.28),
+            //   child: SvgPicture.asset(
+            //     'assets/images/metrifica.svg',
+            //     width: iconSize,
+            //     height: iconSize,
+            //     fit: BoxFit.cover,
+            //   ),
+            // ),
+            // const SizedBox(width: 14),
+            RichText(
+              text: TextSpan(
+                text: 'Metrifica',
+                children: [
+                  TextSpan(
+                    text: ' Labs',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: iconSize * 0.36,
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w800,
+                      height: 0.95,
+                    ),
+                  ),
+                ],
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: iconSize * 0.36,
+                  color: const Color(0xFF102B58),
+                  fontWeight: FontWeight.w800,
+                  height: 0.95,
+                ),
               ),
             ),
           ],
