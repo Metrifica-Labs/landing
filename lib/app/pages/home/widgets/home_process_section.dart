@@ -431,7 +431,7 @@ class _BlueprintCard extends StatelessWidget {
               ),
               clipBehavior: Clip.antiAlias,
               child: Image.asset(
-                'assets/images/blueprint.png',
+                'assets/images/metrifica_350.png',
                 width: size,
                 height: size,
                 fit: BoxFit.cover,

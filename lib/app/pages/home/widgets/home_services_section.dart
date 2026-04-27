@@ -15,7 +15,7 @@ class HomeServicesSection extends StatefulWidget {
 
 class _HomeServicesSectionState extends State<HomeServicesSection> {
   Timer? _animationTimer;
-  int _activeIndex = 0;
+  int _activeIndex = -1;
 
   static const _services = [
     _ServiceData(
@@ -75,11 +75,28 @@ class _HomeServicesSectionState extends State<HomeServicesSection> {
   @override
   void initState() {
     super.initState();
-    // Slower cadence on mobile — reduces unnecessary rebuilds on low-end devices.
-    final interval = widget.isMobile
-        ? const Duration(milliseconds: 3200)
-        : const Duration(milliseconds: 1800);
-    _animationTimer = Timer.periodic(interval, (_) {
+    _startAnimationTimer();
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeServicesSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isMobile != widget.isMobile) {
+      _startAnimationTimer();
+    }
+  }
+
+  void _startAnimationTimer() {
+    _animationTimer?.cancel();
+    _animationTimer = null;
+
+    if (widget.isMobile) {
+      _activeIndex = -1;
+      return;
+    }
+
+    _activeIndex = 0;
+    _animationTimer = Timer.periodic(const Duration(milliseconds: 1800), (_) {
       if (!mounted) return;
       setState(() => _activeIndex = (_activeIndex + 1) % _services.length);
     });
@@ -387,9 +404,7 @@ class _BentoServiceCardState extends State<_BentoServiceCard> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(32),
             border: Border.all(
-              color: active
-                  ? const Color(0xFFD7E2FF)
-                  : const Color(0xFFEAF0FB),
+              color: active ? const Color(0xFFD7E2FF) : const Color(0xFFEAF0FB),
             ),
             boxShadow: [
               BoxShadow(
@@ -494,7 +509,7 @@ class _ServiceCopy extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: dense ? 20 : 21,
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w700,
                     height: 1.1,
                     letterSpacing: -0.7,
                     color: const Color(0xFF0F172A),
