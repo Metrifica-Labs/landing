@@ -145,25 +145,9 @@ class _MobileTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _LogoMark(iconSize: 50, onTap: onScrollToTop),
-        const Spacer(),
-        Container(
-          width: 46,
-          height: 46,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: const Color(0xFFDCE6FF)),
-          ),
-          child: const Icon(
-            Icons.menu_rounded,
-            color: Color(0xFF4A5C81),
-            size: 30,
-          ),
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Row(children: [_LogoMark(iconSize: 50, onTap: onScrollToTop)]),
     );
   }
 }

@@ -51,7 +51,7 @@ class HomeFooterSection extends StatelessWidget {
               maxWidth: 1280,
               padding: EdgeInsets.zero,
               child: Text(
-                '© 2025 Metrifica Labs. Todos os direitos reservados.',
+                '© 2026 Metrifica Labs. Todos os direitos reservados.',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 12,
                   color: const Color(0xFFB0BAD0),
