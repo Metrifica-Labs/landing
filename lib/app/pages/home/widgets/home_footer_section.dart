@@ -18,8 +18,6 @@ class HomeFooterSection extends StatelessWidget {
   final VoidCallback? onScrollToServices;
   final VoidCallback? onScrollToCases;
 
-  static const _iconColor = 'A0AABD';
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -82,8 +80,6 @@ class HomeFooterSection extends StatelessWidget {
                 children: [
                   Expanded(child: _buildLinks()),
                   const SizedBox(width: 24),
-                  Expanded(flex: 2, child: _buildContact()),
-                  const SizedBox(width: 24),
                   _buildSocial(),
                 ],
               ),
@@ -97,8 +93,6 @@ class HomeFooterSection extends StatelessWidget {
             Expanded(flex: 30, child: _buildBrand()),
             const SizedBox(width: 48),
             Expanded(flex: 16, child: _buildLinks()),
-            const SizedBox(width: 32),
-            Expanded(flex: 34, child: _buildContact()),
             const SizedBox(width: 32),
             _buildSocial(),
           ],
@@ -117,8 +111,7 @@ class HomeFooterSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(child: _buildLinks()),
-            Expanded(child: _buildContact()),
-            Expanded(child: _buildSocial()),
+            _buildSocial(),
           ],
         ),
       ],
@@ -200,26 +193,6 @@ class HomeFooterSection extends StatelessWidget {
     );
   }
 
-  Widget _buildContact() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _ContactRow(
-          svgUrl: 'https://cdn.simpleicons.org/maildotru/$_iconColor',
-          label: 'em',
-          text: 'hello@metricalabs.com',
-        ),
-        const SizedBox(height: 11),
-        _ContactRow(icon: Icons.phone_outlined, text: '+55 (11) 99999-9999'),
-        const SizedBox(height: 11),
-        _ContactRow(
-          icon: Icons.location_on_outlined,
-          text: 'São Paulo, Brasil',
-        ),
-      ],
-    );
-  }
-
   Widget _buildSocial() {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -229,55 +202,6 @@ class HomeFooterSection extends StatelessWidget {
         _SocialIconBox(icon: PhosphorIcons.githubLogo()),
         const SizedBox(height: 7),
         _SocialIconBox(icon: PhosphorIcons.instagramLogo()),
-      ],
-    );
-  }
-}
-
-class _ContactRow extends StatelessWidget {
-  const _ContactRow({this.svgUrl, this.icon, this.label, required this.text})
-    : assert(svgUrl != null || icon != null);
-
-  final String? svgUrl;
-  final IconData? icon;
-  final String? label;
-  final String text;
-
-  Widget _fallbackDot() {
-    return const Icon(
-      Icons.circle_outlined,
-      size: 14,
-      color: Color(0xFFA0AABD),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 16,
-          height: 16,
-          child: svgUrl != null
-              ? Image.network(
-                  svgUrl!,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => _fallbackDot(),
-                )
-              : Icon(icon, size: 15, color: const Color(0xFFA0AABD)),
-        ),
-        const SizedBox(width: 9),
-        Flexible(
-          child: Text(
-            text,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF6B7A99),
-            ),
-          ),
-        ),
       ],
     );
   }

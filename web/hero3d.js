@@ -1,14 +1,6 @@
 (function () {
   'use strict';
 
-  // Skip 3D entirely on mobile/touch — avoids downloading THREE.js (~700 KB)
-  // and eliminates the continuous WebGL render loop on low-end devices.
-  var isMobile = ('ontouchstart' in window) || window.innerWidth < 900;
-  if (isMobile) {
-    window.initHero3D = function () {};
-    return;
-  }
-
   // Queue calls that arrive before the async import resolves.
   var _queue = [];
   var _setupFn = null;
@@ -21,7 +13,7 @@
     }
   };
 
-  // Dynamic imports — THREE.js is only downloaded on desktop.
+  // Dynamic imports — downloaded only when initHero3D is actually called.
   Promise.all([
     import('three'),
     import('three/addons/geometries/RoundedBoxGeometry.js'),
@@ -44,12 +36,12 @@
         requestAnimationFrame(tryInit);
         return;
       }
-      init(container, options, THREE, RoundedBoxGeometry);
+      doInit(container, options, THREE, RoundedBoxGeometry);
     }
     requestAnimationFrame(tryInit);
   }
 
-  function init(container, options, THREE, RoundedBoxGeometry) {
+  function doInit(container, options, THREE, RoundedBoxGeometry) {
     var W = container.clientWidth;
     var H = container.clientHeight || W;
 
