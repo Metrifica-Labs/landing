@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/core/theme/theme.dart';
@@ -130,7 +131,7 @@ class _DesktopTopBar extends StatelessWidget {
         ],
         _PrimaryButton(
           text: 'Vamos conversar',
-          onPressed: () {},
+          onPressed: () => context.go('/contato'),
           compact: true,
         ),
       ],
@@ -260,9 +261,9 @@ class _HeroCopy extends StatelessWidget {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const _PrimaryButton(
+                  _PrimaryButton(
                     text: 'Vamos conversar',
-                    onPressed: null,
+                    onPressed: () => context.go('/contato'),
                   ),
                   const SizedBox(height: 18),
                   _GhostLink(text: 'Ver serviços', onTap: onScrollToServices),
@@ -270,9 +271,9 @@ class _HeroCopy extends StatelessWidget {
               )
             : Row(
                 children: [
-                  const _PrimaryButton(
+                  _PrimaryButton(
                     text: 'Vamos conversar',
-                    onPressed: null,
+                    onPressed: () => context.go('/contato'),
                   ),
                   const SizedBox(width: 30),
                   _GhostLink(text: 'Ver serviços', onTap: onScrollToServices),
