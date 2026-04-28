@@ -553,33 +553,22 @@ class _CaseImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
-        child: Image.network(
-          imageUrl!,
-          height: 160,
-          width: double.infinity,
-          fit: BoxFit.cover,
-          filterQuality: FilterQuality.medium,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return _placeholder();
-          },
-          errorBuilder: (_, __, ___) => _placeholder(),
-        ),
-      );
-    }
-    return _placeholder();
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
+      child: _NetImage(
+        url: imageUrl,
+        width: double.infinity,
+        height: 160,
+        fallback: _placeholder(),
+      ),
+    );
   }
 
   Widget _placeholder() {
     return Container(
       height: 160,
-      decoration: BoxDecoration(
-        color: categoryColor.withValues(alpha: 0.06),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
-      ),
+      width: double.infinity,
+      color: categoryColor.withValues(alpha: 0.06),
       child: Center(
         child: Icon(
           Icons.web_rounded,
@@ -1092,20 +1081,12 @@ class _CaseDetailDialog extends StatelessWidget {
   }
 
   Widget _buildFullWidthImage({required double height}) {
-    if (data.imageUrl != null && data.imageUrl!.isNotEmpty) {
-      return Image.network(
-        data.imageUrl!,
-        height: height,
-        width: double.infinity,
-        fit: BoxFit.cover,
-        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-          if (wasSynchronouslyLoaded || frame != null) return child;
-          return _fullWidthPlaceholder(height);
-        },
-        errorBuilder: (_, __, ___) => _fullWidthPlaceholder(height),
-      );
-    }
-    return _fullWidthPlaceholder(height);
+    return _NetImage(
+      url: data.imageUrl,
+      width: double.infinity,
+      height: height,
+      fallback: _fullWidthPlaceholder(height),
+    );
   }
 
   Widget _fullWidthPlaceholder(double height) {
@@ -1124,20 +1105,12 @@ class _CaseDetailDialog extends StatelessWidget {
   }
 
   Widget _buildImage({required double width, required double height}) {
-    if (data.imageUrl != null && data.imageUrl!.isNotEmpty) {
-      return Image.network(
-        data.imageUrl!,
-        width: width,
-        height: height,
-        fit: BoxFit.cover,
-        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-          if (wasSynchronouslyLoaded || frame != null) return child;
-          return _imagePlaceholder(width, height);
-        },
-        errorBuilder: (_, __, ___) => _imagePlaceholder(width, height),
-      );
-    }
-    return _imagePlaceholder(width, height);
+    return _NetImage(
+      url: data.imageUrl,
+      width: width,
+      height: height,
+      fallback: _imagePlaceholder(width, height),
+    );
   }
 
   Widget _imagePlaceholder(double width, double height) {
@@ -1276,12 +1249,11 @@ class _BentoGrid extends StatelessWidget {
         cursor: SystemMouseCursors.click,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: Image.network(
-            images[index],
-            fit: BoxFit.cover,
+          child: _NetImage(
+            url: images[index],
             width: double.infinity,
             height: double.infinity,
-            errorBuilder: (_, __, ___) => Container(
+            fallback: Container(
               color: categoryColor.withValues(alpha: 0.06),
               child: Icon(
                 Icons.broken_image_rounded,
@@ -1512,26 +1484,18 @@ class _ImagesCarouselState extends State<_ImagesCarousel> {
                       cursor: SystemMouseCursors.click,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          widget.images[i],
+                        child: _NetImage(
+                          url: widget.images[i],
                           height: 180,
                           width: _imageWidth,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
+                          fallback: Container(
                             height: 180,
                             width: _imageWidth,
-                            decoration: BoxDecoration(
-                              color: widget.categoryColor.withValues(
-                                alpha: 0.06,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                            color: widget.categoryColor.withValues(alpha: 0.06),
                             child: Icon(
                               Icons.broken_image_rounded,
                               size: 32,
-                              color: widget.categoryColor.withValues(
-                                alpha: 0.25,
-                              ),
+                              color: widget.categoryColor.withValues(alpha: 0.25),
                             ),
                           ),
                         ),
@@ -1788,6 +1752,14 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
                 child: Image.network(
                   widget.images[_current],
                   fit: BoxFit.contain,
+                  loadingBuilder: (_, child, progress) => progress == null
+                      ? child
+                      : const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white54,
+                            strokeWidth: 2,
+                          ),
+                        ),
                 ),
               ),
               // X positioned over the image, not the screen
@@ -1929,4 +1901,88 @@ Color _techColor(String tech) {
 
   final hue = (tech.codeUnits.fold(0, (a, b) => a + b) % 360).toDouble();
   return HSLColor.fromAHSL(1.0, hue, 0.55, 0.40).toColor();
+}
+
+
+// ---------------------------------------------------------------------------
+// Network image with shimmer loading + fade-in
+// ---------------------------------------------------------------------------
+
+class _NetImage extends StatefulWidget {
+  const _NetImage({
+    required this.url,
+    required this.fallback,
+    this.width,
+    this.height,
+  });
+
+  final String? url;
+  final Widget fallback;
+  final double? width;
+  final double? height;
+
+  @override
+  State<_NetImage> createState() => _NetImageState();
+}
+
+class _NetImageState extends State<_NetImage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _shimmer;
+
+  @override
+  void initState() {
+    super.initState();
+    _shimmer = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _shimmer.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final url = widget.url;
+    if (url == null || url.isEmpty) return widget.fallback;
+
+    return SizedBox(
+      width: widget.width,
+      height: widget.height,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          AnimatedBuilder(
+            animation: _shimmer,
+            builder: (_, __) => ColoredBox(
+              color: Color.lerp(
+                const Color(0xFFF1F5F9),
+                const Color(0xFFE2E8F0),
+                _shimmer.value,
+              )!,
+            ),
+          ),
+          Image.network(
+            url,
+            width: widget.width,
+            height: widget.height,
+            fit: BoxFit.cover,
+            loadingBuilder: (_, child, progress) {
+              if (progress != null) return const SizedBox();
+              return TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeOut,
+                builder: (_, v, __) => Opacity(opacity: v, child: child),
+              );
+            },
+            errorBuilder: (_, __, ___) => widget.fallback,
+          ),
+        ],
+      ),
+    );
+  }
 }

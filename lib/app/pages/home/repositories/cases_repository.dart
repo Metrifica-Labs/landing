@@ -13,8 +13,21 @@ class CasesRepository {
         .eq('published', true)
         .order('order', ascending: true);
 
-    return (response as List)
-        .map((json) => CaseModel.fromJson(json as Map<String, dynamic>))
-        .toList();
+    return (response as List).map((json) {
+      final map = Map<String, dynamic>.from(json as Map);
+      map['image_url'] = _resolveUrl(map['image_url'] as String?);
+      map['images'] = (map['images'] as List<dynamic>? ?? [])
+          .map((e) => _resolveUrl(e as String?) ?? '')
+          .where((url) => url.isNotEmpty)
+          .toList();
+      return CaseModel.fromJson(map);
+    }).toList();
+  }
+
+  // Accepts either a bare storage path ("thumbnail.jpg") or a full URL (pass-through).
+  String? _resolveUrl(String? pathOrUrl) {
+    if (pathOrUrl == null || pathOrUrl.isEmpty) return null;
+    if (pathOrUrl.startsWith('http')) return pathOrUrl;
+    return _client.storage.from('cases').getPublicUrl(pathOrUrl);
   }
 }
