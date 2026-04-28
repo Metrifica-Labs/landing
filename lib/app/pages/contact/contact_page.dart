@@ -1,9 +1,9 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -55,6 +55,33 @@ const _attemptOptions = [
 ];
 
 const _investmentOptions = ['Sim', 'Depende do projeto', 'Não no momento'];
+
+class _BrazilPhoneInputFormatter extends TextInputFormatter {
+  const _BrazilPhoneInputFormatter();
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
+    final limited = digits.length > 11 ? digits.substring(0, 11) : digits;
+    final buffer = StringBuffer();
+
+    for (var i = 0; i < limited.length; i++) {
+      if (i == 0) buffer.write('(');
+      if (i == 2) buffer.write(') ');
+      if (i == 7) buffer.write('-');
+      buffer.write(limited[i]);
+    }
+
+    final text = buffer.toString();
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+  }
+}
 
 class ContactPage extends ConsumerStatefulWidget {
   const ContactPage({super.key});
@@ -354,6 +381,7 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                     keyboardType: TextInputType.phone,
                     textCapitalization: TextCapitalization.none,
                     canAdvance: _canAdvance(1),
+                    inputFormatters: const [_BrazilPhoneInputFormatter()],
                     onChanged: (_) {
                       _onInteract();
                       setState(() {});
@@ -411,7 +439,6 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                     onSelect: (v) {
                       _onInteract();
                       setState(() => _revenue = v);
-                      Timer(const Duration(milliseconds: 200), _next);
                     },
                     onNext: _next,
                   ),
@@ -491,7 +518,6 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                     onSelect: (v) {
                       _onInteract();
                       setState(() => _previousAttempt = v);
-                      Timer(const Duration(milliseconds: 200), _next);
                     },
                     onNext: _next,
                   ),
@@ -555,7 +581,6 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                     onSelect: (v) {
                       _onInteract();
                       setState(() => _willingToInvest = v);
-                      Timer(const Duration(milliseconds: 200), _next);
                     },
                     onNext: _next,
                   ),
@@ -834,6 +859,7 @@ class _TextStep extends StatelessWidget {
     this.maxLines = 1,
     this.isLoading = false,
     this.hasError = false,
+    this.inputFormatters,
   });
 
   final int index;
@@ -849,6 +875,7 @@ class _TextStep extends StatelessWidget {
   final int maxLines;
   final bool isLoading;
   final bool hasError;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   Widget build(BuildContext context) {
@@ -868,6 +895,7 @@ class _TextStep extends StatelessWidget {
         textInputAction: maxLines > 1
             ? TextInputAction.newline
             : TextInputAction.done,
+        inputFormatters: inputFormatters,
         minLines: 1,
         maxLines: maxLines,
         onChanged: onChanged,
