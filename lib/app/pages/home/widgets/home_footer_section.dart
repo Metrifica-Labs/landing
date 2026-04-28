@@ -165,7 +165,7 @@ class HomeFooterSection extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         Text(
-          'Transformamos ideias em\nsoluções digitais de alto impacto.',
+          'Tecnologia própria. Construída do zero. Desde a arquitetura.',
           style: GoogleFonts.plusJakartaSans(
             fontSize: 13,
             height: 1.55,
@@ -178,10 +178,7 @@ class HomeFooterSection extends StatelessWidget {
   }
 
   Widget _buildLinks() {
-    final links = [
-      ('Serviços', onScrollToServices),
-      ('Cases', onScrollToCases),
-    ];
+    final links = [('Serviços', onScrollToServices), ('FAQ', onScrollToCases)];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: links

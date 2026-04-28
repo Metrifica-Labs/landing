@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:metrifica_landing/app/pages/home/widgets/home_cases_section.dart';
+import 'package:metrifica_landing/app/pages/home/widgets/home_content_sections.dart';
 import 'package:metrifica_landing/app/pages/home/widgets/home_cta_section.dart';
 import 'package:metrifica_landing/app/pages/home/widgets/home_footer_section.dart';
 import 'package:metrifica_landing/app/pages/home/widgets/home_hero_section.dart'
@@ -20,7 +20,7 @@ class _HomeMobileLayoutState extends State<HomeMobileLayout> {
   final _scrollCtrl = ScrollController();
   final _servicesKey = GlobalKey();
   final _processKey = GlobalKey();
-  final _casesKey = GlobalKey();
+  final _faqKey = GlobalKey();
 
   @override
   void dispose() {
@@ -62,21 +62,36 @@ class _HomeMobileLayoutState extends State<HomeMobileLayout> {
                     isMobile: true,
                     onScrollToServices: () => _scrollTo(_servicesKey),
                   ),
+                  const RepaintBoundary(
+                    child: HomeProblemSection(isMobile: true),
+                  ),
                   RepaintBoundary(
-                    child: HomeServicesSection(key: _servicesKey, isMobile: true),
+                    child: HomeServicesSection(
+                      key: _servicesKey,
+                      isMobile: true,
+                    ),
                   ),
                   RepaintBoundary(
                     child: HomeProcessSection(key: _processKey, isMobile: true),
                   ),
-                  RepaintBoundary(
-                    child: HomeCasesSection(key: _casesKey, isMobile: true),
-                  ),
                   const RepaintBoundary(child: HomeCtaSection(isMobile: true)),
+                  const RepaintBoundary(
+                    child: HomeProjectDevelopmentSection(isMobile: true),
+                  ),
+                  const RepaintBoundary(
+                    child: HomeDifferenceSection(isMobile: true),
+                  ),
+                  RepaintBoundary(
+                    child: HomeFaqSection(key: _faqKey, isMobile: true),
+                  ),
+                  const RepaintBoundary(
+                    child: HomeFinalCtaSection(isMobile: true),
+                  ),
                   HomeFooterSection(
                     isMobile: true,
                     onScrollToTop: _scrollToTop,
                     onScrollToServices: () => _scrollTo(_servicesKey),
-                    onScrollToCases: () => _scrollTo(_casesKey),
+                    onScrollToCases: () => _scrollTo(_faqKey),
                   ),
                 ],
               ),
@@ -91,7 +106,7 @@ class _HomeMobileLayoutState extends State<HomeMobileLayout> {
               onScrollToTop: _scrollToTop,
               onScrollToServices: () => _scrollTo(_servicesKey),
               onScrollToProcess: () => _scrollTo(_processKey),
-              onScrollToCases: () => _scrollTo(_casesKey),
+              onScrollToCases: () => _scrollTo(_faqKey),
             ),
           ),
         ],

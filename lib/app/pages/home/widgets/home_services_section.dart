@@ -20,53 +20,49 @@ class _HomeServicesSectionState extends State<HomeServicesSection> {
   static const _services = [
     _ServiceData(
       type: _ServiceType.software,
-      title: 'Sistemas Complexos',
+      title: 'Back-end & Arquitetura',
       description:
-          'Arquitetura de microsserviços e processamento paralelo para ambientes de missão crítica.',
+          'Infraestrutura desenvolvida do zero para sustentar crescimento no longo prazo, sem reescrever tudo do início.',
       highlights: [
-        _ServiceHighlight(Icons.view_in_ar_rounded, 'Escalabilidade'),
-        _ServiceHighlight(Icons.shield_outlined, 'Alta disponibilidade'),
-        _ServiceHighlight(Icons.speed_rounded, 'Performance'),
+        _ServiceHighlight(Icons.view_in_ar_rounded, 'Código real'),
+        _ServiceHighlight(Icons.shield_outlined, 'Arquitetura segura'),
+        _ServiceHighlight(Icons.speed_rounded, 'Escala'),
       ],
       desktopFlex: 7,
     ),
     _ServiceData(
       type: _ServiceType.webMobile,
-      title: 'Experiência Digital',
+      title: 'Front-end & Produto',
       description:
-          'Interfaces fluidas e apps nativos focados em retenção e performance perceptual.',
+          'Dashboards, portais e ferramentas internas criados para o fluxo real da operação.',
       highlights: [
-        _ServiceHighlight(Icons.check_circle_outline_rounded, 'UX intuitiva'),
-        _ServiceHighlight(Icons.check_circle_outline_rounded, 'Design system'),
-        _ServiceHighlight(Icons.check_circle_outline_rounded, 'Apps nativos'),
+        _ServiceHighlight(Icons.check_circle_outline_rounded, 'Uso real'),
+        _ServiceHighlight(Icons.check_circle_outline_rounded, 'UX operacional'),
+        _ServiceHighlight(Icons.check_circle_outline_rounded, 'Produto'),
       ],
       desktopFlex: 4,
     ),
     _ServiceData(
       type: _ServiceType.cloud,
-      title: 'Cloud & DevOps',
+      title: 'Automação & Integração',
       description:
-          'Infraestrutura imutável, CI/CD avançado e segurança escalável.',
+          'Processos que rodam sem depender de ninguém, com dados integrados e menos retrabalho.',
       highlights: [
-        _ServiceHighlight(Icons.settings_suggest_rounded, 'CI/CD automatizado'),
-        _ServiceHighlight(Icons.all_inclusive_rounded, 'Infra como código'),
-        _ServiceHighlight(Icons.lock_outline_rounded, 'Segurança integrada'),
+        _ServiceHighlight(Icons.settings_suggest_rounded, 'Automação'),
+        _ServiceHighlight(Icons.all_inclusive_rounded, 'Integrações'),
+        _ServiceHighlight(Icons.lock_outline_rounded, 'Menos manual'),
       ],
       desktopFlex: 5,
     ),
     _ServiceData(
       type: _ServiceType.data,
-      title: 'Data Science',
+      title: 'Segurança de Dados',
       description:
-          'Modelagem preditiva e pipelines de Big Data que transformam dados brutos em decisões estratégicas.',
+          'Controle de acesso, criptografia, auditoria e LGPD como fundação da arquitetura.',
       highlights: [
-        _ServiceHighlight(Icons.storage_rounded, 'Eventos/dia', value: '+10M'),
-        _ServiceHighlight(
-          Icons.track_changes_rounded,
-          'Acurácia',
-          value: '98%',
-        ),
-        _ServiceHighlight(Icons.av_timer_rounded, 'Produção', value: '24/7'),
+        _ServiceHighlight(Icons.storage_rounded, 'LGPD'),
+        _ServiceHighlight(Icons.track_changes_rounded, 'Auditoria'),
+        _ServiceHighlight(Icons.av_timer_rounded, 'Proteção'),
       ],
       desktopFlex: 7,
     ),
@@ -169,20 +165,7 @@ class _SectionHeader extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text.rich(
-              TextSpan(
-                text: 'NOSSA ',
-                children: [
-                  TextSpan(
-                    text: 'STACK.',
-                    style: TextStyle(
-                      color: const Color(0xFF2864E8),
-                      decoration: TextDecoration.underline,
-                      decorationColor: const Color(0xFFBFD0FF),
-                      decorationThickness: 3,
-                    ),
-                  ),
-                ],
-              ),
+              TextSpan(text: 'Construímos sua tecnologia própria sob medida.'),
               textAlign: isMobile ? TextAlign.left : TextAlign.center,
               style: GoogleFonts.plusJakartaSans(
                 fontSize: isMobile ? 34 : 44,
@@ -198,7 +181,7 @@ class _SectionHeader extends StatelessWidget {
           SizedBox(
             width: 330,
             child: Text(
-              'Soluções integradas para desafios técnicos de escala global.',
+              'Sem no-code como solução final. Sem sistemas genéricos. Sem IA milagrosa. O seu sistema é desenvolvido do zero para funcionar exatamente como o seu negócio precisa.',
               textAlign: TextAlign.right,
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 14,
@@ -211,7 +194,7 @@ class _SectionHeader extends StatelessWidget {
         if (isMobile) ...[
           const SizedBox(height: 14),
           Text(
-            'Soluções integradas para desafios técnicos de escala global.',
+            'Sem no-code como solução final. Sem sistemas genéricos. Sem IA milagrosa. Código real para funcionar com segurança, performance e escala.',
             style: GoogleFonts.plusJakartaSans(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -586,8 +569,6 @@ class _ServiceHighlightItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasValue = highlight.value != null;
-
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -610,20 +591,10 @@ class _ServiceHighlightItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (hasValue)
-              Text(
-                highlight.value!,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  height: 1,
-                  color: const Color(0xFF2864E8),
-                ),
-              ),
             Text(
               highlight.label,
               style: GoogleFonts.plusJakartaSans(
-                fontSize: dense ? 11.5 : (hasValue ? 11.5 : 12),
+                fontSize: dense ? 11.5 : 12,
                 fontWeight: FontWeight.w700,
                 height: 1.25,
                 color: const Color(0xFF66758D),
@@ -1320,11 +1291,10 @@ class _ServiceData {
 }
 
 class _ServiceHighlight {
-  const _ServiceHighlight(this.icon, this.label, {this.value});
+  const _ServiceHighlight(this.icon, this.label);
 
   final IconData icon;
   final String label;
-  final String? value;
 }
 
 enum _ServiceType { software, webMobile, cloud, data }

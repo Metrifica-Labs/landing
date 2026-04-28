@@ -11,26 +11,30 @@ class HomeProcessSection extends StatelessWidget {
     _StepData(
       number: '01',
       icon: Icons.search_rounded,
-      title: 'Descobrir',
-      description: 'Entendemos seu desafio e objetivos.',
+      title: 'Entendemos',
+      description:
+          'Antes de desenvolver, entendemos como você opera, onde trava e o que precisa ser verdade daqui a dois anos.',
     ),
     _StepData(
       number: '02',
       icon: Icons.edit_rounded,
-      title: 'Planejar',
-      description: 'Definimos a estratégia e o escopo.',
+      title: 'Estruturamos',
+      description:
+          'Mapeamos a causa do problema e projetamos a arquitetura certa, incluindo segurança desde o início.',
     ),
     _StepData(
       number: '03',
       icon: Icons.code_rounded,
-      title: 'Desenvolver',
-      description: 'Construímos com qualidade, testes e transparência.',
+      title: 'Desenvolvemos',
+      description:
+          'Escrevemos código para produção: mantível, escalável e preparado para operar sob pressão por anos.',
     ),
     _StepData(
       number: '04',
       icon: Icons.send_rounded,
-      title: 'Entregar',
-      description: 'Lançamos, suportamos e evoluímos junto com você.',
+      title: 'Evoluímos',
+      description:
+          'Não entregamos e sumimos. O sistema cresce com a sua operação, refinado conforme o negócio avança.',
     ),
   ];
 
@@ -93,7 +97,7 @@ class HomeProcessSection extends StatelessWidget {
 
   Widget _sectionLabel() {
     return Text(
-      'NOSSO PROCESSO',
+      'COMO TRABALHAMOS',
       style: GoogleFonts.plusJakartaSans(
         fontSize: 13,
         fontWeight: FontWeight.w800,
@@ -105,7 +109,7 @@ class HomeProcessSection extends StatelessWidget {
 
   Widget _title(double fontSize) {
     return Text(
-      'Do conceito ao código. Com clareza e colaboração.',
+      'O seu sistema não começa no código. Começa na necessidade do seu negócio.',
       style: GoogleFonts.plusJakartaSans(
         fontSize: fontSize,
         fontWeight: FontWeight.w700,

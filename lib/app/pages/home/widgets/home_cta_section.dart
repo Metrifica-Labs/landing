@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/pages/home/widgets/hero_3d_scene.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
@@ -10,9 +11,7 @@ class HomeCtaSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   
     return Container(
-     
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 32,
         vertical: isMobile ? 32 : 48,
@@ -122,7 +121,7 @@ class HomeCtaSection extends StatelessWidget {
       children: [
         // Label
         Text(
-          'VAMOS CONSTRUIR',
+          'PRIMEIRA CONVERSA',
           style: GoogleFonts.plusJakartaSans(
             fontSize: 11,
             fontWeight: FontWeight.w800,
@@ -133,7 +132,7 @@ class HomeCtaSection extends StatelessWidget {
         const SizedBox(height: 10),
         // Title
         Text(
-          'O próximo grande\nprojeto juntos?',
+          'Reconheceu o seu\nnegócio aqui?',
           style: GoogleFonts.plusJakartaSans(
             fontSize: mobile ? 28 : 34,
             fontWeight: FontWeight.w700,
@@ -145,7 +144,7 @@ class HomeCtaSection extends StatelessWidget {
         const SizedBox(height: 10),
         // Subtitle
         Text(
-          'Conte sua ideia e vamos transformá-la\nem um produto de impacto.',
+          'A primeira conversa é gratuita. Sem compromisso, sem pitch de produto.',
           style: GoogleFonts.plusJakartaSans(
             fontSize: 13,
             height: 1.45,
@@ -206,14 +205,14 @@ class _CtaButtonState extends State<_CtaButton> {
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: () {},
+          onTap: () => context.go('/contato'),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 22),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Iniciar projeto',
+                  'Agendar consultoria gratuita',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,

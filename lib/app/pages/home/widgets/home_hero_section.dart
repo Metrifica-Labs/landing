@@ -1,8 +1,5 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metrifica_landing/app/core/theme/theme.dart';
 import 'package:metrifica_landing/app/pages/home/widgets/hero_3d_scene.dart';
@@ -111,7 +108,7 @@ class _DesktopTopBar extends StatelessWidget {
     final navItems = [
       ('Serviços', onScrollToServices),
       ('Processo', onScrollToProcess),
-      ('Cases', onScrollToCases),
+      ('FAQ', onScrollToCases),
     ];
 
     return Row(
@@ -130,7 +127,7 @@ class _DesktopTopBar extends StatelessWidget {
           const SizedBox(width: 34),
         ],
         _PrimaryButton(
-          text: 'Vamos conversar',
+          text: 'Agendar consultoria',
           onPressed: () => context.go('/contato'),
           compact: true,
         ),
@@ -240,7 +237,10 @@ class _HeroCopy extends StatelessWidget {
           text: TextSpan(
             style: titleStyle,
             children: [
-              const TextSpan(text: 'Ideias que\nmovem negocios'),
+              const TextSpan(
+                text:
+                    'O seu negócio já cresceu.\nA tecnologia precisa acompanhar',
+              ),
               TextSpan(
                 text: '.',
                 style: titleStyle.copyWith(color: const Color(0xFF1763FF)),
@@ -252,7 +252,7 @@ class _HeroCopy extends StatelessWidget {
         ConstrainedBox(
           constraints: BoxConstraints(maxWidth: isMobile ? 340 : 490),
           child: Text(
-            'Desenvolvemos solucoes digitais personalizadas para transformar ideias em resultados reais.',
+            'Aqui na Metrifica construímos a sua infraestrutura tecnológica própria que sustenta seu crescimento com escala de verdade.',
             style: bodyStyle,
           ),
         ),
@@ -262,7 +262,7 @@ class _HeroCopy extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _PrimaryButton(
-                    text: 'Vamos conversar',
+                    text: 'Agendar consultoria gratuita',
                     onPressed: () => context.go('/contato'),
                   ),
                   const SizedBox(height: 18),
@@ -272,7 +272,7 @@ class _HeroCopy extends StatelessWidget {
             : Row(
                 children: [
                   _PrimaryButton(
-                    text: 'Vamos conversar',
+                    text: 'Agendar consultoria gratuita',
                     onPressed: () => context.go('/contato'),
                   ),
                   const SizedBox(width: 30),
@@ -280,7 +280,7 @@ class _HeroCopy extends StatelessWidget {
                 ],
               ),
         SizedBox(height: isMobile ? 26 : 42),
-        _TechnologiesRow(isMobile: isMobile),
+        _ProofRow(isMobile: isMobile),
       ],
     );
   }
@@ -298,7 +298,7 @@ class _MicroLabel extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        'SOFTWARE QUE IMPULSIONA',
+        'Tecnologia própria. Construída do zero.',
         style: GoogleFonts.plusJakartaSans(
           fontSize: 13,
           fontWeight: FontWeight.w800,
@@ -418,102 +418,51 @@ class _GhostLink extends StatelessWidget {
   }
 }
 
-class _TechnologiesRow extends StatelessWidget {
-  const _TechnologiesRow({required this.isMobile});
+class _ProofRow extends StatelessWidget {
+  const _ProofRow({required this.isMobile});
 
   final bool isMobile;
 
   @override
   Widget build(BuildContext context) {
-    final icons = <_TechIconData>[
-      _TechIconData(label: 'react', assetPath: 'assets/images/tech/react.svg'),
-      _TechIconData(label: 'node', assetPath: 'assets/images/tech/node.svg'),
-      _TechIconData(
-        label: 'ts',
-        assetPath: 'assets/images/tech/typescript.svg',
-      ),
-      _TechIconData(
-        label: 'js',
-        assetPath: 'assets/images/tech/javascript.svg',
-      ),
-      _TechIconData(
-        label: 'flutter',
-        assetPath: 'assets/images/tech/flutter.svg',
-      ),
-      _TechIconData(
-        label: 'python',
-        assetPath: 'assets/images/tech/python.svg',
-      ),
-      _TechIconData(label: 'aws', assetPath: 'assets/images/tech/aws.svg'),
-      _TechIconData(
-        label: 'docker',
-        assetPath: 'assets/images/tech/docker.svg',
-      ),
-      _TechIconData(
-        label: 'firebase',
-        assetPath: 'assets/images/tech/firebase.svg',
-      ),
+    const items = [
+      'Apps desenvolvidos do zero, sem atalhos',
+      'Nada de sistemas genéricos, no-code ou IA milagrosa',
+      'Uma infraestrutura construída para o seu negócio',
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Tecnologias que utilizamos:',
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: isMobile ? 14 : 12,
-            color: const Color(0xFF98A4B8),
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.1,
-          ),
-        ),
-        const SizedBox(height: 14),
         Wrap(
-          spacing: isMobile ? 16 : 18,
+          spacing: 10,
           runSpacing: 10,
-          children: icons.map((item) => _TechIcon(data: item)).toList(),
+          children: items
+              .map(
+                (item) => Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3F6FF),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: const Color(0xFFE1E9FF)),
+                  ),
+                  child: Text(
+                    item,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: isMobile ? 12 : 11,
+                      color: const Color(0xFF53627E),
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.1,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
         ),
       ],
-    );
-  }
-}
-
-class _TechIconData {
-  const _TechIconData({required this.label, required this.assetPath});
-
-  final String label;
-  final String assetPath;
-}
-
-class _TechIcon extends StatelessWidget {
-  const _TechIcon({required this.data});
-
-  final _TechIconData data;
-
-  Widget fallbackLabel() {
-    return Center(
-      child: Text(
-        data.label.substring(0, math.min(2, data.label.length)).toUpperCase(),
-        style: GoogleFonts.plusJakartaSans(
-          color: const Color(0xFFA0AABD),
-          fontWeight: FontWeight.w800,
-          fontSize: 10,
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 26,
-      height: 26,
-      child: SvgPicture.asset(
-        data.assetPath,
-        fit: BoxFit.contain,
-        colorFilter: const ColorFilter.mode(Color(0xFFA0AABD), BlendMode.srcIn),
-        placeholderBuilder: (_) => fallbackLabel(),
-      ),
     );
   }
 }
