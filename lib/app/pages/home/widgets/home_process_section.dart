@@ -99,7 +99,7 @@ class HomeProcessSection extends StatelessWidget {
     return Text(
       'COMO TRABALHAMOS',
       style: GoogleFonts.plusJakartaSans(
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: FontWeight.w800,
         letterSpacing: 1.2,
         color: const Color(0xFF2864E8),
@@ -112,9 +112,9 @@ class HomeProcessSection extends StatelessWidget {
       'O seu sistema não começa no código. Começa na necessidade do seu negócio.',
       style: GoogleFonts.plusJakartaSans(
         fontSize: fontSize,
-        fontWeight: FontWeight.w700,
-        height: 1.1,
-        letterSpacing: -1.0,
+        fontWeight: FontWeight.w800,
+        height: 1.14,
+        letterSpacing: -0.8,
         color: const Color(0xFF0B1C45),
       ),
     );

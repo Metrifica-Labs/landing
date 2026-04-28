@@ -76,10 +76,10 @@ class HomeProblemSection extends StatelessWidget {
           Text(
             'Mais esforço não vai resolver. Mais gente não vai resolver. Mais sistema genérico definitivamente não vai.',
             style: GoogleFonts.plusJakartaSans(
-              fontSize: isMobile ? 31 : 56,
-              fontWeight: FontWeight.w900,
-              height: 1.02,
-              letterSpacing: isMobile ? -1.4 : -2.8,
+              fontSize: isMobile ? 28 : 44,
+              fontWeight: FontWeight.w800,
+              height: 1.08,
+              letterSpacing: isMobile ? -1.1 : -1.9,
               color: _dark,
             ),
           ),
@@ -270,10 +270,10 @@ class HomeDifferenceSection extends StatelessWidget {
           Text(
             'Empresas que constroem tecnologia própria não param de crescer. As que dependem de sistema genérico começam a envelhecer.',
             style: GoogleFonts.plusJakartaSans(
-              fontSize: isMobile ? 28 : 44,
-              fontWeight: FontWeight.w900,
-              height: 1.06,
-              letterSpacing: -1.6,
+              fontSize: isMobile ? 25 : 36,
+              fontWeight: FontWeight.w800,
+              height: 1.14,
+              letterSpacing: -1.1,
               color: _dark,
             ),
           ),
@@ -386,10 +386,10 @@ class HomeFinalCtaSection extends StatelessWidget {
             Text(
               'Pronto para construir tecnologia própria que sustenta o crescimento do seu negócio?',
               style: GoogleFonts.plusJakartaSans(
-                fontSize: isMobile ? 31 : 52,
-                fontWeight: FontWeight.w900,
-                height: 1.04,
-                letterSpacing: -2,
+                fontSize: isMobile ? 29 : 44,
+                fontWeight: FontWeight.w800,
+                height: 1.1,
+                letterSpacing: -1.5,
                 color: Colors.white,
               ),
             ),
@@ -438,7 +438,7 @@ class _SectionShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: color,
-      padding: EdgeInsets.symmetric(vertical: isMobile ? 64 : 96),
+      padding: EdgeInsets.symmetric(vertical: isMobile ? 58 : 88),
       child: MaxWidthContainer(
         maxWidth: 1280,
         padding: EdgeInsets.symmetric(horizontal: isMobile ? 22 : 32),
@@ -473,10 +473,10 @@ class _SectionHeader extends StatelessWidget {
           child: Text(
             title,
             style: GoogleFonts.plusJakartaSans(
-              fontSize: isMobile ? 32 : 48,
-              fontWeight: FontWeight.w900,
-              height: 1.04,
-              letterSpacing: isMobile ? -1.4 : -2.1,
+              fontSize: isMobile ? 29 : 42,
+              fontWeight: FontWeight.w800,
+              height: 1.12,
+              letterSpacing: isMobile ? -1 : -1.6,
               color: _dark,
             ),
           ),
@@ -507,7 +507,7 @@ class _ProblemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: const Color(0xFFFBFCFF),
         borderRadius: BorderRadius.circular(24),
@@ -520,7 +520,7 @@ class _ProblemCard extends StatelessWidget {
           const SizedBox(height: 14),
           Text(title, style: _cardTitleStyle()),
           const SizedBox(height: 10),
-          Expanded(child: Text(body, style: _smallBodyStyle())),
+          Text(body, style: _smallBodyStyle()),
         ],
       ),
     );
@@ -542,7 +542,7 @@ class _BlueCallout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(28),
+      padding: const EdgeInsets.all(26),
       decoration: BoxDecoration(
         color: _blue,
         borderRadius: BorderRadius.circular(24),
@@ -559,10 +559,7 @@ class _BlueCallout extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: _cardTitleStyle().copyWith(
-                    color: Colors.white,
-                    fontSize: 24,
-                  ),
+                  style: _cardTitleStyle().copyWith(color: Colors.white),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -715,7 +712,7 @@ class _PhaseBody extends StatelessWidget {
         Text(
           phase.subtitle,
           style: _smallBodyStyle().copyWith(
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w800,
             color: _dark,
           ),
         ),
@@ -849,29 +846,29 @@ class _PhaseData {
 
 TextStyle _labelStyle() => GoogleFonts.plusJakartaSans(
   fontSize: 12,
-  fontWeight: FontWeight.w900,
-  letterSpacing: 1.5,
+  fontWeight: FontWeight.w800,
+  letterSpacing: 1.3,
   color: _blue,
 );
 
 TextStyle _bodyStyle(bool isMobile) => GoogleFonts.plusJakartaSans(
   fontSize: isMobile ? 15 : 16,
   height: 1.65,
-  fontWeight: FontWeight.w600,
+  fontWeight: FontWeight.w500,
   color: _muted,
 );
 
 TextStyle _smallBodyStyle() => GoogleFonts.plusJakartaSans(
   fontSize: 14,
   height: 1.55,
-  fontWeight: FontWeight.w600,
+  fontWeight: FontWeight.w500,
   color: _muted,
 );
 
 TextStyle _cardTitleStyle() => GoogleFonts.plusJakartaSans(
   fontSize: 19,
-  fontWeight: FontWeight.w900,
-  height: 1.14,
-  letterSpacing: -0.5,
+  fontWeight: FontWeight.w800,
+  height: 1.18,
+  letterSpacing: -0.35,
   color: _dark,
 );

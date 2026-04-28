@@ -142,67 +142,51 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Flex(
-      direction: isMobile ? Axis.vertical : Axis.horizontal,
+    return Column(
       crossAxisAlignment: isMobile
           ? CrossAxisAlignment.start
-          : CrossAxisAlignment.end,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          : CrossAxisAlignment.center,
       children: [
-        Column(
-          crossAxisAlignment: isMobile
-              ? CrossAxisAlignment.start
-              : CrossAxisAlignment.center,
-          children: [
-            Text(
-              'O QUE FAZEMOS',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.7,
-                color: const Color(0xFF2864E8),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text.rich(
-              TextSpan(text: 'Construímos sua tecnologia própria sob medida.'),
-              textAlign: isMobile ? TextAlign.left : TextAlign.center,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: isMobile ? 34 : 44,
-                fontWeight: FontWeight.w900,
-                height: 0.98,
-                letterSpacing: -1.8,
-                color: const Color(0xFF0F172A),
-              ),
-            ),
-          ],
+        Text(
+          'O QUE FAZEMOS',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.6,
+            color: const Color(0xFF2864E8),
+          ),
         ),
-        if (!isMobile)
-          SizedBox(
-            width: 330,
-            child: Text(
-              'Sem no-code como solução final. Sem sistemas genéricos. Sem IA milagrosa. O seu sistema é desenvolvido do zero para funcionar exatamente como o seu negócio precisa.',
-              textAlign: TextAlign.right,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                height: 1.55,
-                color: const Color(0xFF8A95AA),
-              ),
+        const SizedBox(height: 16),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 820),
+          child: Text(
+            'Construímos sua tecnologia própria sob medida para a escala da sua empresa.',
+            textAlign: isMobile ? TextAlign.left : TextAlign.center,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: isMobile ? 30 : 40,
+              fontWeight: FontWeight.w800,
+              height: 1.1,
+              letterSpacing: -1.3,
+              color: const Color(0xFF0F172A),
             ),
           ),
-        if (isMobile) ...[
-          const SizedBox(height: 14),
-          Text(
-            'Sem no-code como solução final. Sem sistemas genéricos. Sem IA milagrosa. Código real para funcionar com segurança, performance e escala.',
+        ),
+        const SizedBox(height: 16),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: Text(
+            isMobile
+                ? 'Sem no-code como solução final. Sem sistemas genéricos. Sem IA milagrosa. Código real para funcionar com segurança, performance e escala.'
+                : 'Sem no-code como solução final. Sem sistemas genéricos. Sem IA milagrosa. O seu sistema é desenvolvido do zero para funcionar exatamente como o seu negócio precisa.',
+            textAlign: isMobile ? TextAlign.left : TextAlign.center,
             style: GoogleFonts.plusJakartaSans(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              height: 1.55,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              height: 1.6,
               color: const Color(0xFF8A95AA),
             ),
           ),
-        ],
+        ),
       ],
     );
   }
@@ -372,7 +356,7 @@ class _BentoServiceCardState extends State<_BentoServiceCard> {
       builder: (context, constraints) {
         final isCompact = widget.compact || constraints.maxWidth < 380;
         final active = widget.active;
-        final cardHeight = widget.compact ? null : (isCompact ? 520.0 : 290.0);
+        final cardHeight = widget.compact ? null : (isCompact ? 520.0 : 320.0);
         final visualWidth = isCompact
             ? double.infinity
             : (constraints.maxWidth * 0.38).clamp(150.0, 210.0).toDouble();
@@ -501,7 +485,7 @@ class _ServiceCopy extends StatelessWidget {
                 const SizedBox(height: 12),
                 Text(
                   data.description,
-                  maxLines: dense ? 3 : 3,
+                  maxLines: dense ? 4 : 4,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: dense ? 13 : 13.5,

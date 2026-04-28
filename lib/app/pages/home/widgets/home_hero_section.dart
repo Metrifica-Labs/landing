@@ -164,15 +164,15 @@ class _DesktopHeroBody extends StatelessWidget {
         children: [
           const Positioned(
             top: -100,
-            right: -240,
-            width: 1000,
+            right: -360,
+            width: 960,
             height: 840,
             child: Hero3DScene(),
           ),
           const Positioned(
             top: 48,
             left: 0,
-            width: 535,
+            width: 640,
             child: _HeroCopy(isMobile: false),
           ),
         ],
@@ -196,7 +196,7 @@ class _MobileHeroBody extends StatelessWidget {
           right: -178,
           width: 560,
           height: 520,
-          child: Hero3DScene(pointerEvents: false, opacity: 0.24),
+          child: Hero3DScene(pointerEvents: false, opacity: 0.15),
         ),
         _HeroCopy(isMobile: true, onScrollToServices: onScrollToServices),
       ],
@@ -213,17 +213,17 @@ class _HeroCopy extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleStyle = GoogleFonts.plusJakartaSans(
-      fontSize: isMobile ? 56 : 72,
-      fontWeight: FontWeight.w700,
-      height: isMobile ? 1.05 : 0.98,
-      letterSpacing: isMobile ? -2.4 : -3.2,
+      fontSize: isMobile ? 43 : 62,
+      fontWeight: FontWeight.w800,
+      height: isMobile ? 1.08 : 1.02,
+      letterSpacing: isMobile ? -1.6 : -2.4,
       color: const Color(0xFF0B1C45),
     );
 
     final bodyStyle = GoogleFonts.plusJakartaSans(
-      fontSize: isMobile ? 18 : 16,
+      fontSize: isMobile ? 16 : 17,
       fontWeight: FontWeight.w500,
-      height: isMobile ? 1.45 : 1.55,
+      height: isMobile ? 1.55 : 1.6,
       color: const Color(0xFF7A879F),
       letterSpacing: -0.2,
     );
@@ -250,7 +250,7 @@ class _HeroCopy extends StatelessWidget {
         ),
         SizedBox(height: isMobile ? 24 : 28),
         ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: isMobile ? 340 : 490),
+          constraints: BoxConstraints(maxWidth: isMobile ? 340 : 560),
           child: Text(
             'Aqui na Metrifica construímos a sua infraestrutura tecnológica própria que sustenta seu crescimento com escala de verdade.',
             style: bodyStyle,
@@ -292,7 +292,7 @@ class _MicroLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
       decoration: BoxDecoration(
         color: const Color(0xFFE8F0FF),
         borderRadius: BorderRadius.circular(999),
@@ -300,7 +300,7 @@ class _MicroLabel extends StatelessWidget {
       child: Text(
         'Tecnologia própria. Construída do zero.',
         style: GoogleFonts.plusJakartaSans(
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.6,
           color: const Color(0xFF2864E8),
@@ -324,8 +324,8 @@ class _PrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: compact ? 56 : 58,
-      constraints: BoxConstraints(minWidth: compact ? 230 : 238),
+      height: compact ? 54 : 56,
+      constraints: BoxConstraints(minWidth: compact ? 220 : 248),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF2A74FF), Color(0xFF1659E8)],
@@ -343,14 +343,14 @@ class _PrimaryButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         onTap: onPressed,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 text,
                 style: GoogleFonts.plusJakartaSans(
-                  fontSize: compact ? 14 : 14,
+                  fontSize: 13,
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.2,
