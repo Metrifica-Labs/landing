@@ -16,13 +16,45 @@ const _kBlue = Color(0xFF2864E8);
 const _kDark = Color(0xFF0F172A);
 const _kMuted = Color(0xFF64748B);
 const _kBorder = Color(0xFFE2E8F0);
+const _totalSteps = 16;
 
 const _revenueOptions = [
-  'até R\$ 50 mil/mês',
-  'R\$ 50k – R\$ 200k/mês',
-  'R\$ 200k – R\$ 1 mi/mês',
-  'acima de R\$ 1 mi/mês',
+  'Até R\$100K',
+  'R\$100K - R\$300K',
+  'R\$300K - R\$1M',
+  'R\$1M - R\$3M',
+  'Acima de R\$3M',
 ];
+
+const _momentOptions = [
+  'Sou dono de várias lojas, estou crescendo, mas sem estrutura',
+  'Tenho muitos clientes, minha operação não acompanha o crescimento',
+  'Tenho demanda infinita e ainda dependo demais de pessoas/processos manuais',
+  'Já tenho sistema, mas ele limita meu crescimento',
+  'Quero um sistema ou app próprio',
+];
+
+const _problemOptions = [
+  'Processos manuais e sem controle gerencial',
+  'Retrabalho constante com muitos erros',
+  'Sistemas que não conversam, não integram',
+  'Falta de automação, agilidade e escala',
+  'Falta de controle dos dados, falta de segurança',
+  'Decisões sem dados, falta de controle da operação',
+  'Equipe sobrecarregada',
+  'Dependência de você para tudo',
+  'Possibilidade de escalar mas falta estrutura',
+];
+
+const _attemptOptions = [
+  'Sim, com ferramentas/sistemas prontos',
+  'Sim, contratando desenvolvedor',
+  'Sim, com agência',
+  'Não tentei ainda',
+  'Sim, mas nada resolveu de verdade',
+];
+
+const _investmentOptions = ['Sim', 'Depende do projeto', 'Não no momento'];
 
 class ContactPage extends ConsumerStatefulWidget {
   const ContactPage({super.key});
@@ -37,13 +69,33 @@ class _ContactPageState extends ConsumerState<ContactPage> {
   bool _pixelStarted = false;
 
   final _nameCtrl = TextEditingController();
-  final _emailCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
+  final _companyCtrl = TextEditingController();
+  final _instagramCtrl = TextEditingController();
+  final _businessDescriptionCtrl = TextEditingController();
+  final _consequenceCtrl = TextEditingController();
+  final _failedAttemptCtrl = TextEditingController();
+  final _currentSystemsCtrl = TextEditingController();
+  final _idealSystemCtrl = TextEditingController();
+  final _whyMetrificaCtrl = TextEditingController();
   String? _revenue;
+  final Set<String> _moments = {};
+  final Set<String> _problems = {};
+  String? _previousAttempt;
+  String? _willingToInvest;
 
   final _nameFocus = FocusNode();
-  final _emailFocus = FocusNode();
   final _phoneFocus = FocusNode();
+  final _emailFocus = FocusNode();
+  final _companyFocus = FocusNode();
+  final _instagramFocus = FocusNode();
+  final _businessDescriptionFocus = FocusNode();
+  final _consequenceFocus = FocusNode();
+  final _failedAttemptFocus = FocusNode();
+  final _currentSystemsFocus = FocusNode();
+  final _idealSystemFocus = FocusNode();
+  final _whyMetrificaFocus = FocusNode();
 
   @override
   void initState() {
@@ -51,17 +103,32 @@ class _ContactPageState extends ConsumerState<ContactPage> {
     if (kDebugMode) {
       final rng = Random();
       const names = [
-        'João Silva', 'Maria Oliveira', 'Carlos Mendes', 'Ana Beatriz Costa',
-        'Rafael Souza', 'Fernanda Lima', 'Bruno Alves', 'Juliana Ferreira',
-        'Lucas Carvalho', 'Camila Rocha',
+        'João Silva',
+        'Maria Oliveira',
+        'Carlos Mendes',
+        'Ana Beatriz Costa',
+        'Rafael Souza',
+        'Fernanda Lima',
+        'Bruno Alves',
+        'Juliana Ferreira',
+        'Lucas Carvalho',
+        'Camila Rocha',
       ];
       const domains = [
-        'empresa.com.br', 'negocio.com', 'startup.io', 'corp.com.br',
-        'business.com', 'grupo.com.br',
+        'empresa.com.br',
+        'negocio.com',
+        'startup.io',
+        'corp.com.br',
+        'business.com',
+        'grupo.com.br',
       ];
       const ddds = ['11', '21', '31', '41', '51', '61', '71', '85'];
       final name = names[rng.nextInt(names.length)];
-      final slug = name.split(' ').take(2).join('.').toLowerCase()
+      final slug = name
+          .split(' ')
+          .take(2)
+          .join('.')
+          .toLowerCase()
           .replaceAll(RegExp(r'[áàã]'), 'a')
           .replaceAll(RegExp(r'[éê]'), 'e')
           .replaceAll(RegExp(r'[í]'), 'i')
@@ -70,9 +137,27 @@ class _ContactPageState extends ConsumerState<ContactPage> {
       final ddd = ddds[rng.nextInt(ddds.length)];
       final phone = '9${rng.nextInt(9000) + 1000}-${rng.nextInt(9000) + 1000}';
       _nameCtrl.text = name;
-      _emailCtrl.text = '$slug@${domains[rng.nextInt(domains.length)]}';
       _phoneCtrl.text = '($ddd) $phone';
+      _emailCtrl.text = '$slug@${domains[rng.nextInt(domains.length)]}';
+      _companyCtrl.text = 'Empresa ${name.split(' ').last}';
+      _instagramCtrl.text = '@${slug.replaceAll('.', '')}';
       _revenue = _revenueOptions[rng.nextInt(_revenueOptions.length)];
+      _moments.add(_momentOptions.first);
+      _businessDescriptionCtrl.text =
+          'Operação em crescimento com vendas recorrentes e necessidade de escalar processos internos.';
+      _problems.addAll([_problemOptions[0], _problemOptions[3]]);
+      _consequenceCtrl.text =
+          'A operação fica mais cara, lenta e dependente de pessoas-chave.';
+      _previousAttempt = _attemptOptions.first;
+      _failedAttemptCtrl.text =
+          'As ferramentas prontas não se adaptaram ao fluxo real da empresa.';
+      _currentSystemsCtrl.text =
+          'Planilhas, WhatsApp, CRM e ERP. Atendem parcialmente.';
+      _idealSystemCtrl.text =
+          'Centralizaria dados, automatizaria tarefas e daria visão gerencial em tempo real.';
+      _willingToInvest = _investmentOptions.first;
+      _whyMetrificaCtrl.text =
+          'Porque preciso transformar a operação em um sistema escalável e sob medida.';
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _nameFocus.requestFocus();
@@ -83,11 +168,27 @@ class _ContactPageState extends ConsumerState<ContactPage> {
   void dispose() {
     _pageCtrl.dispose();
     _nameCtrl.dispose();
-    _emailCtrl.dispose();
     _phoneCtrl.dispose();
+    _emailCtrl.dispose();
+    _companyCtrl.dispose();
+    _instagramCtrl.dispose();
+    _businessDescriptionCtrl.dispose();
+    _consequenceCtrl.dispose();
+    _failedAttemptCtrl.dispose();
+    _currentSystemsCtrl.dispose();
+    _idealSystemCtrl.dispose();
+    _whyMetrificaCtrl.dispose();
     _nameFocus.dispose();
-    _emailFocus.dispose();
     _phoneFocus.dispose();
+    _emailFocus.dispose();
+    _companyFocus.dispose();
+    _instagramFocus.dispose();
+    _businessDescriptionFocus.dispose();
+    _consequenceFocus.dispose();
+    _failedAttemptFocus.dispose();
+    _currentSystemsFocus.dispose();
+    _idealSystemFocus.dispose();
+    _whyMetrificaFocus.dispose();
     super.dispose();
   }
 
@@ -102,15 +203,27 @@ class _ContactPageState extends ConsumerState<ContactPage> {
 
   bool _canAdvance(int step) => switch (step) {
     0 => _nameCtrl.text.trim().isNotEmpty,
-    1 => _isValidEmail(_emailCtrl.text.trim()),
-    2 => _phoneCtrl.text.trim().replaceAll(RegExp(r'\D'), '').length >= 10,
-    3 => _revenue != null,
+    1 => _phoneCtrl.text.trim().replaceAll(RegExp(r'\D'), '').length >= 10,
+    2 => _isValidEmail(_emailCtrl.text.trim()),
+    3 => _companyCtrl.text.trim().isNotEmpty,
+    4 => _instagramCtrl.text.trim().isNotEmpty,
+    5 => _revenue != null,
+    6 => _moments.isNotEmpty,
+    7 => _businessDescriptionCtrl.text.trim().isNotEmpty,
+    8 => _problems.isNotEmpty,
+    9 => _consequenceCtrl.text.trim().isNotEmpty,
+    10 => _previousAttempt != null,
+    11 => _failedAttemptCtrl.text.trim().isNotEmpty,
+    12 => _currentSystemsCtrl.text.trim().isNotEmpty,
+    13 => _idealSystemCtrl.text.trim().isNotEmpty,
+    14 => _willingToInvest != null,
+    15 => _whyMetrificaCtrl.text.trim().isNotEmpty,
     _ => false,
   };
 
   void _next() {
     if (!_canAdvance(_step)) return;
-    if (_step < 3) {
+    if (_step < _totalSteps - 1) {
       _animateTo(_step + 1);
     } else {
       _submit();
@@ -137,9 +250,25 @@ class _ContactPageState extends ConsumerState<ContactPage> {
         case 0:
           _nameFocus.requestFocus();
         case 1:
-          _emailFocus.requestFocus();
-        case 2:
           _phoneFocus.requestFocus();
+        case 2:
+          _emailFocus.requestFocus();
+        case 3:
+          _companyFocus.requestFocus();
+        case 4:
+          _instagramFocus.requestFocus();
+        case 7:
+          _businessDescriptionFocus.requestFocus();
+        case 9:
+          _consequenceFocus.requestFocus();
+        case 11:
+          _failedAttemptFocus.requestFocus();
+        case 12:
+          _currentSystemsFocus.requestFocus();
+        case 13:
+          _idealSystemFocus.requestFocus();
+        case 15:
+          _whyMetrificaFocus.requestFocus();
         default:
           break;
       }
@@ -147,23 +276,37 @@ class _ContactPageState extends ConsumerState<ContactPage> {
   }
 
   Future<void> _submit() async {
-    await ref.read(leadNotifierProvider.notifier).submit(
-      LeadModel(
-        name: _nameCtrl.text.trim(),
-        email: _emailCtrl.text.trim(),
-        phone: _phoneCtrl.text.trim(),
-        monthlyRevenue: _revenue!,
-      ),
-    );
+    await ref
+        .read(leadNotifierProvider.notifier)
+        .submit(
+          LeadModel(
+            name: _nameCtrl.text.trim(),
+            phone: _phoneCtrl.text.trim(),
+            email: _emailCtrl.text.trim(),
+            companyName: _companyCtrl.text.trim(),
+            instagram: _instagramCtrl.text.trim(),
+            monthlyRevenue: _revenue!,
+            businessMoment: _moments.toList(),
+            businessDescription: _businessDescriptionCtrl.text.trim(),
+            currentProblems: _problems.toList(),
+            consequence12Months: _consequenceCtrl.text.trim(),
+            previousAttempt: _previousAttempt!,
+            failedAttemptDetails: _failedAttemptCtrl.text.trim(),
+            currentSystems: _currentSystemsCtrl.text.trim(),
+            idealSystemSolution: _idealSystemCtrl.text.trim(),
+            willingToInvest: _willingToInvest!,
+            whyMetrifica: _whyMetrificaCtrl.text.trim(),
+          ),
+        );
     if (!mounted) return;
     if (!ref.read(leadNotifierProvider).hasError) {
       PixelService.formSubmit();
       _pageCtrl.animateToPage(
-        4,
+        _totalSteps,
         duration: const Duration(milliseconds: 420),
         curve: Curves.easeInOutCubic,
       );
-      setState(() => _step = 4);
+      setState(() => _step = _totalSteps);
     }
   }
 
@@ -178,10 +321,10 @@ class _ContactPageState extends ConsumerState<ContactPage> {
           children: [
             _TopBar(
               step: _step,
-              onBack: _step < 4 ? _back : null,
+              onBack: _step < _totalSteps ? _back : null,
               onClose: () => context.go('/'),
             ),
-            if (_step < 4) _ProgressBar(step: _step),
+            if (_step < _totalSteps) _ProgressBar(step: _step),
             Expanded(
               child: PageView(
                 controller: _pageCtrl,
@@ -204,11 +347,11 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                   ),
                   _TextStep(
                     index: 1,
-                    question: 'Qual é o seu\ne-mail?',
-                    hint: 'seu@email.com',
-                    controller: _emailCtrl,
-                    focusNode: _emailFocus,
-                    keyboardType: TextInputType.emailAddress,
+                    question: 'E o seu número\ndo WhatsApp?',
+                    hint: '(21) 99999-9999',
+                    controller: _phoneCtrl,
+                    focusNode: _phoneFocus,
+                    keyboardType: TextInputType.phone,
                     textCapitalization: TextCapitalization.none,
                     canAdvance: _canAdvance(1),
                     onChanged: (_) {
@@ -219,11 +362,11 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                   ),
                   _TextStep(
                     index: 2,
-                    question: 'Qual é o seu\nWhatsApp?',
-                    hint: '(11) 99999-9999',
-                    controller: _phoneCtrl,
-                    focusNode: _phoneFocus,
-                    keyboardType: TextInputType.phone,
+                    question: 'Qual é o seu\nmelhor e-mail?',
+                    hint: 'seu@email.com',
+                    controller: _emailCtrl,
+                    focusNode: _emailFocus,
+                    keyboardType: TextInputType.emailAddress,
                     textCapitalization: TextCapitalization.none,
                     canAdvance: _canAdvance(2),
                     onChanged: (_) {
@@ -232,16 +375,207 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                     },
                     onNext: _next,
                   ),
+                  _TextStep(
+                    index: 3,
+                    question: 'E o nome\nda empresa?',
+                    hint: 'Nome da empresa',
+                    controller: _companyCtrl,
+                    focusNode: _companyFocus,
+                    keyboardType: TextInputType.text,
+                    textCapitalization: TextCapitalization.words,
+                    canAdvance: _canAdvance(3),
+                    onChanged: (_) {
+                      _onInteract();
+                      setState(() {});
+                    },
+                    onNext: _next,
+                  ),
+                  _TextStep(
+                    index: 4,
+                    question: 'E o @ do\nInstagram?',
+                    hint: '@suaempresa',
+                    controller: _instagramCtrl,
+                    focusNode: _instagramFocus,
+                    keyboardType: TextInputType.text,
+                    textCapitalization: TextCapitalization.none,
+                    canAdvance: _canAdvance(4),
+                    onChanged: (_) {
+                      _onInteract();
+                      setState(() {});
+                    },
+                    onNext: _next,
+                  ),
                   _RevenueStep(
+                    index: 5,
                     selected: _revenue,
-                    isLoading: leadState.isLoading,
-                    hasError: leadState.hasError,
                     onSelect: (v) {
                       _onInteract();
                       setState(() => _revenue = v);
                       Timer(const Duration(milliseconds: 200), _next);
                     },
-                    onRetry: _next,
+                    onNext: _next,
+                  ),
+                  _ChoiceStep(
+                    index: 6,
+                    question: 'Qual alternativa descreve\nseu momento hoje?',
+                    helper: 'Pode marcar mais de uma opção.',
+                    options: _momentOptions,
+                    selected: _moments,
+                    canAdvance: _canAdvance(6),
+                    onToggle: (v) {
+                      _onInteract();
+                      setState(
+                        () => _moments.contains(v)
+                            ? _moments.remove(v)
+                            : _moments.add(v),
+                      );
+                    },
+                    onNext: _next,
+                  ),
+                  _TextStep(
+                    index: 7,
+                    question: 'Descreva seu modelo\nde negócio e objetivo',
+                    hint: 'Nicho, operação atual e objetivo principal...',
+                    controller: _businessDescriptionCtrl,
+                    focusNode: _businessDescriptionFocus,
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                    canAdvance: _canAdvance(7),
+                    maxLines: 5,
+                    onChanged: (_) {
+                      _onInteract();
+                      setState(() {});
+                    },
+                    onNext: _next,
+                  ),
+                  _ChoiceStep(
+                    index: 8,
+                    question: 'Quais problemas você\nmais vive hoje?',
+                    helper: 'Pode marcar mais de uma opção.',
+                    options: _problemOptions,
+                    selected: _problems,
+                    canAdvance: _canAdvance(8),
+                    onToggle: (v) {
+                      _onInteract();
+                      setState(
+                        () => _problems.contains(v)
+                            ? _problems.remove(v)
+                            : _problems.add(v),
+                      );
+                    },
+                    onNext: _next,
+                  ),
+                  _TextStep(
+                    index: 9,
+                    question:
+                        'O que acontece se continuar\nassim por 12 meses?',
+                    hint: 'Descreva o impacto real no negócio...',
+                    controller: _consequenceCtrl,
+                    focusNode: _consequenceFocus,
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                    canAdvance: _canAdvance(9),
+                    maxLines: 4,
+                    onChanged: (_) {
+                      _onInteract();
+                      setState(() {});
+                    },
+                    onNext: _next,
+                  ),
+                  _SingleChoiceStep(
+                    index: 10,
+                    question: 'Você já tentou\nresolver isso antes?',
+                    options: _attemptOptions,
+                    selected: _previousAttempt,
+                    canAdvance: _canAdvance(10),
+                    onSelect: (v) {
+                      _onInteract();
+                      setState(() => _previousAttempt = v);
+                      Timer(const Duration(milliseconds: 200), _next);
+                    },
+                    onNext: _next,
+                  ),
+                  _TextStep(
+                    index: 11,
+                    question: 'O que não funcionou\nnessas tentativas?',
+                    hint:
+                        'Conte onde travou, o que faltou ou por que não resolveu...',
+                    controller: _failedAttemptCtrl,
+                    focusNode: _failedAttemptFocus,
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                    canAdvance: _canAdvance(11),
+                    maxLines: 4,
+                    onChanged: (_) {
+                      _onInteract();
+                      setState(() {});
+                    },
+                    onNext: _next,
+                  ),
+                  _TextStep(
+                    index: 12,
+                    question: 'Quais sistemas você\nusa hoje?',
+                    hint:
+                        'CRM, ERP, planilhas, WhatsApp... Eles atendem totalmente?',
+                    controller: _currentSystemsCtrl,
+                    focusNode: _currentSystemsFocus,
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                    canAdvance: _canAdvance(12),
+                    maxLines: 4,
+                    onChanged: (_) {
+                      _onInteract();
+                      setState(() {});
+                    },
+                    onNext: _next,
+                  ),
+                  _TextStep(
+                    index: 13,
+                    question:
+                        'Se tivesse um sistema ideal,\no que ele resolveria?',
+                    hint: 'Explique o resultado esperado para sua operação...',
+                    controller: _idealSystemCtrl,
+                    focusNode: _idealSystemFocus,
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                    canAdvance: _canAdvance(13),
+                    maxLines: 4,
+                    onChanged: (_) {
+                      _onInteract();
+                      setState(() {});
+                    },
+                    onNext: _next,
+                  ),
+                  _SingleChoiceStep(
+                    index: 14,
+                    question: 'Você está disposto\na investir para escalar?',
+                    options: _investmentOptions,
+                    selected: _willingToInvest,
+                    canAdvance: _canAdvance(14),
+                    onSelect: (v) {
+                      _onInteract();
+                      setState(() => _willingToInvest = v);
+                      Timer(const Duration(milliseconds: 200), _next);
+                    },
+                    onNext: _next,
+                  ),
+                  _TextStep(
+                    index: 15,
+                    question: 'Por que a Metrifica pode\nte ajudar agora?',
+                    hint: 'Conte por que faz sentido falar com nosso time...',
+                    controller: _whyMetrificaCtrl,
+                    focusNode: _whyMetrificaFocus,
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                    canAdvance: _canAdvance(15),
+                    maxLines: 4,
+                    isLoading: leadState.isLoading,
+                    hasError: leadState.hasError,
+                    onChanged: (_) {
+                      _onInteract();
+                      setState(() {});
+                    },
+                    onNext: _next,
                   ),
                   _SuccessStep(onHome: () => context.go('/')),
                 ],
@@ -278,7 +612,7 @@ class _TopBar extends StatelessWidget {
       child: Row(
         children: [
           AnimatedOpacity(
-            opacity: (step > 0 && step < 4) ? 1.0 : 0.0,
+            opacity: (step > 0 && step < _totalSteps) ? 1.0 : 0.0,
             duration: const Duration(milliseconds: 200),
             child: IconButton(
               icon: const Icon(Icons.arrow_back_rounded, size: 20),
@@ -331,7 +665,7 @@ class _ProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
-      tween: Tween(end: (step + 1) / 4),
+      tween: Tween(end: (step + 1) / _totalSteps),
       duration: const Duration(milliseconds: 450),
       curve: Curves.easeOutCubic,
       builder: (_, value, __) => LinearProgressIndicator(
@@ -384,104 +718,103 @@ class _StepLayout extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-              Text(
-                'Pergunta ${index + 1} de 4',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.6,
-                  color: _kBlue,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                question,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: isMobile ? 30 : 40,
-                  fontWeight: FontWeight.w800,
-                  height: 1.08,
-                  letterSpacing: -1.4,
-                  color: _kDark,
-                ),
-              ),
-              const SizedBox(height: 40),
-              input,
-              const SizedBox(height: 36),
-              if (hasError)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 14),
-                  child: Text(
-                    'Algo deu errado. Tente novamente.',
+                  Text(
+                    'Pergunta ${index + 1} de $_totalSteps',
                     style: GoogleFonts.plusJakartaSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFFEF4444),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.6,
+                      color: _kBlue,
                     ),
                   ),
-                ),
-              AnimatedOpacity(
-                opacity: canAdvance || isLoading || hasError ? 1.0 : 0.35,
-                duration: const Duration(milliseconds: 250),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed:
-                        (canAdvance && !isLoading) ? onNext : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _kBlue,
-                      disabledBackgroundColor: _kBlue,
-                      foregroundColor: Colors.white,
-                      disabledForegroundColor: Colors.white,
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                  const SizedBox(height: 20),
+                  Text(
+                    question,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: isMobile ? 30 : 40,
+                      fontWeight: FontWeight.w800,
+                      height: 1.08,
+                      letterSpacing: -1.4,
+                      color: _kDark,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  input,
+                  const SizedBox(height: 36),
+                  if (hasError)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 14),
+                      child: Text(
+                        'Algo deu errado. Tente novamente.',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFFEF4444),
+                        ),
                       ),
                     ),
-                    child: isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            hasError
-                                ? 'Tentar novamente'
-                                : isLastStep
+                  AnimatedOpacity(
+                    opacity: canAdvance || isLoading || hasError ? 1.0 : 0.35,
+                    duration: const Duration(milliseconds: 250),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: (canAdvance && !isLoading) ? onNext : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _kBlue,
+                          disabledBackgroundColor: _kBlue,
+                          foregroundColor: Colors.white,
+                          disabledForegroundColor: Colors.white,
+                          elevation: 0,
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: isLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                hasError
+                                    ? 'Tentar novamente'
+                                    : isLastStep
                                     ? 'Enviar'
                                     : 'Continuar',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                      ),
+                    ),
                   ),
-                ),
+                  if (!isMobile) ...[
+                    const SizedBox(height: 14),
+                    Text(
+                      'Pressione Enter ↵',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        color: const Color(0xFFB0BDD0),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              if (!isMobile) ...[
-                const SizedBox(height: 14),
-                Text(
-                  'Pressione Enter ↵',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
-                    color: const Color(0xFFB0BDD0),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ],
+            ),
           ),
         ),
       ),
-    ),
-  ),
-);
-}
+    );
+  }
 }
 
 // ─── Text Step ───────────────────────────────────────────────────────────────
@@ -498,6 +831,9 @@ class _TextStep extends StatelessWidget {
     required this.canAdvance,
     required this.onChanged,
     required this.onNext,
+    this.maxLines = 1,
+    this.isLoading = false,
+    this.hasError = false,
   });
 
   final int index;
@@ -510,6 +846,9 @@ class _TextStep extends StatelessWidget {
   final bool canAdvance;
   final ValueChanged<String> onChanged;
   final VoidCallback onNext;
+  final int maxLines;
+  final bool isLoading;
+  final bool hasError;
 
   @override
   Widget build(BuildContext context) {
@@ -518,14 +857,21 @@ class _TextStep extends StatelessWidget {
       question: question,
       canAdvance: canAdvance,
       onNext: onNext,
+      isLastStep: isLoading || hasError,
+      isLoading: isLoading,
+      hasError: hasError,
       input: TextField(
         controller: controller,
         focusNode: focusNode,
         keyboardType: keyboardType,
         textCapitalization: textCapitalization,
-        textInputAction: TextInputAction.done,
+        textInputAction: maxLines > 1
+            ? TextInputAction.newline
+            : TextInputAction.done,
+        minLines: 1,
+        maxLines: maxLines,
         onChanged: onChanged,
-        onSubmitted: (_) => onNext(),
+        onSubmitted: maxLines > 1 ? null : (_) => onNext(),
         style: GoogleFonts.plusJakartaSans(
           fontSize: 22,
           fontWeight: FontWeight.w600,
@@ -557,69 +903,135 @@ class _TextStep extends StatelessWidget {
 
 class _RevenueStep extends StatelessWidget {
   const _RevenueStep({
+    required this.index,
     required this.selected,
-    required this.isLoading,
-    required this.hasError,
     required this.onSelect,
-    required this.onRetry,
+    required this.onNext,
   });
 
+  final int index;
   final String? selected;
-  final bool isLoading;
-  final bool hasError;
   final ValueChanged<String> onSelect;
-  final VoidCallback onRetry;
+  final VoidCallback onNext;
 
   @override
   Widget build(BuildContext context) {
     return _StepLayout(
-      index: 3,
-      question: 'Qual o faturamento\nmédio mensal?',
+      index: index,
+      question: 'Qual é o faturamento\nmédio mensal atual?',
       canAdvance: selected != null,
-      onNext: onRetry,
-      isLastStep: true,
-      isLoading: isLoading,
-      hasError: hasError,
+      onNext: onNext,
       input: Column(
+        children: _revenueOptions
+            .map(
+              (option) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _RevenueCard(
+                  label: option,
+                  selected: selected == option,
+                  onTap: () => onSelect(option),
+                ),
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+}
+
+class _SingleChoiceStep extends StatelessWidget {
+  const _SingleChoiceStep({
+    required this.index,
+    required this.question,
+    required this.options,
+    required this.selected,
+    required this.canAdvance,
+    required this.onSelect,
+    required this.onNext,
+  });
+
+  final int index;
+  final String question;
+  final List<String> options;
+  final String? selected;
+  final bool canAdvance;
+  final ValueChanged<String> onSelect;
+  final VoidCallback onNext;
+
+  @override
+  Widget build(BuildContext context) {
+    return _StepLayout(
+      index: index,
+      question: question,
+      canAdvance: canAdvance,
+      onNext: onNext,
+      input: Column(
+        children: options
+            .map(
+              (option) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _RevenueCard(
+                  label: option,
+                  selected: selected == option,
+                  onTap: () => onSelect(option),
+                ),
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+}
+
+class _ChoiceStep extends StatelessWidget {
+  const _ChoiceStep({
+    required this.index,
+    required this.question,
+    required this.helper,
+    required this.options,
+    required this.selected,
+    required this.canAdvance,
+    required this.onToggle,
+    required this.onNext,
+  });
+
+  final int index;
+  final String question;
+  final String helper;
+  final List<String> options;
+  final Set<String> selected;
+  final bool canAdvance;
+  final ValueChanged<String> onToggle;
+  final VoidCallback onNext;
+
+  @override
+  Widget build(BuildContext context) {
+    return _StepLayout(
+      index: index,
+      question: question,
+      canAdvance: canAdvance,
+      onNext: onNext,
+      input: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: _RevenueCard(
-                  label: _revenueOptions[0],
-                  selected: selected == _revenueOptions[0],
-                  onTap: () => onSelect(_revenueOptions[0]),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _RevenueCard(
-                  label: _revenueOptions[1],
-                  selected: selected == _revenueOptions[1],
-                  onTap: () => onSelect(_revenueOptions[1]),
-                ),
-              ),
-            ],
+          Text(
+            helper,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: _kMuted,
+            ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _RevenueCard(
-                  label: _revenueOptions[2],
-                  selected: selected == _revenueOptions[2],
-                  onTap: () => onSelect(_revenueOptions[2]),
-                ),
+          const SizedBox(height: 14),
+          ...options.map(
+            (option) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _RevenueCard(
+                label: option,
+                selected: selected.contains(option),
+                onTap: () => onToggle(option),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _RevenueCard(
-                  label: _revenueOptions[3],
-                  selected: selected == _revenueOptions[3],
-                  onTap: () => onSelect(_revenueOptions[3]),
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),
@@ -723,15 +1135,11 @@ class _SuccessStep extends StatelessWidget {
                   color: Color(0xFFEEF3FF),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.check_rounded,
-                  color: _kBlue,
-                  size: 38,
-                ),
+                child: const Icon(Icons.check_rounded, color: _kBlue, size: 38),
               ),
               const SizedBox(height: 36),
               Text(
-                'Recebemos seu\ncontato!',
+                'Aplicação\nrecebida!',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: isMobile ? 34 : 44,
@@ -743,7 +1151,7 @@ class _SuccessStep extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Text(
-                'Em breve nossa equipe vai\nentrar em contato com você.',
+                'Todo formulário recebido é analisado minuciosamente pelo nosso time. Se sua aplicação for aprovada, entraremos em contato em até 1 dia útil para agendar uma consultoria estratégica de viabilidade do seu projeto. Fique atento ao seu WhatsApp!',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 16,
