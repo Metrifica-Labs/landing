@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:metrifica_landing/app/core/theme/theme.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -51,7 +50,7 @@ class HomeFooterSection extends StatelessWidget {
               maxWidth: 1280,
               padding: EdgeInsets.zero,
               child: Text(
-                '© 2026 Metrifica Labs. Todos os direitos reservados.',
+                '© 2026 metrifica. Todos os direitos reservados.',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 12,
                   color: const Color(0xFFB0BAD0),
@@ -138,26 +137,13 @@ class HomeFooterSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              RichText(
-                text: TextSpan(
-                  text: 'Metrifica',
-                  children: [
-                    TextSpan(
-                      text: ' Labs',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 50 * 0.36,
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w800,
-                        height: 0.95,
-                      ),
-                    ),
-                  ],
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 50 * 0.36,
-                    color: const Color(0xFF102B58),
-                    fontWeight: FontWeight.w800,
-                    height: 0.95,
-                  ),
+              Text(
+                'metrifica labs',
+                style: GoogleFonts.crimsonText(
+                  fontSize: 50 * 0.42,
+                  color: const Color(0xFF102B58),
+                  fontWeight: FontWeight.w400,
+                  height: 0.95,
                 ),
               ),
             ],

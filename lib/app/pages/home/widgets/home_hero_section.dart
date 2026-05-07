@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:metrifica_landing/app/core/theme/theme.dart';
 import 'package:metrifica_landing/app/pages/home/widgets/hero_3d_scene.dart';
 import 'package:metrifica_landing/app/shared/widgets/max_width_container.dart';
 
@@ -492,26 +491,13 @@ class _LogoMark extends StatelessWidget {
             //   ),
             // ),
             // const SizedBox(width: 14),
-            RichText(
-              text: TextSpan(
-                text: 'Metrifica',
-                children: [
-                  TextSpan(
-                    text: ' Labs',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: iconSize * 0.36,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w800,
-                      height: 0.95,
-                    ),
-                  ),
-                ],
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: iconSize * 0.36,
-                  color: const Color(0xFF102B58),
-                  fontWeight: FontWeight.w800,
-                  height: 0.95,
-                ),
+            Text(
+              'metrifica',
+              style: GoogleFonts.crimsonText(
+                fontSize: iconSize * 0.42,
+                color: const Color(0xFF102B58),
+                fontWeight: FontWeight.w700,
+                height: 0.95,
               ),
             ),
           ],
