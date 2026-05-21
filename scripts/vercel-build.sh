@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+FLUTTER_VERSION="3.35.5"
+
 if [ ! -d "$HOME/flutter" ]; then
-  git clone https://github.com/flutter/flutter.git -b stable --depth 1 "$HOME/flutter"
+  git clone https://github.com/flutter/flutter.git -b "$FLUTTER_VERSION" --depth 1 "$HOME/flutter"
 fi
 
 export PATH="$HOME/flutter/bin:$PATH"
