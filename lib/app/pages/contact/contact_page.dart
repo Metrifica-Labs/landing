@@ -1,4 +1,6 @@
 import 'dart:math';
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -189,6 +191,7 @@ class _ContactPageState extends ConsumerState<ContactPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _nameFocus.requestFocus();
     });
+    html.window.onBeforeUnload.listen((_) => _triggerAutoSave());
   }
 
   @override
@@ -248,10 +251,46 @@ class _ContactPageState extends ConsumerState<ContactPage> {
     _ => false,
   };
 
+  LeadModel _buildDraftModel({String status = 'partial'}) {
+    String? nonEmpty(String s) => s.trim().isEmpty ? null : s.trim();
+    return LeadModel(
+      name:                 nonEmpty(_nameCtrl.text),
+      phone:                nonEmpty(_phoneCtrl.text),
+      email:                nonEmpty(_emailCtrl.text),
+      companyName:          nonEmpty(_companyCtrl.text),
+      instagram:            nonEmpty(_instagramCtrl.text),
+      monthlyRevenue:       _revenue,
+      businessMoment:       _moments.isEmpty  ? null : _moments.toList(),
+      businessDescription:  nonEmpty(_businessDescriptionCtrl.text),
+      currentProblems:      _problems.isEmpty ? null : _problems.toList(),
+      consequence12Months:  nonEmpty(_consequenceCtrl.text),
+      previousAttempt:      _previousAttempt,
+      failedAttemptDetails: nonEmpty(_failedAttemptCtrl.text),
+      currentSystems:       nonEmpty(_currentSystemsCtrl.text),
+      idealSystemSolution:  nonEmpty(_idealSystemCtrl.text),
+      willingToInvest:      _willingToInvest,
+      whyMetrifica:         nonEmpty(_whyMetrificaCtrl.text),
+      status:               status,
+      currentStep:          _step,
+    );
+  }
+
+  void _triggerAutoSave() {
+    final notifier = ref.read(leadNotifierProvider.notifier);
+    final draftId  = ref.read(leadNotifierProvider).draftId;
+    final draft    = _buildDraftModel();
+    if (draftId == null) {
+      notifier.saveDraft(draft);
+    } else {
+      notifier.updateDraft(draft);
+    }
+  }
+
   void _next() {
     if (!_canAdvance(_step)) return;
     if (_step < _totalSteps - 1) {
       _animateTo(_step + 1);
+      _triggerAutoSave();
     } else {
       _submit();
     }
@@ -305,26 +344,7 @@ class _ContactPageState extends ConsumerState<ContactPage> {
   Future<void> _submit() async {
     await ref
         .read(leadNotifierProvider.notifier)
-        .submit(
-          LeadModel(
-            name: _nameCtrl.text.trim(),
-            phone: _phoneCtrl.text.trim(),
-            email: _emailCtrl.text.trim(),
-            companyName: _companyCtrl.text.trim(),
-            instagram: _instagramCtrl.text.trim(),
-            monthlyRevenue: _revenue!,
-            businessMoment: _moments.toList(),
-            businessDescription: _businessDescriptionCtrl.text.trim(),
-            currentProblems: _problems.toList(),
-            consequence12Months: _consequenceCtrl.text.trim(),
-            previousAttempt: _previousAttempt!,
-            failedAttemptDetails: _failedAttemptCtrl.text.trim(),
-            currentSystems: _currentSystemsCtrl.text.trim(),
-            idealSystemSolution: _idealSystemCtrl.text.trim(),
-            willingToInvest: _willingToInvest!,
-            whyMetrifica: _whyMetrificaCtrl.text.trim(),
-          ),
-        );
+        .submit(_buildDraftModel(status: 'completed'));
     if (!mounted) return;
     if (!ref.read(leadNotifierProvider).hasError) {
       PixelService.formSubmit();

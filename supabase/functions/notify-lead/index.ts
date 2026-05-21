@@ -2,12 +2,12 @@ const WHATSAPP_API_URL = "https://graph.facebook.com/v20.0";
 
 interface Lead {
   id: string;
-  name: string;
-  email: string;
-  phone: string;
+  name?: string;
+  email?: string;
+  phone?: string;
   company_name?: string;
   instagram?: string;
-  monthly_revenue: string;
+  monthly_revenue?: string;
   business_moment?: string[];
   business_description?: string;
   current_problems?: string[];
@@ -19,6 +19,8 @@ interface Lead {
   willing_to_invest?: string;
   why_metrifica?: string;
   created_at: string;
+  status: "partial" | "completed";
+  current_step: number;
 }
 
 interface WebhookPayload {
@@ -45,8 +47,12 @@ Deno.serve(async (req: Request) => {
 
   const payload: WebhookPayload = await req.json();
 
-  if (payload.type !== "INSERT" || payload.table !== "leads") {
+  if (payload.table !== "leads") {
     return new Response("Ignored", { status: 200 });
+  }
+
+  if (payload.record.status !== "completed") {
+    return new Response("Ignored (partial)", { status: 200 });
   }
 
   const lead = payload.record;
