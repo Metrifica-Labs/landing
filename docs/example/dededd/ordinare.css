@@ -1,0 +1,185 @@
+/* ÓRDINARE — Editorial Vivo
+   Luxury editorial landing · cream + gold, serif display, one dark manifesto break */
+
+/* ---------- Tokens ---------- */
+:root{
+  --cream:        #F6F0E6;
+  --cream-2:      #EFE7D9;   /* alternating / stats bar */
+  --paper:        #FBF7F0;   /* cards */
+  --ink:          #1D1A15;   /* primary text (warm near-black) */
+  --ink-2:        #5A5247;   /* secondary text */
+  --ink-3:        #8C8475;   /* muted / labels */
+  --gold:         #B08A52;   /* accent */
+  --gold-2:       #C9A66B;   /* lighter gold */
+  --gold-deep:    #8E6E3C;
+  --line:         rgba(29,26,21,.14);
+  --line-soft:    rgba(29,26,21,.08);
+  --noir:         #14110C;   /* dark manifesto bg */
+  --noir-2:       #1E1A13;
+
+  --serif: "Cormorant Garamond", Georgia, serif;
+  --sans:  "Jost", "Helvetica Neue", Arial, sans-serif;
+
+  --ease: cubic-bezier(.22,.61,.36,1);
+  --maxw: 1240px;
+  --pad: clamp(20px, 5vw, 80px);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--cream);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  font-weight:300;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+/* ---------- Type ---------- */
+.serif{font-family:var(--serif)}
+.eyebrow{
+  font-family:var(--sans);
+  font-size:12px;
+  font-weight:500;
+  letter-spacing:.34em;
+  text-transform:uppercase;
+  color:var(--gold-deep);
+}
+.display{
+  font-family:var(--serif);
+  font-weight:500;
+  line-height:1.02;
+  letter-spacing:-.005em;
+  text-wrap:balance;
+}
+h2.section-title{
+  font-family:var(--serif);
+  font-weight:500;
+  font-size:clamp(30px,4.4vw,58px);
+  line-height:1.06;
+  letter-spacing:.01em;
+  text-wrap:balance;
+}
+p{text-wrap:pretty}
+
+/* ---------- Layout ---------- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--pad)}
+section{position:relative}
+.section-pad{padding-block:clamp(70px,9vw,140px)}
+
+/* monogram watermark */
+.monogram-bg{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;
+}
+.monogram-bg span{
+  position:absolute;
+  font-family:var(--serif);
+  font-weight:500;
+  color:var(--ink);
+  opacity:.035;
+  line-height:.8;
+  letter-spacing:-.04em;
+  white-space:nowrap;
+  user-select:none;
+}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:.7em;
+  font-family:var(--sans);font-weight:500;font-size:13px;
+  letter-spacing:.16em;text-transform:uppercase;
+  padding:18px 30px;border:none;cursor:pointer;
+  position:relative;overflow:hidden;transition:all .5s var(--ease);
+}
+.btn-gold{
+  background:var(--ink);color:var(--cream);
+}
+.btn-gold .arrow{transition:transform .5s var(--ease)}
+.btn-gold:hover{background:var(--gold-deep)}
+.btn-gold:hover .arrow{transform:translate(4px,-4px)}
+.btn-outline{
+  background:transparent;color:var(--ink);
+  border:1px solid var(--line);
+}
+.btn-outline:hover{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.btn .arrow{display:inline-block;font-size:15px}
+
+/* ---------- Nav ---------- */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px var(--pad);
+  transition:background .5s var(--ease), padding .5s var(--ease), box-shadow .5s var(--ease);
+}
+.nav.scrolled{
+  background:rgba(246,240,230,.86);
+  backdrop-filter:blur(14px);
+  padding-block:14px;
+  box-shadow:0 1px 0 var(--line-soft);
+}
+.brand{
+  font-family:var(--serif);font-weight:600;font-size:23px;
+  letter-spacing:.22em;display:flex;align-items:baseline;gap:2px;
+}
+.brand sup{font-size:9px;letter-spacing:0;color:var(--gold);transform:translateY(-2px)}
+.nav-links{display:flex;gap:34px;list-style:none}
+.nav-links a{
+  font-size:12px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-2);position:relative;padding:4px 0;transition:color .3s;
+}
+.nav-links a::after{
+  content:"";position:absolute;left:0;bottom:0;width:0;height:1px;
+  background:var(--gold);transition:width .4s var(--ease);
+}
+.nav-links a:hover{color:var(--ink)}
+.nav-links a:hover::after{width:100%}
+.nav-cta{
+  font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+  padding:13px 26px;border:1px solid var(--gold);color:var(--gold-deep);
+  transition:all .4s var(--ease);white-space:nowrap;
+}
+.nav-cta:hover{background:var(--gold);color:var(--cream);border-color:var(--gold)}
+.nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none}
+.nav-burger span{width:24px;height:1.5px;background:var(--ink);transition:.3s}
+
+/* ---------- Engagement chips (the signature device) ---------- */
+.chip{
+  position:absolute;z-index:5;
+  display:flex;align-items:center;gap:8px;
+  background:var(--paper);
+  border:1px solid var(--gold);
+  border-radius:40px;
+  padding:9px 15px 9px 11px;
+  box-shadow:0 16px 40px -16px rgba(29,26,21,.4);
+  font-size:13px;font-weight:500;color:var(--ink);
+  white-space:nowrap;
+  animation:floaty 6s ease-in-out infinite;
+}
+.chip .ic{
+  width:26px;height:26px;border-radius:50%;
+  display:grid;place-items:center;flex:none;
+  background:linear-gradient(135deg,var(--gold-2),var(--gold-deep));
+  color:#fff;
+}
+.chip .ic svg{width:14px;height:14px;fill:#fff}
+.chip.heart .ic{background:linear-gradient(135deg,#E0848A,#C04A52)}
+@keyframes floaty{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-12px)}
+}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(36px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.08s}
+.reveal.d2{transition-delay:.16s}
+.reveal.d3{transition-delay:.24s}
+.reveal.d4{transition-delay:.32s}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  .chip{animation:none}
+}
