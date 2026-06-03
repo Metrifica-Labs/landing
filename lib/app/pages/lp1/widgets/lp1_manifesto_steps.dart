@@ -9,10 +9,10 @@ class Lp1ManifestoSection extends StatelessWidget {
   const Lp1ManifestoSection({super.key});
 
   static const _items = <String>[
-    'Atrai os clientes certos, todos os dias',
-    'Gera autoridade e desejo pela sua oferta',
-    'Conecta, qualifica e prepara para a compra',
-    'Converte seguidores em clientes High Ticket',
+    'Com processos que rodam sem você no centro de tudo.',
+    'Com automações que eliminam o retrabalho manual.',
+    'Com dados centralizados e visibilidade em tempo real.',
+    'Com tecnologia que escala junto com o seu faturamento.',
   ];
 
   @override
@@ -36,8 +36,9 @@ class Lp1ManifestoSection extends StatelessWidget {
         left: Reveal(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const Eyebrow('A virada', color: LpColors.gold2),
+              const Eyebrow('Como deve ser', color: LpColors.gold2),
               const SizedBox(height: 22),
               Text.rich(
                 TextSpan(
@@ -48,9 +49,9 @@ class Lp1ManifestoSection extends StatelessWidget {
                     height: 1.05,
                   ),
                   children: [
-                    const TextSpan(text: 'É assim que o seu Instagram '),
+                    const TextSpan(text: 'É assim que a sua operação '),
                     TextSpan(
-                      text: 'deveria',
+                      text: 'deve',
                       style: LpType.serif(
                         size: h2Size,
                         weight: FontWeight.w500,
@@ -60,6 +61,7 @@ class Lp1ManifestoSection extends StatelessWidget {
                       ),
                     ),
                     const TextSpan(text: ' trabalhar por você.'),
+
                   ],
                 ),
               ),
@@ -69,6 +71,7 @@ class Lp1ManifestoSection extends StatelessWidget {
         right: Reveal(
           delayMs: 80,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [for (final item in _items) _ManifestoItem(text: item)],
           ),
         ),
@@ -128,41 +131,36 @@ class Lp1StepsSection extends StatelessWidget {
     (
       '01',
       Icons.search,
-      'Diagnóstico',
-      'Entendemos seu momento atual e os principais desafios do seu negócio.'
+      'Diagnóstico Real',
+      'Mapeamos onde estão os gargalos que travam sua escala, o que está sendo feito manualmente e o que já deveria estar automatizado.'
     ),
     (
       '02',
-      Icons.assignment_outlined,
-      'Estratégia',
-      'Criamos um plano personalizado para atrair e converter clientes.'
+      Icons.map_outlined,
+      'Mapeamento Escalável',
+      'Você vai entender exatamente onde está o "vazamento" que impede sua operação de escalar — integração, automação ou processo.'
     ),
     (
       '03',
-      Icons.bolt,
-      'Execução',
-      'Implementamos conteúdos e ações com foco em resultados reais.'
-    ),
-    (
-      '04',
-      Icons.trending_up,
-      'Escala',
-      'Acompanhamos, ajustamos e escalamos para você vender todos os dias.'
+      Icons.rocket_launch_outlined,
+      'Plano de Implementação',
+      'O caminho mais direto para sua operação parar de depender de você e começar a escalar com tecnologia na ordem certa.'
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final cols = lpColumns(width, wide: 4, tablet: 2, mobile: 1);
+    final cols = lpColumns(width, wide: 3, tablet: 2, mobile: 1);
 
     return LpSection(
       background: LpColors.cream,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const LpCenteredHead(
-            eyebrow: 'Como funciona',
-            title: 'Quatro passos até a previsibilidade.',
+            eyebrow: 'Entregas',
+            title: 'O que você recebe na consultoria gratuita.',
             bottomGap: 60,
           ),
           LpGrid(
@@ -213,7 +211,7 @@ class _StepCard extends StatelessWidget {
         children: [
           Text(
             number,
-            style: LpType.serif(
+            style: LpType.numeral(
               size: 15,
               weight: FontWeight.w500,
               color: LpColors.goldDeep,

@@ -31,6 +31,7 @@ class Lp1FooterSection extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: kLpMaxW),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
                 padding: const EdgeInsets.only(bottom: 40),
@@ -51,7 +52,7 @@ class Lp1FooterSection extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'MENTORIA & ESTRATÉGIA DIGITAL',
+                          'ESTRATÉGIA, TECNOLOGIA & ESCALA',
                           style: LpType.sans(
                             size: 12,
                             weight: FontWeight.w400,
@@ -86,7 +87,7 @@ class Lp1FooterSection extends StatelessWidget {
                   runSpacing: 12,
                   children: [
                     Text(
-                      '© 2026 ÓRDINARE. Todos os direitos reservados.',
+                      '© 2026 Metrifica. Todos os direitos reservados.',
                       style: LpType.sans(
                         size: 12.5,
                         weight: FontWeight.w300,

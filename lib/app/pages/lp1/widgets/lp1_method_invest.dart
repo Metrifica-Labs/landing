@@ -25,20 +25,21 @@ class Lp1MethodSection extends StatelessWidget {
         left: Reveal(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               const Eyebrow('O método'),
               const SizedBox(height: 18),
               Text(
-                'Chega de perfil bonito e vazio.',
+                'Não somos uma agência. Não somos uma consultoria genérica.',
                 style: LpType.sectionTitle(width),
               ),
               const SizedBox(height: 24),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 400),
                 child: Text(
-                  'Meu método é para você que quer parar de só postar e começar '
-                  'a vender. Estratégia personalizada, conteúdo que conecta e '
-                  'posicionamento que gera confiança, autoridade e clientes.',
+                  'Somos os parceiros que entram no seu negócio, entendem o '
+                  'gargalo real e implementam a tecnologia exata que você '
+                  'precisa para escalar.',
                   style: LpType.sans(
                     size: 16.5,
                     weight: FontWeight.w300,
@@ -135,41 +136,41 @@ class Lp1InvestSection extends StatelessWidget {
 
   static const _rows = <_LedgerData>[
     _LedgerData(
-      icon: Icons.add_circle_outline,
-      title: 'Vamos conversar?',
-      desc: 'Primeiro passo para transformar seu Instagram',
-      price: 'Gratuito',
-      small: 'Diagnóstico',
+      icon: Icons.schedule_outlined,
+      title: 'Horas salvas por semana',
+      desc: 'Com automação de processos repetitivos',
+      price: '+20h',
     ),
     _LedgerData(
-      icon: Icons.show_chart,
-      title: 'Consultoria estratégica',
-      desc: 'Direção clara em uma sessão intensiva',
-      price: 'R\$ 4.497',
+      icon: Icons.trending_down,
+      title: 'Redução de retrabalho',
+      desc: 'Operacional eliminado com integrações',
+      price: '-80%',
     ),
     _LedgerData(
-      icon: Icons.person_outline,
-      title: 'Mentoria individual',
-      desc: 'Acompanhamento personalizado',
-      price: 'R\$ 12.900',
+      icon: Icons.money_off_outlined,
+      title: 'Custo por processo automatizado',
+      desc: 'Na sua operação após implementação',
+      price: 'R\$ 0,00',
     ),
     _LedgerData(
-      icon: Icons.group_outlined,
-      title: 'Mentoria em grupo',
-      desc: 'Transforme e escale seu negócio',
-      price: 'R\$ 5.700',
+      icon: Icons.groups_outlined,
+      title: 'Atendimentos simultâneos',
+      desc: 'Sem ampliar o time atual',
+      price: '×3',
     ),
     _LedgerData(
-      icon: Icons.desktop_windows_outlined,
-      title: 'Cursos',
-      desc: 'Aprenda no seu ritmo',
-      price: 'R\$ 2.990',
+      icon: Icons.hub_outlined,
+      title: 'Sistemas integrados',
+      desc: 'Em uma única operação centralizada',
+      price: '100%',
     ),
     _LedgerData(
-      icon: Icons.auto_awesome_outlined,
-      title: 'Workshops',
-      desc: 'Imersões práticas de alto valor',
-      price: 'R\$ 1.290',
+      icon: Icons.trending_up,
+      title: 'Potencial de escala',
+      desc: 'Da sua empresa com a tecnologia certa',
+      price: 'EXPONENCIAL',
+      small: 'resultado',
     ),
   ];
 
@@ -185,21 +186,21 @@ class Lp1InvestSection extends StatelessWidget {
         left: Reveal(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const Eyebrow('Investimento'),
+              const Eyebrow('Métricas reais'),
               const SizedBox(height: 20),
               Text(
-                'Onde a sua próxima fase começa.',
+                'Porque aqui olhamos para o que realmente importa.',
                 style: LpType.sectionTitle(width),
               ),
               const SizedBox(height: 20),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 360),
                 child: Text(
-                  'Aqui, conversamos sobre a criação de posicionamento '
-                  'estratégico, funis de conteúdo e campanhas que envolvem as '
-                  'métricas que realmente importam para aumentar o seu '
-                  'faturamento.',
+                  'Falamos sobre o que está travando a escala da sua operação. '
+                  'Sobre processos que deveriam ser automáticos mas ainda são '
+                  'manuais. Sobre integrações que deveriam existir mas não existem.',
                   style: LpType.sans(
                     size: 16.5,
                     weight: FontWeight.w300,
@@ -210,7 +211,7 @@ class Lp1InvestSection extends StatelessWidget {
               ),
               const SizedBox(height: 34),
               LpButton(
-                label: 'Quero investir no meu negócio',
+                label: 'Quero uma vaga',
                 onTap: onContato,
               ),
             ],
@@ -223,6 +224,7 @@ class Lp1InvestSection extends StatelessWidget {
               border: Border(top: BorderSide(color: LpColors.line)),
             ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [for (final r in _rows) _LedgerRow(data: r)],
             ),
           ),
@@ -326,7 +328,7 @@ class _LedgerRow extends StatelessWidget {
                 children: [
                   Text(
                     data.price,
-                    style: LpType.serif(
+                    style: LpType.numeral(
                       size: priceSize,
                       weight: FontWeight.w500,
                       color: LpColors.goldDeep,

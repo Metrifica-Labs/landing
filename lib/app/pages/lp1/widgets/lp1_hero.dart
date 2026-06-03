@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:metrifica_landing/app/pages/lp1/lp1_theme.dart';
 
@@ -14,7 +15,10 @@ class Lp1HeroSection extends StatelessWidget {
     final isMobile = width <= kLpMobileBreak;
 
     final copy = _HeroCopy(onContato: onContato, isMobile: isMobile);
-    final portrait = const Reveal(delayMs: 160, child: _HeroPortrait());
+    final portrait = Reveal(
+      delayMs: 160,
+      child: _HeroPortrait(floatingChips: !stacked),
+    );
 
     final Widget grid;
     if (stacked) {
@@ -27,6 +31,8 @@ class Lp1HeroSection extends StatelessWidget {
               child: portrait,
             ),
           ),
+          const SizedBox(height: 26),
+          const Reveal(delayMs: 220, child: _HeroChipsRow()),
           SizedBox(height: lpClampVw(30, 5, 70, width)),
           copy,
         ],
@@ -44,31 +50,61 @@ class Lp1HeroSection extends StatelessWidget {
 
     return Container(
       color: LpColors.cream,
-      child: Column(
+      child: Stack(
         children: [
-          Padding(
-            padding: EdgeInsets.only(top: isMobile ? 118 : 140),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: kLpMaxW),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: lpPad(width)),
-                  child: grid,
+          // Bottom gradient fade into next section
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: IgnorePointer(
+              child: Container(
+                height: 440,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      LpColors.cream.withValues(alpha: 0),
+                      LpColors.cream.withValues(alpha: 0.35),
+                      LpColors.cream.withValues(alpha: 0.78),
+                      LpColors.cream,
+                    ],
+                    stops: const [0.0, 0.35, 0.7, 1.0],
+                  ),
                 ),
               ),
             ),
           ),
-          SizedBox(height: lpClampVw(60, 8, 110, width)),
-          const Marquee(
-            items: [
-              'Posicionamento',
-              'Autoridade',
-              'High Ticket',
-              'Conteúdo que vende',
-              'Funil estratégico',
+          // Content
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: isMobile ? 118 : 140),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: kLpMaxW),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: lpPad(width)),
+                      child: grid,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: lpClampVw(60, 8, 110, width)),
+              const Marquee(
+                items: [
+                  'Estratégia',
+                  'Tecnologia',
+                  'Automação',
+                  'Integração',
+                  'Escala',
+                ],
+              ),
+              SizedBox(height: lpSectionPad(width)),
             ],
           ),
-          SizedBox(height: lpSectionPad(width)),
         ],
       ),
     );
@@ -85,26 +121,29 @@ class _HeroCopy extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final h1Size = isMobile
-        ? lpClampVw(34, 11, 52, width)
-        : lpClampVw(36, 4.6, 64, width);
+        ? lpClampVw(34, 6, 52, width)
+        : lpClampVw(36, 3.6, 64, width);
     final h1 = LpType.serif(
       size: h1Size,
       weight: FontWeight.w500,
       color: LpColors.ink,
-      height: 1.03,
+      height: 1.0,
       letterSpacing: -0.6,
     );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Reveal(
           child: Row(
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(width: 46, height: 1, color: LpColors.gold),
               const SizedBox(width: 14),
-              const Eyebrow('Mentoria & Estratégia Digital'),
+              const Flexible(
+                child: Eyebrow('Estratégia, Tecnologia & Escala'),
+              ),
             ],
           ),
         ),
@@ -116,12 +155,10 @@ class _HeroCopy extends StatelessWidget {
               style: h1,
               children: [
                 const TextSpan(
-                  text:
-                      'Quer atrair clientes prontos para comprar seu High Ticket? ',
+                  text: 'Sua operação está travada porque você ainda não tem a tecnologia certa para escalar. ',
                 ),
                 TextSpan(
-                  text:
-                      'Mesmo que o seu Instagram ainda não venda todos os dias?',
+                  text: 'Você já fatura. Já tem time mas a escala está sendo um grande desafio…',
                   style: h1.copyWith(
                     fontStyle: FontStyle.italic,
                     color: LpColors.goldDeep,
@@ -137,9 +174,9 @@ class _HeroCopy extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
             child: Text(
-              'Eu te ajudo a transformar o seu perfil no Instagram em uma '
-              'máquina previsível de atração, autoridade e vendas de '
-              'serviços e produtos premium.',
+              'Agora é hora da tecnologia trabalhar por você: automações, '
+              'integrações e sistemas que escalam a operação enquanto você '
+              'foca no que realmente importa.',
               style: LpType.sans(
                 size: 17,
                 weight: FontWeight.w300,
@@ -153,7 +190,7 @@ class _HeroCopy extends StatelessWidget {
         Reveal(
           delayMs: 240,
           child: LpButton(
-            label: 'Quero vender todos os dias',
+            label: 'Quero uma vaga',
             onTap: onContato,
           ),
         ),
@@ -199,8 +236,9 @@ class _HeroProof extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 14),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 200),
+        Flexible(
+          child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 220),
           child: Text.rich(
             TextSpan(
               style: LpType.sans(
@@ -211,7 +249,7 @@ class _HeroProof extends StatelessWidget {
               ),
               children: [
                 TextSpan(
-                  text: '+ de 500 alunas',
+                  text: '+150 operações',
                   style: LpType.sans(
                     size: 13.5,
                     weight: FontWeight.w500,
@@ -220,10 +258,11 @@ class _HeroProof extends StatelessWidget {
                   ),
                 ),
                 const TextSpan(
-                  text: ' transformando seus negócios todos os dias.',
+                  text: ' diagnosticadas e transformadas.',
                 ),
               ],
             ),
+          ),
           ),
         ),
       ],
@@ -232,112 +271,177 @@ class _HeroProof extends StatelessWidget {
 }
 
 class _HeroPortrait extends StatelessWidget {
-  const _HeroPortrait();
+  const _HeroPortrait({this.floatingChips = true});
+
+  /// On stacked/mobile layouts the floating chips overlap the small portrait
+  /// and look unpolished — they're rendered as a clean static row instead
+  /// (see [_HeroChipsRow]), so the portrait suppresses them.
+  final bool floatingChips;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final w = constraints.maxWidth;
-        final h = w * 3.7 / 3;
-        return SizedBox(
-          width: w,
-          height: h,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              // decorative gold ring (sits 18px outside the portrait)
-              Positioned(
-                left: -18,
-                right: -18,
-                top: -18,
-                bottom: -18,
-                child: _ring(w + 36, h + 36),
+        final w = constraints.maxWidth - 110;
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // O.svg: gradiente vermelho em camada única (sem blur), com bordas
+            // suaves via fade no topo e na base — sem emendas/faixas.
+            Positioned(
+              top: -w * 0.06,
+              left: -w * 0.1,
+              child: IgnorePointer(
+                child: ShaderMask(
+                  shaderCallback: (bounds) => const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.white,
+                      Colors.white,
+                      Colors.transparent,
+                    ],
+                    stops: [0.0, 0.24, 0.62, 0.96],
+                  ).createShader(bounds),
+                  blendMode: BlendMode.dstIn,
+                  child: ShaderMask(
+                    shaderCallback: (bounds) => const LinearGradient(
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
+                      colors: [
+                        Color(0xC07B2D3A),
+                        Color(0x99935060),
+                        Color(0x33A5455A),
+                        Color(0x00AB4A60),
+                      ],
+                      stops: [0.0, 0.45, 0.75, 1.0],
+                    ).createShader(bounds),
+                    blendMode: BlendMode.srcIn,
+                    child: SvgPicture.asset(
+                      'assets/images/lp1/o.svg',
+                      width: w * 1.35,
+                    ),
+                  ),
+                ),
               ),
-              Positioned.fill(child: _arch(w, h)),
+            ),
+            // The portrait itself fades out toward the bottom so its hard cut
+            // dissolves into the gradient instead of showing a seam…
+            ShaderMask(
+              shaderCallback: (bounds) => const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: [0.0, 0.5, 0.78, 0.94],
+                colors: [
+                  Colors.white,
+                  Colors.white,
+                  Color(0x40FFFFFF),
+                  Colors.transparent,
+                ],
+              ).createShader(bounds),
+              blendMode: BlendMode.dstIn,
+              child: Image.asset(
+                'assets/images/lp1/top_landing.png',
+                width: w,
+                fit: BoxFit.contain,
+              ),
+            ),
+            // …and a cream wash sits underneath/over it finishing on opaque
+            // cream, so whatever remains of the cut is fully covered.
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: FractionallySizedBox(
+                    heightFactor: 0.4,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          stops: const [0.0, 0.55, 0.86, 1.0],
+                          colors: [
+                            LpColors.cream.withValues(alpha: 0),
+                            LpColors.cream.withValues(alpha: 0.7),
+                            LpColors.cream,
+                            LpColors.cream,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Floating chips — desktop only. On stacked/mobile they're rendered
+            // as a static row beneath the portrait (see [_HeroChipsRow]).
+            if (floatingChips) ...[
               Positioned(
-                top: h * 0.08,
+                top: w * 0.12,
                 left: -w * 0.06,
                 child: const FloatyChip(
-                  label: '358 curtidas',
-                  icon: Icons.favorite,
-                  heart: true,
+                  label: '+150 operações',
+                  icon: Icons.check_circle,
+                  heart: false,
                   delayMs: 0,
                 ),
               ),
               Positioned(
-                bottom: h * 0.14,
+                bottom: w * 0.18,
                 right: -w * 0.08,
                 child: const FloatyChip(
-                  label: '92 comentários',
-                  icon: Icons.chat_bubble,
+                  label: '20h salvas/semana',
+                  icon: Icons.schedule,
                   delayMs: 1400,
                 ),
               ),
               Positioned(
-                top: h * 0.46,
+                top: w * 0.5,
                 right: -w * 0.12,
                 child: const FloatyChip(
-                  label: 'Novo lead',
+                  label: 'Nova vaga',
                   icon: Icons.send,
                   delayMs: 700,
                 ),
               ),
             ],
-          ),
+          ],
         );
       },
     );
   }
+}
 
-  Widget _arch(double w, double h) {
-    final radius = BorderRadius.only(
-      topLeft: Radius.elliptical(w / 2, h / 2),
-      topRight: Radius.elliptical(w / 2, h / 2),
-      bottomLeft: Radius.elliptical(w / 2, h * 0.38),
-      bottomRight: Radius.elliptical(w / 2, h * 0.38),
-    );
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: radius,
-        gradient: const LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [LpColors.cream2, Color(0xFFE3D6BF)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF1D1A15).withValues(alpha: 0.45),
-            blurRadius: 90,
-            spreadRadius: -50,
-            offset: const Offset(0, 50),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: Image.asset(
-          'assets/images/lp1/miriam-hero.jpg',
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-  }
+// Static, centered chip row shown beneath the portrait on stacked/mobile
+// layouts — replaces the floating chips that overlap the small portrait.
+class _HeroChipsRow extends StatelessWidget {
+  const _HeroChipsRow();
 
-  Widget _ring(double w, double h) {
-    return Opacity(
-      opacity: 0.5,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: LpColors.gold),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.elliptical(w / 2, h / 2),
-            topRight: Radius.elliptical(w / 2, h / 2),
-            bottomLeft: Radius.elliptical(w / 2, h * 0.40),
-            bottomRight: Radius.elliptical(w / 2, h * 0.40),
-          ),
+  @override
+  Widget build(BuildContext context) {
+    return const Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        FloatyChip(
+          label: '+150 operações',
+          icon: Icons.check_circle,
+          float: false,
         ),
-      ),
+        FloatyChip(
+          label: '20h salvas/semana',
+          icon: Icons.schedule,
+          float: false,
+        ),
+        FloatyChip(
+          label: 'Nova vaga',
+          icon: Icons.send,
+          float: false,
+        ),
+      ],
     );
   }
 }

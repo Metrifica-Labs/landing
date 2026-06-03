@@ -33,11 +33,10 @@ class Lp1FinalCtaSection extends StatelessWidget {
               ),
               children: [
                 const TextSpan(
-                  text:
-                      'Pronta para atrair clientes e vender todos os dias? ',
+                  text: 'Vagas limitadas para quem quer escalar com tecnologia, lucro e previsibilidade. ',
                 ),
                 TextSpan(
-                  text: 'Eu posso te ajudar.',
+                  text: 'Não prometemos hype. Prometemos resultado.',
                   style: LpType.serif(
                     size: h2Size,
                     weight: FontWeight.w500,
@@ -54,12 +53,13 @@ class Lp1FinalCtaSection extends StatelessWidget {
           delayMs: 80,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 380),
                 child: Text(
-                  'Vamos criar um plano estratégico personalizado para o seu '
-                  'negócio e transformar seu Instagram em uma máquina de vendas.',
+                  'Se você quer entender exatamente onde está o gargalo '
+                  'que trava a sua escala e qual tecnologia resolve isso agora.',
                   style: LpType.sans(
                     size: 16.5,
                     weight: FontWeight.w300,
@@ -70,7 +70,7 @@ class Lp1FinalCtaSection extends StatelessWidget {
               ),
               const SizedBox(height: 28),
               LpButton(
-                label: 'Quero vender todos os dias',
+                label: 'Quero destravar minha escala agora',
                 onTap: onContato,
               ),
             ],
@@ -88,121 +88,120 @@ class Lp1AboutSection extends StatelessWidget {
   const Lp1AboutSection({super.key});
 
   static const _stats = <(String, String)>[
-    ('8 anos', 'De mercado'),
-    ('+500', 'Alunas'),
-    ('+3M', 'Em faturamento'),
+    ('+55M', 'Gerados para clientes'),
+    ('+18', 'Anos no mercado digital'),
+    ('+150', 'Operações transformadas'),
   ];
 
   static const _accordion = <(String, String)>[
     (
-      'Minha missão',
-      'Mostrar que o Instagram pode ser muito mais que um perfil bonito: uma '
-          'ferramenta real de atração, autoridade e vendas consistentes para o '
-          'seu negócio.'
+      'Diagnóstico de Gargalos Operacionais',
+      'Entramos na sua operação, mapeamos o que está quebrando a escala, '
+          'onde está o gargalo invisível que impede você de crescer e o que '
+          'implementar de forma personalizada.'
     ),
     (
-      'Meu método',
-      'Posicionamento estratégico, conteúdo que conecta e funis que transformam '
-          'seguidores em clientes prontos para comprar a sua oferta premium.'
+      'Integrações e Automações',
+      'Fazemos os seus sistemas conversarem, eliminamos o retrabalho manual '
+          'e criamos fluxos automáticos que processam volume sem precisar de '
+          'mais gente. Sua operação escala sem você estar no centro de tudo.'
     ),
     (
-      'Por que eu faço o que faço?',
-      'Porque acredito que toda empresária merece previsibilidade, liberdade e '
-          'um negócio que cresce com estrutura — não na base da sorte ou do '
-          'achismo.'
+      'Conteúdo em Volume com IA Própria',
+      'Nossa IA treinada com a sua personalização produz volume de conteúdo '
+          'com qualidade para suas redes sociais sem depender do seu tempo, '
+          'sem perder a identidade da marca.'
+    ),
+    (
+      'Desenvolvimento de Tecnologia Sob Medida',
+      'Quando nenhuma ferramenta do mercado resolve, construímos. Sistemas, '
+          'softwares e aplicativos desenvolvidos do zero para as necessidades '
+          'específicas do seu negócio que viram ativos e diferenciais reais.'
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
+    final stacked = width <= kLpTabletBreak;
+
+    final intro = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Eyebrow('Sobre nós'),
+        const SizedBox(height: 18),
+        Text('Metrifica', style: LpType.sectionTitle(width)),
+        const SizedBox(height: 22),
+        Text(
+          'Somos uma empresa de tecnologia fundada por um estrategista de '
+          'negócios e um gestor de tráfego que cansaram de ver empresários '
+          'talentosos travados por falta de estrutura tecnológica.',
+          style: _bodyStyle,
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'Antes de falar de ferramenta, entendemos o negócio. Antes de '
+          'implementar, diagnosticamos. Antes de cobrar, provamos que funciona.',
+          style: _bodyStyle,
+        ),
+        const SizedBox(height: 30),
+        _StatsRow(stats: _stats),
+      ],
+    );
+
+    const accordion = _Accordion(items: _accordion);
+
+    final Widget header;
+    if (stacked) {
+      // Photo banner fading at the bottom, intro stacked beneath it.
+      header = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Reveal(
+            child: AspectRatio(
+              aspectRatio: 3 / 2,
+              child: _AboutPhoto(axis: Axis.vertical),
+            ),
+          ),
+          const SizedBox(height: 30),
+          Reveal(delayMs: 80, child: intro),
+        ],
+      );
+    } else {
+      // Desktop: intro overlaps the open, faded right side of the photo.
+      header = Reveal(
+        child: Stack(
+          children: [
+            const AspectRatio(
+              aspectRatio: 3 / 2,
+              child: _AboutPhoto(axis: Axis.horizontal),
+            ),
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 460),
+                  child: intro,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return LpSection(
       background: LpColors.cream,
-      child: LpSplit(
-        flexLeft: 8,
-        flexRight: 12,
-        left: Reveal(
-          child: AspectRatio(
-            aspectRatio: 3 / 3.8,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: Image.asset(
-                'assets/images/lp1/miriam-hero.jpg',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ),
-        right: Reveal(
-          delayMs: 80,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Eyebrow('Sobre mim'),
-              const SizedBox(height: 18),
-              Text('Miriam Santos', style: LpType.sectionTitle(width)),
-              const SizedBox(height: 26),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 560),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Sou estrategista digital e mentora de empresárias que '
-                      'querem vender serviços e produtos de alto valor todos os '
-                      'dias, com previsibilidade e liberdade.',
-                      style: _bodyStyle,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Há mais de 8 anos, ajudo profissionais a construir '
-                      'negócios digitais lucrativos — com posicionamento forte, '
-                      'conteúdos que vendem e estratégias que realmente '
-                      'funcionam.',
-                      style: _bodyStyle,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 32),
-              Wrap(
-                spacing: 36,
-                runSpacing: 20,
-                children: [
-                  for (final s in _stats)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          s.$1,
-                          style: LpType.serif(
-                            size: 34,
-                            weight: FontWeight.w500,
-                            color: LpColors.goldDeep,
-                            height: 1.1,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          s.$2.toUpperCase(),
-                          style: LpType.sans(
-                            size: 11,
-                            weight: FontWeight.w400,
-                            color: LpColors.ink3,
-                            letterSpacing: 1.8,
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-              const SizedBox(height: 32),
-              const _Accordion(items: _accordion),
-            ],
-          ),
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          header,
+          SizedBox(height: stacked ? 36 : 48),
+          const Reveal(delayMs: 120, child: accordion),
+        ],
       ),
     );
   }
@@ -213,6 +212,80 @@ class Lp1AboutSection extends StatelessWidget {
     color: LpColors.ink2,
     height: 1.6,
   );
+}
+
+// Inline stats row (value + label) shared by the about header.
+class _StatsRow extends StatelessWidget {
+  const _StatsRow({required this.stats});
+
+  final List<(String, String)> stats;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 32,
+      runSpacing: 18,
+      children: [
+        for (final s in stats)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                s.$1,
+                style: LpType.numeral(
+                  size: 34,
+                  weight: FontWeight.w500,
+                  color: LpColors.goldDeep,
+                  height: 1.1,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                s.$2.toUpperCase(),
+                style: LpType.sans(
+                  size: 11,
+                  weight: FontWeight.w400,
+                  color: LpColors.ink3,
+                  letterSpacing: 1.8,
+                ),
+              ),
+            ],
+          ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// About photo — `bottom.png` with a directional fade so it melts into the
+// cream section: horizontal (right edge fades) on desktop, where the intro
+// copy is laid over the open faded side; vertical (bottom fades) on mobile,
+// where the copy stacks beneath it.
+// ---------------------------------------------------------------------------
+class _AboutPhoto extends StatelessWidget {
+  const _AboutPhoto({required this.axis});
+
+  final Axis axis;
+
+  @override
+  Widget build(BuildContext context) {
+    final horizontal = axis == Axis.horizontal;
+    return ShaderMask(
+      shaderCallback: (bounds) => LinearGradient(
+        begin: horizontal ? Alignment.centerLeft : Alignment.topCenter,
+        end: horizontal ? Alignment.centerRight : Alignment.bottomCenter,
+        colors: const [Colors.white, Colors.white, Colors.transparent],
+        stops: horizontal ? const [0.0, 0.42, 0.9] : const [0.0, 0.68, 1.0],
+      ).createShader(bounds),
+      blendMode: BlendMode.dstIn,
+      child: Image.asset(
+        'assets/images/lp1/bottom.png',
+        fit: BoxFit.cover,
+        alignment: Alignment.centerLeft,
+      ),
+    );
+  }
 }
 
 class _Accordion extends StatefulWidget {

@@ -16,29 +16,24 @@ class _Lp1TestimonialsSectionState extends State<Lp1TestimonialsSection> {
   static const _gap = 20.0;
   static const _cards = <_Testi>[
     _Testi(
-      'Transformei meu Instagram em uma máquina de atrair clientes e oportunidades reais.',
-      'Juliana R.',
-      '@juliaroar',
+      'A Metrifica identificou em dias o que estava travando nossa operação há meses. Automatizamos processos que consumiam horas e hoje rodam sozinhos.',
+      'Marcos Freitas',
+      'APN — Maior imersão para empresários do Brasil',
     ),
     _Testi(
-      'A mentoria me trouxe clareza, estratégia e resultados consistentes.',
-      'Fernanda M.',
-      '@femartdsm',
+      'Finalmente temos visibilidade real da nossa operação. Os sistemas conversam, o retrabalho acabou e a escala ficou previsível.',
+      'Matheus Shark',
+      'Milhas Inteligentes',
     ),
     _Testi(
-      'Conteúdo que conecta, posicionamento que vende e resultados consistentes.',
-      'Mariana S.',
-      '@marianas',
+      'O diagnóstico foi cirúrgico. Identificaram exatamente onde estava o gargalo e implementaram a solução certa sem enrolação.',
+      'Érika Aragão',
+      'Cílios Design — Franquias',
     ),
     _Testi(
-      'Finalmente consegui vender meu serviço de alto valor com previsibilidade.',
-      'Carla A.',
-      '@palcfes',
-    ),
-    _Testi(
-      'Saí do perfil bonito e parado para um funil que gera clientes todos os dias.',
-      'Erika A.',
-      '@erikaragao',
+      'Em 30 dias automatizamos mais do que tentamos fazer em 2 anos. Resultado real, mensurável e sem precisar ampliar o time.',
+      'BlitzPay',
+      'Plataforma de infoprodutores — mais de R\$100M faturados',
     ),
   ];
 
@@ -93,10 +88,11 @@ class _Lp1TestimonialsSectionState extends State<Lp1TestimonialsSection> {
     final head = Reveal(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          const Eyebrow('Depoimentos'),
+          const Eyebrow('Prova social'),
           const SizedBox(height: 16),
-          Text('O que minhas alunas dizem.', style: LpType.sectionTitle(width)),
+          Text('Alguns nomes que já passaram por aqui.', style: LpType.sectionTitle(width)),
         ],
       ),
     );
@@ -118,6 +114,7 @@ class _Lp1TestimonialsSectionState extends State<Lp1TestimonialsSection> {
       clipChildren: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           if (stacked) ...[
             head,
@@ -141,30 +138,39 @@ class _Lp1TestimonialsSectionState extends State<Lp1TestimonialsSection> {
                     (constraints.maxWidth - _gap * (perView - 1)) / perView;
                 final dx = -index * (cardW + _gap);
 
-                return ClipRect(
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween<double>(end: dx),
-                    duration: const Duration(milliseconds: 700),
-                    curve: kLpEase,
-                    builder: (context, value, child) => Transform.translate(
-                      offset: Offset(value, 0),
-                      child: child,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (var i = 0; i < _cards.length; i++)
-                          Padding(
-                            padding: EdgeInsets.only(
-                              right: i == _cards.length - 1 ? 0 : _gap,
-                            ),
-                            child: SizedBox(
-                              width: cardW,
-                              child: _TestiCard(data: _cards[i]),
-                            ),
-                          ),
-                      ],
+                return SizedBox(
+                  width: constraints.maxWidth,
+                  child: ClipRect(
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(end: dx),
+                      duration: const Duration(milliseconds: 700),
+                      curve: kLpEase,
+                      builder: (context, value, child) => Transform.translate(
+                        offset: Offset(value, 0),
+                        child: child,
+                      ),
+                      child: UnconstrainedBox(
+                        constrainedAxis: Axis.vertical,
+                        alignment: Alignment.topLeft,
+                        child: IntrinsicHeight(
+                         child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            for (var i = 0; i < _cards.length; i++)
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  right: i == _cards.length - 1 ? 0 : _gap,
+                                ),
+                                child: SizedBox(
+                                  width: cardW,
+                                  child: _TestiCard(data: _cards[i]),
+                                ),
+                              ),
+                          ],
+                        ),
+                       ),
+                      ),
                     ),
                   ),
                 );
@@ -200,6 +206,7 @@ class _TestiCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
         children: [
           Text(
             '★★★★★',
@@ -220,6 +227,7 @@ class _TestiCard extends StatelessWidget {
               italic: true,
             ),
           ),
+          const Spacer(),
           const SizedBox(height: 24),
           Row(
             children: [
@@ -233,26 +241,34 @@ class _TestiCard extends StatelessWidget {
                 child: const Icon(Icons.person, size: 22, color: LpColors.ink3),
               ),
               const SizedBox(width: 13),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    data.name,
-                    style: LpType.sans(
-                      size: 14,
-                      weight: FontWeight.w500,
-                      color: LpColors.ink,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      data.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: LpType.sans(
+                        size: 14,
+                        weight: FontWeight.w500,
+                        color: LpColors.ink,
+                      ),
                     ),
-                  ),
-                  Text(
-                    data.handle,
-                    style: LpType.sans(
-                      size: 12.5,
-                      weight: FontWeight.w300,
-                      color: LpColors.ink3,
+                    Text(
+                      data.handle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: LpType.sans(
+                        size: 12.5,
+                        weight: FontWeight.w300,
+                        color: LpColors.ink3,
+                        height: 1.3,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

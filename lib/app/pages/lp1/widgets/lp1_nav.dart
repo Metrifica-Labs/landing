@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:metrifica_landing/app/pages/lp1/lp1_theme.dart';
 
-/// The ÓRDINARE wordmark, reused in the nav and footer.
+/// The ORDENARE wordmark SVG, reused in the nav and footer.
 class LpBrand extends StatelessWidget {
   const LpBrand({super.key, this.color = LpColors.ink, this.regColor = LpColors.gold});
 
@@ -11,28 +12,10 @@ class LpBrand extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text.rich(
-      TextSpan(
-        text: 'ÓRDINARE',
-        style: LpType.serif(
-          size: 23,
-          weight: FontWeight.w600,
-          color: color,
-          letterSpacing: 5,
-        ),
-        children: [
-          WidgetSpan(
-            alignment: PlaceholderAlignment.top,
-            child: Transform.translate(
-              offset: const Offset(2, -2),
-              child: Text(
-                '®',
-                style: LpType.serif(size: 9, color: regColor, weight: FontWeight.w600),
-              ),
-            ),
-          ),
-        ],
-      ),
+    return SvgPicture.asset(
+      'assets/images/lp1/ordenare logo.svg',
+      height: 26,
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
     );
   }
 }
@@ -44,7 +27,6 @@ class Lp1Nav extends StatefulWidget {
     required this.isMobile,
     this.onTop,
     this.onSobre,
-    this.onMetodo,
     this.onInvest,
     this.onMentoria,
     this.onContato,
@@ -54,7 +36,6 @@ class Lp1Nav extends StatefulWidget {
   final bool isMobile;
   final VoidCallback? onTop;
   final VoidCallback? onSobre;
-  final VoidCallback? onMetodo;
   final VoidCallback? onInvest;
   final VoidCallback? onMentoria;
   final VoidCallback? onContato;
@@ -67,10 +48,9 @@ class _Lp1NavState extends State<Lp1Nav> {
   bool _open = false;
 
   List<(String, VoidCallback?)> get _links => [
-        ('Sobre', widget.onSobre),
-        ('Método', widget.onMetodo),
-        ('Investimento', widget.onInvest),
-        ('Mentoria', widget.onMentoria),
+        ('Transformação', widget.onSobre),
+        ('Métricas', widget.onInvest),
+        ('Diferenciais', widget.onMentoria),
         ('Contato', widget.onContato),
       ];
 

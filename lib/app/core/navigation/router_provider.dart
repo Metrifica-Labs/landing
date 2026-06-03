@@ -6,7 +6,7 @@ import 'package:metrifica_landing/app/pages/lp1/lp1_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/lp-1',
     routes: [
       GoRoute(
         path: '/',

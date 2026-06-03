@@ -9,18 +9,18 @@ class Lp1WhomSection extends StatelessWidget {
   const Lp1WhomSection({super.key});
 
   static const _items = <(IconData?, String)>[
-    (Icons.home_outlined,
-        'Empresárias e prestadoras de serviços que querem vender todos os dias.'),
-    (Icons.description_outlined,
-        'Consultores e infoprodutores que desejam escalar o digital.'),
-    (Icons.person_outline,
-        'Profissionais que querem se posicionar com autoridade e estratégia.'),
-    (Icons.trending_up,
-        'Negócios que já faturam bem, mas querem crescer com previsibilidade.'),
-    (Icons.error_outline,
-        'Quem está cansada de postar sem resultado e viver de altos e baixos.'),
+    (Icons.check_circle_outline,
+        'Já faturam mas estão travados por processos manuais que não escalam.'),
+    (Icons.check_circle_outline,
+        'Têm sistemas que não conversam e dados espalhados em múltiplas ferramentas.'),
+    (Icons.check_circle_outline,
+        'Estão cansados de depender de tudo passar por eles para funcionar.'),
+    (Icons.check_circle_outline,
+        'Viram o concorrente crescer mais rápido e sabem que a diferença é estrutura tecnológica.'),
+    (Icons.check_circle_outline,
+        'Querem escalar sem contratar linearmente — dobrar faturamento sem dobrar equipe.'),
     (null,
-        'Procura fórmulas mágicas ou quer resultado sem estratégia e sem consistência.'),
+        'Quem está começando do zero ou ainda não tem operação rodando.'),
   ];
 
   @override
@@ -31,28 +31,75 @@ class Lp1WhomSection extends StatelessWidget {
     return LpSection(
       background: LpColors.cream,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const LpCenteredHead(
-            eyebrow: 'Para quem é',
-            title: 'Feito para quem leva o próprio negócio a sério.',
+            eyebrow: 'Qualificação',
+            title: 'Para quem está pronto para escalar com tecnologia.',
           ),
-          LpGrid(
+          _EqualHeightGrid(
             columns: cols,
             gap: 16,
-            children: [
-              for (var i = 0; i < _items.length; i++)
-                Reveal(
-                  delayMs: 80 * ((i % cols) + 1),
-                  child: _WhomCard(
-                    icon: _items[i].$1,
-                    text: _items[i].$2,
-                    isNo: _items[i].$1 == null,
-                  ),
-                ),
-            ],
+            items: _items,
           ),
         ],
       ),
+    );
+  }
+}
+
+// Grid that renders rows of cards all with the same height per row.
+class _EqualHeightGrid extends StatelessWidget {
+  const _EqualHeightGrid({
+    required this.columns,
+    required this.gap,
+    required this.items,
+  });
+
+  final int columns;
+  final double gap;
+  final List<(IconData?, String)> items;
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = (items.length / columns).ceil();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (var row = 0; row < rows; row++) ...[
+              if (row > 0) SizedBox(height: gap),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (var col = 0; col < columns; col++) ...[
+                      if (col > 0) SizedBox(width: gap),
+                      Builder(builder: (_) {
+                        final i = row * columns + col;
+                        if (i >= items.length) {
+                          return Expanded(child: const SizedBox());
+                        }
+                        return Expanded(
+                          child: Reveal(
+                            delayMs: 80 * (col + 1),
+                            child: _WhomCard(
+                              icon: items[i].$1,
+                              text: items[i].$2,
+                              isNo: items[i].$1 == null,
+                            ),
+                          ),
+                        );
+                      }),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ],
+        );
+      },
     );
   }
 }
@@ -144,16 +191,16 @@ class Lp1ContentSection extends StatelessWidget {
 
   static const _cards = <(String, String)>[
     (
-      'Estratégias práticas',
-      'Dicas e direção para atrair clientes prontos para comprar todos os dias.'
+      'Diagnóstico Operacional Real',
+      'Mapeamos onde estão os gargalos que travam sua escala e o que já deveria estar automatizado.'
     ),
     (
-      'Bastidores & método',
-      'A mentalidade e os métodos por trás de um negócio digital de sucesso.'
+      'Automações & Integrações',
+      'Fazemos seus sistemas conversarem, eliminamos o retrabalho e criamos fluxos automáticos que processam volume.'
     ),
     (
-      'Tendências & insights',
-      'Análises do mercado digital e do universo High Ticket que importam.'
+      'IA Própria para Conteúdo',
+      'Nossa IA treinada com a sua voz produz volume de conteúdo com qualidade sem depender do seu tempo.'
     ),
   ];
 
@@ -165,10 +212,11 @@ class Lp1ContentSection extends StatelessWidget {
     return LpSection(
       background: LpColors.cream,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const LpCenteredHead(
-            eyebrow: 'Conteúdos',
-            title: 'Conteúdos que geram valor,\nconexão e resultado.',
+            eyebrow: 'Diferenciais',
+            title: 'Os diferenciais da Metrifica.',
           ),
           LpGrid(
             columns: cols,
@@ -187,7 +235,7 @@ class Lp1ContentSection extends StatelessWidget {
           const SizedBox(height: 48),
           Reveal(
             child: LpButton(
-              label: 'Quero receber conteúdos exclusivos',
+              label: 'Quero uma vaga',
               gold: false,
               onTap: onContato,
             ),

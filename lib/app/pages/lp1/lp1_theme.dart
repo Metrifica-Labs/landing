@@ -11,8 +11,8 @@ import 'package:google_fonts/google_fonts.dart';
 class LpColors {
   const LpColors._();
 
-  static const Color cream = Color(0xFFF6F0E6); // base background
-  static const Color cream2 = Color(0xFFEFE7D9); // alternating / stats bar
+  static const Color cream = ui.Color.fromARGB(255, 252, 245, 237); // base background
+  static const Color cream2 = ui.Color.fromARGB(255, 247, 238, 224); // alternating / stats bar
   static const Color paper = Color(0xFFFBF7F0); // cards
   static const Color ink = Color(0xFF1D1A15); // primary text
   static const Color ink2 = Color(0xFF5A5247); // secondary text
@@ -84,6 +84,30 @@ class LpType {
     );
   }
 
+  /// Numerals (stats, prices, step indices). Same Cormorant display face as
+  /// [serif] but forces *lining* + *tabular* figures so the digits sit on a
+  /// single cap-height baseline instead of Cormorant's default old-style
+  /// figures (which drop descenders and look misaligned next to body text).
+  static TextStyle numeral({
+    required double size,
+    FontWeight weight = FontWeight.w500,
+    Color color = LpColors.ink,
+    double? height,
+    double? letterSpacing,
+  }) {
+    return GoogleFonts.cormorantGaramond(
+      fontSize: size,
+      fontWeight: weight,
+      color: color,
+      height: height,
+      letterSpacing: letterSpacing,
+      fontFeatures: const [
+        FontFeature.liningFigures(),
+        FontFeature.tabularFigures(),
+      ],
+    );
+  }
+
   /// `.eyebrow` — 12px, w500, letter-spacing .34em, uppercase, gold-deep.
   static TextStyle eyebrow({Color color = LpColors.goldDeep}) => GoogleFonts.jost(
         fontSize: 12,
@@ -152,7 +176,7 @@ class _RevealState extends State<Reveal> with SingleTickerProviderStateMixin {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _check();
-      _safety = Timer(const Duration(milliseconds: 2600), _show);
+      _safety = Timer(const Duration(milliseconds: 600), _show);
     });
   }
 
@@ -314,31 +338,15 @@ class LpButton extends StatelessWidget {
                     color: hovering ? LpColors.ink : LpColors.line,
                   ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                child: Text(
-                  label.toUpperCase(),
-                  style: LpType.sans(
-                    size: 13,
-                    weight: FontWeight.w500,
-                    color: fg,
-                    letterSpacing: 2,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              AnimatedSlide(
-                duration: const Duration(milliseconds: 500),
-                curve: kLpEase,
-                offset: hovering ? const Offset(0.25, -0.25) : Offset.zero,
-                child: Text(
-                  '↗',
-                  style: LpType.sans(size: 15, color: fg),
-                ),
-              ),
-            ],
+          child: Text(
+            label.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: LpType.sans(
+              size: 13,
+              weight: FontWeight.w500,
+              color: fg,
+              letterSpacing: 2,
+            ),
           ),
         );
       },
@@ -485,12 +493,17 @@ class FloatyChip extends StatelessWidget {
     required this.icon,
     this.heart = false,
     this.delayMs = 0,
+    this.float = true,
   });
 
   final String label;
   final IconData icon;
   final bool heart;
   final int delayMs;
+
+  /// When false the chip renders statically (no vertical drift) — used for the
+  /// inline mobile chip row where floating over the portrait looks unpolished.
+  final bool float;
 
   @override
   Widget build(BuildContext context) {
@@ -539,6 +552,8 @@ class FloatyChip extends StatelessWidget {
       ),
     );
 
+    if (!float) return chip;
+
     return chip
         .animate(onPlay: (c) => c.repeat(reverse: true))
         .moveY(
@@ -566,6 +581,12 @@ class Marquee extends StatefulWidget {
 class _MarqueeState extends State<Marquee> with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
 
+  /// Number of repeated keyword sets laid side by side. Translating by exactly
+  /// one set per cycle gives a seamless loop, but the visible strip is only
+  /// gap-free while the remaining `(copies - 1)` sets still span the viewport —
+  /// so enough copies are rendered to cover even ultra-wide screens.
+  static const int _copies = 6;
+
   @override
   void initState() {
     super.initState();
@@ -589,7 +610,7 @@ class _MarqueeState extends State<Marquee> with SingleTickerProviderStateMixin {
           Text(
             item,
             style: LpType.serif(
-              size: 24,
+              size: 20,
               italic: true,
               color: LpColors.ink3,
               weight: FontWeight.w400,
@@ -605,29 +626,37 @@ class _MarqueeState extends State<Marquee> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(color: LpColors.line),
-          bottom: BorderSide(color: LpColors.line),
+    // Fixed height required: OverflowBox inside a SingleChildScrollView column
+    // receives unbounded height unless the Marquee wrapper bounds it.
+    return SizedBox(
+      height: 68,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(color: LpColors.line),
+            bottom: BorderSide(color: LpColors.line),
+          ),
         ),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: ClipRect(
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: OverflowBox(
-            maxWidth: double.infinity,
-            alignment: Alignment.centerLeft,
-            child: AnimatedBuilder(
-              animation: _ctrl,
-              builder: (context, child) => FractionalTranslation(
-                translation: Offset(-0.5 * _ctrl.value, 0),
-                child: child,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [_set(), _set()],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: ClipRect(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: OverflowBox(
+                maxWidth: double.infinity,
+                maxHeight: 28,
+                alignment: Alignment.centerLeft,
+                child: AnimatedBuilder(
+                  animation: _ctrl,
+                  builder: (context, child) => FractionalTranslation(
+                    translation: Offset(-_ctrl.value / _copies, 0),
+                    child: child,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [for (var i = 0; i < _copies; i++) _set()],
+                  ),
+                ),
               ),
             ),
           ),
@@ -721,6 +750,7 @@ class LpSplit extends StatelessWidget {
     if (width <= kLpTabletBreak) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [left, SizedBox(height: stackedGap ?? 48), right],
       );
     }

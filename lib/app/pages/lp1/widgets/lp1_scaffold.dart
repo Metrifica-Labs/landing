@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:metrifica_landing/app/pages/lp1/lp1_theme.dart';
 import 'package:metrifica_landing/app/pages/lp1/widgets/lp1_features_stats.dart';
@@ -6,7 +7,7 @@ import 'package:metrifica_landing/app/pages/lp1/widgets/lp1_final_about.dart';
 import 'package:metrifica_landing/app/pages/lp1/widgets/lp1_footer.dart';
 import 'package:metrifica_landing/app/pages/lp1/widgets/lp1_hero.dart';
 import 'package:metrifica_landing/app/pages/lp1/widgets/lp1_manifesto_steps.dart';
-import 'package:metrifica_landing/app/pages/lp1/widgets/lp1_method_invest.dart';
+import 'package:metrifica_landing/app/pages/lp1/widgets/lp1_method_invest.dart'; // Lp1InvestSection still used
 import 'package:metrifica_landing/app/pages/lp1/widgets/lp1_nav.dart';
 import 'package:metrifica_landing/app/pages/lp1/widgets/lp1_testimonials.dart';
 import 'package:metrifica_landing/app/pages/lp1/widgets/lp1_whom_content.dart';
@@ -29,7 +30,6 @@ class _Lp1ScaffoldState extends State<Lp1Scaffold> {
   final _offset = ValueNotifier<double>(0);
 
   final _sobreKey = GlobalKey();
-  final _metodoKey = GlobalKey();
   final _investKey = GlobalKey();
   final _mentoriaKey = GlobalKey();
   final _contatoKey = GlobalKey();
@@ -38,6 +38,12 @@ class _Lp1ScaffoldState extends State<Lp1Scaffold> {
   void initState() {
     super.initState();
     _scrollCtrl.addListener(() => _offset.value = _scrollCtrl.offset);
+    // Flutter Web can start the scroll at max offset; force-reset to 0.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _scrollCtrl.hasClients) {
+        _scrollCtrl.jumpTo(0.0);
+      }
+    });
   }
 
   @override
@@ -48,10 +54,10 @@ class _Lp1ScaffoldState extends State<Lp1Scaffold> {
   }
 
   void _scrollToTop() => _scrollCtrl.animateTo(
-        0,
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeInOut,
-      );
+    0,
+    duration: const Duration(milliseconds: 600),
+    curve: Curves.easeInOut,
+  );
 
   void _scrollTo(GlobalKey key) {
     final ctx = key.currentContext;
@@ -65,7 +71,9 @@ class _Lp1ScaffoldState extends State<Lp1Scaffold> {
 
   @override
   Widget build(BuildContext context) {
-    void contato() => _scrollTo(_contatoKey);
+    // All conversion CTAs (hero/invest/content/final + nav contact) route to
+    // the multi-step contact form instead of scrolling to a section.
+    void contato() => context.go('/contato');
 
     return Scaffold(
       backgroundColor: LpColors.cream,
@@ -84,14 +92,6 @@ class _Lp1ScaffoldState extends State<Lp1Scaffold> {
                       child: const RepaintBoundary(child: Lp1FeaturesSection()),
                     ),
                     const RepaintBoundary(child: Lp1StatsSection()),
-                    KeyedSubtree(
-                      key: _metodoKey,
-                      child: RepaintBoundary(
-                        child: Lp1MethodSection(
-                          onInvest: () => _scrollTo(_investKey),
-                        ),
-                      ),
-                    ),
                     KeyedSubtree(
                       key: _investKey,
                       child: RepaintBoundary(
@@ -130,7 +130,6 @@ class _Lp1ScaffoldState extends State<Lp1Scaffold> {
               isMobile: widget.isMobile,
               onTop: _scrollToTop,
               onSobre: () => _scrollTo(_sobreKey),
-              onMetodo: () => _scrollTo(_metodoKey),
               onInvest: () => _scrollTo(_investKey),
               onMentoria: () => _scrollTo(_mentoriaKey),
               onContato: contato,
