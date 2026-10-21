@@ -4,6 +4,14 @@
   "framework": null,
   "rewrites": [
     {
+      "source": "/tower",
+      "destination": "/tower/index.html"
+    },
+    {
+      "source": "/tower/:path*",
+      "destination": "/tower/index.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

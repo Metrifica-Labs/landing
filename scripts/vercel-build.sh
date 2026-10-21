@@ -20,3 +20,9 @@ flutter pub get
 flutter build web --release \
   --dart-define=SUPABASE_URL="$SUPABASE_URL_VALUE" \
   --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY_VALUE"
+
+# Tower landing (React/Vite) is served at /tower next to the Flutter app.
+npm ci --prefix tower
+npm run build --prefix tower
+rm -rf build/web/tower
+cp -r tower/dist build/web/tower
