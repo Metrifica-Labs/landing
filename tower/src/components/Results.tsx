@@ -26,8 +26,9 @@ function CaseItem({ c, lead }: { c: Case; lead: boolean }) {
         <h3>{c.title}</h3>
         <p>{c.summary}</p>
         <p className="case-meta mono">
+          {c.kind && <span>{c.kind}</span>}
           {c.duration && <span>{c.duration}</span>}
-          <span>{c.sectors.join(' · ')}</span>
+          {c.sectors && <span>{c.sectors.join(' · ')}</span>}
         </p>
         {c.link && (
           <a className="src" href={c.link} target="_blank" rel="noreferrer">
@@ -50,14 +51,14 @@ export function Results() {
             Feito por essa orquestra.
           </h2>
           <p className="body">
-            A Metrifica já opera com a Tower no dia a dia. Aqui entram os resultados reais: o que o time entregou, em quanto
-            tempo e quem trabalhou.
+            A Metrifica já opera com a Tower no dia a dia. Estes produtos estão no ar e foram construídos por esse time de
+            agentes.
           </p>
         </div>
 
         <ul className="cases">
           {CASES.map((c, i) => (
-            <CaseItem key={c.id} c={c} lead={i === 0} />
+            <CaseItem key={c.id} c={c} lead={i === 0 && CASES.length % 2 === 1} />
           ))}
           {Array.from({ length: empty }, (_, i) => {
             const n = String(CASES.length + i + 1).padStart(2, '0');
