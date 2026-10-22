@@ -9,17 +9,11 @@ fi
 
 export PATH="$HOME/flutter/bin:$PATH"
 
-SUPABASE_URL_VALUE="${SUPABASE_URL:-}"
-SUPABASE_ANON_KEY_VALUE="${SUPABASE_ANON_KEY:-}"
-
-if [ -z "$SUPABASE_URL_VALUE" ] || [ -z "$SUPABASE_ANON_KEY_VALUE" ]; then
-  echo "Warning: SUPABASE_URL or SUPABASE_ANON_KEY is not configured in Vercel."
-fi
+# API da landing (leads + cases) roda na PROD: /opt/metrifica-landing-api (ver server/).
+API_URL_VALUE="${API_URL:-https://api.metrifica.com.br/landing}"
 
 flutter pub get
-flutter build web --release \
-  --dart-define=SUPABASE_URL="$SUPABASE_URL_VALUE" \
-  --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY_VALUE"
+flutter build web --release --dart-define=API_URL="$API_URL_VALUE"
 
 # Tower landing (React/Vite) is served at /tower next to the Flutter app.
 npm ci --prefix tower

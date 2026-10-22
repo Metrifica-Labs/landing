@@ -1,29 +1,22 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:metrifica_landing/app/core/providers/api_client_provider.dart';
 
 import '../models/lead_model.dart';
 
 class LeadRepository {
-  const LeadRepository(this._client);
+  const LeadRepository(this._api);
 
-  final SupabaseClient _client;
+  final ApiClient _api;
 
   Future<String> saveDraft(LeadModel lead) async {
-    final res = await _client
-        .from('leads')
-        .insert(lead.toJson())
-        .select('id')
-        .single();
+    final res = await _api.post('/leads', lead.toJson());
     return res['id'] as String;
   }
 
   Future<void> updateDraft(String id, LeadModel lead) async {
-    await _client.from('leads').update(lead.toJson()).eq('id', id);
+    await _api.patch('/leads/$id', lead.toJson());
   }
 
   Future<void> submit(String id, LeadModel lead) async {
-    await _client
-        .from('leads')
-        .update({...lead.toJson(), 'status': 'completed'})
-        .eq('id', id);
+    await _api.patch('/leads/$id', {...lead.toJson(), 'status': 'completed'});
   }
 }

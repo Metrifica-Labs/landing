@@ -1,6 +1,8 @@
 class AppConfig {
   AppConfig._();
 
-  static const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
-  static const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+  static const apiUrl = String.fromEnvironment(
+    'API_URL',
+    defaultValue: 'https://api.metrifica.com.br/landing',
+  );
 }

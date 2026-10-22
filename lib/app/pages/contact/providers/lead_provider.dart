@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:metrifica_landing/app/core/providers/supabase_provider.dart';
+import 'package:metrifica_landing/app/core/providers/api_client_provider.dart';
 
 import '../models/lead_model.dart';
 import '../repositories/lead_repository.dart';
 
 final _leadRepositoryProvider = Provider<LeadRepository>((ref) {
-  return LeadRepository(ref.watch(supabaseClientProvider));
+  return LeadRepository(ref.watch(apiClientProvider));
 });
 
 class LeadState {

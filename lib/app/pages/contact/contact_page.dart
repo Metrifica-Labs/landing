@@ -18,22 +18,14 @@ const _kBlue = Color(0xFF2864E8);
 const _kDark = Color(0xFF0F172A);
 const _kMuted = Color(0xFF64748B);
 const _kBorder = Color(0xFFE2E8F0);
-const _totalSteps = 16;
+const _totalSteps = 12;
 
 const _revenueOptions = [
-  'Até R\$100K',
-  'R\$100K - R\$300K',
-  'R\$300K - R\$1M',
-  'R\$1M - R\$3M',
-  'Acima de R\$3M',
-];
-
-const _momentOptions = [
-  'Sou dono de várias lojas, estou crescendo, mas sem estrutura',
-  'Tenho muitos clientes, minha operação não acompanha o crescimento',
-  'Tenho demanda infinita e ainda dependo demais de pessoas/processos manuais',
-  'Já tenho sistema, mas ele limita meu crescimento',
-  'Quero um sistema ou app próprio',
+  'Até R\$5.000',
+  'R\$5.000 - R\$10.000',
+  'R\$10.000 - R\$15.000',
+  'R\$15.000 - R\$20.000',
+  'Acima de R\$20.000',
 ];
 
 const _problemOptions = [
@@ -99,32 +91,25 @@ class _ContactPageState extends ConsumerState<ContactPage> {
 
   final _nameCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
-  final _emailCtrl = TextEditingController();
-  final _companyCtrl = TextEditingController();
   final _instagramCtrl = TextEditingController();
   final _businessDescriptionCtrl = TextEditingController();
   final _consequenceCtrl = TextEditingController();
   final _failedAttemptCtrl = TextEditingController();
   final _currentSystemsCtrl = TextEditingController();
   final _idealSystemCtrl = TextEditingController();
-  final _whyMetrificaCtrl = TextEditingController();
   String? _revenue;
-  final Set<String> _moments = {};
   final Set<String> _problems = {};
   String? _previousAttempt;
   String? _willingToInvest;
 
   final _nameFocus = FocusNode();
   final _phoneFocus = FocusNode();
-  final _emailFocus = FocusNode();
-  final _companyFocus = FocusNode();
   final _instagramFocus = FocusNode();
   final _businessDescriptionFocus = FocusNode();
   final _consequenceFocus = FocusNode();
   final _failedAttemptFocus = FocusNode();
   final _currentSystemsFocus = FocusNode();
   final _idealSystemFocus = FocusNode();
-  final _whyMetrificaFocus = FocusNode();
 
   @override
   void initState() {
@@ -143,14 +128,6 @@ class _ContactPageState extends ConsumerState<ContactPage> {
         'Lucas Carvalho',
         'Camila Rocha',
       ];
-      const domains = [
-        'empresa.com.br',
-        'negocio.com',
-        'startup.io',
-        'corp.com.br',
-        'business.com',
-        'grupo.com.br',
-      ];
       const ddds = ['11', '21', '31', '41', '51', '61', '71', '85'];
       final name = names[rng.nextInt(names.length)];
       final slug = name
@@ -167,11 +144,8 @@ class _ContactPageState extends ConsumerState<ContactPage> {
       final phone = '9${rng.nextInt(9000) + 1000}-${rng.nextInt(9000) + 1000}';
       _nameCtrl.text = name;
       _phoneCtrl.text = '($ddd) $phone';
-      _emailCtrl.text = '$slug@${domains[rng.nextInt(domains.length)]}';
-      _companyCtrl.text = 'Empresa ${name.split(' ').last}';
       _instagramCtrl.text = '@${slug.replaceAll('.', '')}';
       _revenue = _revenueOptions[rng.nextInt(_revenueOptions.length)];
-      _moments.add(_momentOptions.first);
       _businessDescriptionCtrl.text =
           'Operação em crescimento com vendas recorrentes e necessidade de escalar processos internos.';
       _problems.addAll([_problemOptions[0], _problemOptions[3]]);
@@ -185,8 +159,6 @@ class _ContactPageState extends ConsumerState<ContactPage> {
       _idealSystemCtrl.text =
           'Centralizaria dados, automatizaria tarefas e daria visão gerencial em tempo real.';
       _willingToInvest = _investmentOptions.first;
-      _whyMetrificaCtrl.text =
-          'Porque preciso transformar a operação em um sistema escalável e sob medida.';
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _nameFocus.requestFocus();
@@ -199,26 +171,20 @@ class _ContactPageState extends ConsumerState<ContactPage> {
     _pageCtrl.dispose();
     _nameCtrl.dispose();
     _phoneCtrl.dispose();
-    _emailCtrl.dispose();
-    _companyCtrl.dispose();
     _instagramCtrl.dispose();
     _businessDescriptionCtrl.dispose();
     _consequenceCtrl.dispose();
     _failedAttemptCtrl.dispose();
     _currentSystemsCtrl.dispose();
     _idealSystemCtrl.dispose();
-    _whyMetrificaCtrl.dispose();
     _nameFocus.dispose();
     _phoneFocus.dispose();
-    _emailFocus.dispose();
-    _companyFocus.dispose();
     _instagramFocus.dispose();
     _businessDescriptionFocus.dispose();
     _consequenceFocus.dispose();
     _failedAttemptFocus.dispose();
     _currentSystemsFocus.dispose();
     _idealSystemFocus.dispose();
-    _whyMetrificaFocus.dispose();
     super.dispose();
   }
 
@@ -228,26 +194,19 @@ class _ContactPageState extends ConsumerState<ContactPage> {
     PixelService.formStart();
   }
 
-  bool _isValidEmail(String s) =>
-      RegExp(r'^[\w\.\-]+@[\w\.\-]+\.\w{2,}$').hasMatch(s);
-
   bool _canAdvance(int step) => switch (step) {
     0 => _nameCtrl.text.trim().isNotEmpty,
     1 => _phoneCtrl.text.trim().replaceAll(RegExp(r'\D'), '').length >= 10,
-    2 => _isValidEmail(_emailCtrl.text.trim()),
-    3 => _companyCtrl.text.trim().isNotEmpty,
-    4 => _instagramCtrl.text.trim().isNotEmpty,
-    5 => _revenue != null,
-    6 => _moments.isNotEmpty,
-    7 => _businessDescriptionCtrl.text.trim().isNotEmpty,
-    8 => _problems.isNotEmpty,
-    9 => _consequenceCtrl.text.trim().isNotEmpty,
-    10 => _previousAttempt != null,
-    11 => _failedAttemptCtrl.text.trim().isNotEmpty,
-    12 => _currentSystemsCtrl.text.trim().isNotEmpty,
-    13 => _idealSystemCtrl.text.trim().isNotEmpty,
-    14 => _willingToInvest != null,
-    15 => _whyMetrificaCtrl.text.trim().isNotEmpty,
+    2 => _instagramCtrl.text.trim().isNotEmpty,
+    3 => _revenue != null,
+    4 => _businessDescriptionCtrl.text.trim().isNotEmpty,
+    5 => _problems.isNotEmpty,
+    6 => _consequenceCtrl.text.trim().isNotEmpty,
+    7 => _previousAttempt != null,
+    8 => _failedAttemptCtrl.text.trim().isNotEmpty,
+    9 => _currentSystemsCtrl.text.trim().isNotEmpty,
+    10 => _idealSystemCtrl.text.trim().isNotEmpty,
+    11 => _willingToInvest != null,
     _ => false,
   };
 
@@ -256,20 +215,16 @@ class _ContactPageState extends ConsumerState<ContactPage> {
     return LeadModel(
       name:                 nonEmpty(_nameCtrl.text),
       phone:                nonEmpty(_phoneCtrl.text),
-      email:                nonEmpty(_emailCtrl.text),
-      companyName:          nonEmpty(_companyCtrl.text),
       instagram:            nonEmpty(_instagramCtrl.text),
       monthlyRevenue:       _revenue,
-      businessMoment:       _moments.isEmpty  ? null : _moments.toList(),
       businessDescription:  nonEmpty(_businessDescriptionCtrl.text),
       currentProblems:      _problems.isEmpty ? null : _problems.toList(),
-      consequence12Months:  nonEmpty(_consequenceCtrl.text),
+      consequence:          nonEmpty(_consequenceCtrl.text),
       previousAttempt:      _previousAttempt,
       failedAttemptDetails: nonEmpty(_failedAttemptCtrl.text),
       currentSystems:       nonEmpty(_currentSystemsCtrl.text),
       idealSystemSolution:  nonEmpty(_idealSystemCtrl.text),
       willingToInvest:      _willingToInvest,
-      whyMetrifica:         nonEmpty(_whyMetrificaCtrl.text),
       status:               status,
       currentStep:          _step,
     );
@@ -318,23 +273,17 @@ class _ContactPageState extends ConsumerState<ContactPage> {
         case 1:
           _phoneFocus.requestFocus();
         case 2:
-          _emailFocus.requestFocus();
-        case 3:
-          _companyFocus.requestFocus();
-        case 4:
           _instagramFocus.requestFocus();
-        case 7:
+        case 4:
           _businessDescriptionFocus.requestFocus();
-        case 9:
+        case 6:
           _consequenceFocus.requestFocus();
-        case 11:
+        case 8:
           _failedAttemptFocus.requestFocus();
-        case 12:
+        case 9:
           _currentSystemsFocus.requestFocus();
-        case 13:
+        case 10:
           _idealSystemFocus.requestFocus();
-        case 15:
-          _whyMetrificaFocus.requestFocus();
         default:
           break;
       }
@@ -394,7 +343,7 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                   ),
                   _TextStep(
                     index: 1,
-                    question: 'E o seu número\ndo WhatsApp?',
+                    question: 'Qual é o seu número\ndo WhatsApp?',
                     hint: '(21) 99999-9999',
                     controller: _phoneCtrl,
                     focusNode: _phoneFocus,
@@ -410,11 +359,11 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                   ),
                   _TextStep(
                     index: 2,
-                    question: 'Qual é o seu\nmelhor e-mail?',
-                    hint: 'seu@email.com',
-                    controller: _emailCtrl,
-                    focusNode: _emailFocus,
-                    keyboardType: TextInputType.emailAddress,
+                    question: 'Qual é o @ do seu Instagram\nou da empresa?',
+                    hint: '@suaempresa',
+                    controller: _instagramCtrl,
+                    focusNode: _instagramFocus,
+                    keyboardType: TextInputType.text,
                     textCapitalization: TextCapitalization.none,
                     canAdvance: _canAdvance(2),
                     onChanged: (_) {
@@ -423,38 +372,8 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                     },
                     onNext: _next,
                   ),
-                  _TextStep(
-                    index: 3,
-                    question: 'E o nome\nda empresa?',
-                    hint: 'Nome da empresa',
-                    controller: _companyCtrl,
-                    focusNode: _companyFocus,
-                    keyboardType: TextInputType.text,
-                    textCapitalization: TextCapitalization.words,
-                    canAdvance: _canAdvance(3),
-                    onChanged: (_) {
-                      _onInteract();
-                      setState(() {});
-                    },
-                    onNext: _next,
-                  ),
-                  _TextStep(
-                    index: 4,
-                    question: 'E o @ do\nInstagram?',
-                    hint: '@suaempresa',
-                    controller: _instagramCtrl,
-                    focusNode: _instagramFocus,
-                    keyboardType: TextInputType.text,
-                    textCapitalization: TextCapitalization.none,
-                    canAdvance: _canAdvance(4),
-                    onChanged: (_) {
-                      _onInteract();
-                      setState(() {});
-                    },
-                    onNext: _next,
-                  ),
                   _RevenueStep(
-                    index: 5,
+                    index: 3,
                     selected: _revenue,
                     onSelect: (v) {
                       _onInteract();
@@ -462,32 +381,15 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                     },
                     onNext: _next,
                   ),
-                  _ChoiceStep(
-                    index: 6,
-                    question: 'Qual alternativa descreve\nseu momento hoje?',
-                    helper: 'Pode marcar mais de uma opção.',
-                    options: _momentOptions,
-                    selected: _moments,
-                    canAdvance: _canAdvance(6),
-                    onToggle: (v) {
-                      _onInteract();
-                      setState(
-                        () => _moments.contains(v)
-                            ? _moments.remove(v)
-                            : _moments.add(v),
-                      );
-                    },
-                    onNext: _next,
-                  ),
                   _TextStep(
-                    index: 7,
+                    index: 4,
                     question: 'Descreva seu modelo\nde negócio e objetivo',
                     hint: 'Nicho, operação atual e objetivo principal...',
                     controller: _businessDescriptionCtrl,
                     focusNode: _businessDescriptionFocus,
                     keyboardType: TextInputType.multiline,
                     textCapitalization: TextCapitalization.sentences,
-                    canAdvance: _canAdvance(7),
+                    canAdvance: _canAdvance(4),
                     maxLines: 5,
                     onChanged: (_) {
                       _onInteract();
@@ -496,12 +398,12 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                     onNext: _next,
                   ),
                   _ChoiceStep(
-                    index: 8,
+                    index: 5,
                     question: 'Quais problemas você\nmais vive hoje?',
                     helper: 'Pode marcar mais de uma opção.',
                     options: _problemOptions,
                     selected: _problems,
-                    canAdvance: _canAdvance(8),
+                    canAdvance: _canAdvance(5),
                     onToggle: (v) {
                       _onInteract();
                       setState(
@@ -513,12 +415,58 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                     onNext: _next,
                   ),
                   _TextStep(
-                    index: 9,
+                    index: 6,
                     question:
-                        'O que acontece se continuar\nassim por 12 meses?',
+                        'O que acontece se continuar\ndo jeito que está?',
                     hint: 'Descreva o impacto real no negócio...',
                     controller: _consequenceCtrl,
                     focusNode: _consequenceFocus,
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                    canAdvance: _canAdvance(6),
+                    maxLines: 4,
+                    onChanged: (_) {
+                      _onInteract();
+                      setState(() {});
+                    },
+                    onNext: _next,
+                  ),
+                  _SingleChoiceStep(
+                    index: 7,
+                    question: 'Você já tentou\nresolver isso antes?',
+                    options: _attemptOptions,
+                    selected: _previousAttempt,
+                    canAdvance: _canAdvance(7),
+                    onSelect: (v) {
+                      _onInteract();
+                      setState(() => _previousAttempt = v);
+                    },
+                    onNext: _next,
+                  ),
+                  _TextStep(
+                    index: 8,
+                    question: 'O que não funcionou\nnessas tentativas?',
+                    hint:
+                        'Conte onde travou, o que faltou ou por que não resolveu...',
+                    controller: _failedAttemptCtrl,
+                    focusNode: _failedAttemptFocus,
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                    canAdvance: _canAdvance(8),
+                    maxLines: 4,
+                    onChanged: (_) {
+                      _onInteract();
+                      setState(() {});
+                    },
+                    onNext: _next,
+                  ),
+                  _TextStep(
+                    index: 9,
+                    question: 'Quais sistemas você\nusa hoje?',
+                    hint:
+                        'CRM, ERP, planilhas, WhatsApp... Eles atendem totalmente?',
+                    controller: _currentSystemsCtrl,
+                    focusNode: _currentSystemsFocus,
                     keyboardType: TextInputType.multiline,
                     textCapitalization: TextCapitalization.sentences,
                     canAdvance: _canAdvance(9),
@@ -529,54 +477,8 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                     },
                     onNext: _next,
                   ),
-                  _SingleChoiceStep(
+                  _TextStep(
                     index: 10,
-                    question: 'Você já tentou\nresolver isso antes?',
-                    options: _attemptOptions,
-                    selected: _previousAttempt,
-                    canAdvance: _canAdvance(10),
-                    onSelect: (v) {
-                      _onInteract();
-                      setState(() => _previousAttempt = v);
-                    },
-                    onNext: _next,
-                  ),
-                  _TextStep(
-                    index: 11,
-                    question: 'O que não funcionou\nnessas tentativas?',
-                    hint:
-                        'Conte onde travou, o que faltou ou por que não resolveu...',
-                    controller: _failedAttemptCtrl,
-                    focusNode: _failedAttemptFocus,
-                    keyboardType: TextInputType.multiline,
-                    textCapitalization: TextCapitalization.sentences,
-                    canAdvance: _canAdvance(11),
-                    maxLines: 4,
-                    onChanged: (_) {
-                      _onInteract();
-                      setState(() {});
-                    },
-                    onNext: _next,
-                  ),
-                  _TextStep(
-                    index: 12,
-                    question: 'Quais sistemas você\nusa hoje?',
-                    hint:
-                        'CRM, ERP, planilhas, WhatsApp... Eles atendem totalmente?',
-                    controller: _currentSystemsCtrl,
-                    focusNode: _currentSystemsFocus,
-                    keyboardType: TextInputType.multiline,
-                    textCapitalization: TextCapitalization.sentences,
-                    canAdvance: _canAdvance(12),
-                    maxLines: 4,
-                    onChanged: (_) {
-                      _onInteract();
-                      setState(() {});
-                    },
-                    onNext: _next,
-                  ),
-                  _TextStep(
-                    index: 13,
                     question:
                         'Se tivesse um sistema ideal,\no que ele resolveria?',
                     hint: 'Explique o resultado esperado para sua operação...',
@@ -584,7 +486,7 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                     focusNode: _idealSystemFocus,
                     keyboardType: TextInputType.multiline,
                     textCapitalization: TextCapitalization.sentences,
-                    canAdvance: _canAdvance(13),
+                    canAdvance: _canAdvance(10),
                     maxLines: 4,
                     onChanged: (_) {
                       _onInteract();
@@ -593,32 +495,17 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                     onNext: _next,
                   ),
                   _SingleChoiceStep(
-                    index: 14,
-                    question: 'Você está disposto\na investir para escalar?',
+                    index: 11,
+                    question:
+                        'Você teria 2k para investir mensalmente para implementar IA/tecnologia na sua operação hoje?',
                     options: _investmentOptions,
                     selected: _willingToInvest,
-                    canAdvance: _canAdvance(14),
+                    canAdvance: _canAdvance(11),
+                    isLoading: leadState.isLoading,
+                    hasError: leadState.hasError,
                     onSelect: (v) {
                       _onInteract();
                       setState(() => _willingToInvest = v);
-                    },
-                    onNext: _next,
-                  ),
-                  _TextStep(
-                    index: 15,
-                    question: 'Por que a Metrifica pode\nte ajudar agora?',
-                    hint: 'Conte por que faz sentido falar com nosso time...',
-                    controller: _whyMetrificaCtrl,
-                    focusNode: _whyMetrificaFocus,
-                    keyboardType: TextInputType.multiline,
-                    textCapitalization: TextCapitalization.sentences,
-                    canAdvance: _canAdvance(15),
-                    maxLines: 4,
-                    isLoading: leadState.isLoading,
-                    hasError: leadState.hasError,
-                    onChanged: (_) {
-                      _onInteract();
-                      setState(() {});
                     },
                     onNext: _next,
                   ),
@@ -877,8 +764,6 @@ class _TextStep extends StatelessWidget {
     required this.onChanged,
     required this.onNext,
     this.maxLines = 1,
-    this.isLoading = false,
-    this.hasError = false,
     this.inputFormatters,
   });
 
@@ -893,8 +778,6 @@ class _TextStep extends StatelessWidget {
   final ValueChanged<String> onChanged;
   final VoidCallback onNext;
   final int maxLines;
-  final bool isLoading;
-  final bool hasError;
   final List<TextInputFormatter>? inputFormatters;
 
   @override
@@ -904,9 +787,6 @@ class _TextStep extends StatelessWidget {
       question: question,
       canAdvance: canAdvance,
       onNext: onNext,
-      isLastStep: isLoading || hasError,
-      isLoading: isLoading,
-      hasError: hasError,
       input: TextField(
         controller: controller,
         focusNode: focusNode,
@@ -996,6 +876,8 @@ class _SingleChoiceStep extends StatelessWidget {
     required this.canAdvance,
     required this.onSelect,
     required this.onNext,
+    this.isLoading = false,
+    this.hasError = false,
   });
 
   final int index;
@@ -1005,6 +887,8 @@ class _SingleChoiceStep extends StatelessWidget {
   final bool canAdvance;
   final ValueChanged<String> onSelect;
   final VoidCallback onNext;
+  final bool isLoading;
+  final bool hasError;
 
   @override
   Widget build(BuildContext context) {
@@ -1013,6 +897,9 @@ class _SingleChoiceStep extends StatelessWidget {
       question: question,
       canAdvance: canAdvance,
       onNext: onNext,
+      isLastStep: isLoading || hasError,
+      isLoading: isLoading,
+      hasError: hasError,
       input: Column(
         children: options
             .map(

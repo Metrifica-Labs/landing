@@ -1,0 +1,12 @@
+# Na PROD (root@82.112.244.226): /opt/metrifica-landing-api
+# nginx: location /landing/ em api.metrifica.com.br -> 127.0.0.1:8097
+services:
+  api:
+    build: .
+    container_name: metrifica-landing-api
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:8097:8080"
+    volumes:
+      - ./data:/data
