@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/services/pixel_service.dart';
@@ -19,6 +18,10 @@ const _kDark = Color(0xFF0F172A);
 const _kMuted = Color(0xFF64748B);
 const _kBorder = Color(0xFFE2E8F0);
 const _totalSteps = 12;
+
+/// A landing principal é a Tower (React, servida em /tower fora do app Flutter),
+/// então sair do formulário é navegação de página inteira, não rota do GoRouter.
+void _goToLanding() => html.window.location.assign('/tower');
 
 const _revenueOptions = [
   'Até R\$5.000',
@@ -255,7 +258,7 @@ class _ContactPageState extends ConsumerState<ContactPage> {
     if (_step > 0) {
       _animateTo(_step - 1);
     } else {
-      context.go('/');
+      _goToLanding();
     }
   }
 
@@ -318,7 +321,7 @@ class _ContactPageState extends ConsumerState<ContactPage> {
             _TopBar(
               step: _step,
               onBack: _step < _totalSteps ? _back : null,
-              onClose: () => context.go('/'),
+              onClose: _goToLanding,
             ),
             if (_step < _totalSteps) _ProgressBar(step: _step),
             Expanded(
@@ -509,7 +512,7 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                     },
                     onNext: _next,
                   ),
-                  _SuccessStep(onHome: () => context.go('/')),
+                  _SuccessStep(onHome: _goToLanding),
                 ],
               ),
             ),

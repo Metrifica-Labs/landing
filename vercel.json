@@ -2,6 +2,13 @@
   "buildCommand": "bash scripts/vercel-build.sh",
   "outputDirectory": "build/web",
   "framework": null,
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/tower",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/tower",
